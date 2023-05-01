@@ -37,6 +37,11 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          env:
+          - name: SQLALCHEMY_DATABASE_URI
+            value: {{ .Values.powerdnsAdmin.config.databaseUri | required ".Values.powerdnsAdmin.config.databaseUri is required!" | quote }}
+          - name: LOG_LEVEL
+            value: {{ .Values.powerdnsAdmin.config.logLevel | default "DEBUG" | quote }}
           livenessProbe:
             httpGet:
               path: /
