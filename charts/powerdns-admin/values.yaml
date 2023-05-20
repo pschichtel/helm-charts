@@ -69,7 +69,8 @@ powerdnsAdmin:
     secretKeySecret: {}
     #  secret: secret
     #  key: key
-    databaseUri: "mysql://username:password@host/databasename"
+    # This value must be a sqlalchemy compatible connection string like "mysql://username:password@host/databasename"
+    databaseUri: null
     databaseUriSecret: {}
     #  secret: secret
     #  key: key

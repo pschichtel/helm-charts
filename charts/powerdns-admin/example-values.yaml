@@ -1,0 +1,4 @@
+powerdnsAdmin:
+  config:
+    secretKey: 'strong-value'
+    databaseUri: "mysql://username:password@host/databasename"
