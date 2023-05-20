@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-zone-if-not-exist-sh
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      name: create-zone-if-not-exist-sh
+    spec:
+      containers:
+      - name: create-zone-if-not-exist-sh
+        image: curlimages/curl:8.1.0
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: POWERDNS_API
+            value: "{{ template "pdns.fullname" . }}.{{ .Release.Namespace }}"
+          - name: ZONE
+            value: {{ .Values.powerdns.zoneName }}
+          - name: POWERDNS_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: powerdns-api-key
+                key: POWERDNS_API_KEY
+        command:
+        - /bin/sh
+        - -c
+        - |
+          while true; do
+            echo -n "Fetching zones from PowerDNS (http://$POWERDNS_API:{{ .Values.powerdns.webserver.bindPort }}/api/v1/servers/localhost/zones)... "
+            ZONES=$(curl --fail -H "X-API-Key: $POWERDNS_API_KEY" http://$POWERDNS_API:{{ .Values.powerdns.webserver.bindPort }}/api/v1/servers/localhost/zones)
+            if [ $? -eq 0 ]; then
+              echo "OK."
+              break
+            else
+              echo "Failed."
+            fi
+            sleep 10
+          done
+          if [ "${ZONES}" = "[]" ]; then
+            echo "Zone is missing, creating... "
+            while true; do
+              echo -n "Creating zone: {\"name\":\"$ZONE\",\"type\":\"Zone\",\"nameservers\":[\"ns1-$ZONE\"],\"kind\":\"Native\"}... "
+              curl --fail -X POST -d "{\"name\":\"$ZONE\",\"type\":\"Zone\",\"nameservers\":[\"ns1-$ZONE\"],\"kind\":\"Native\"}" -H "X-API-Key: $POWERDNS_API_KEY" http://$POWERDNS_API:8081/api/v1/servers/localhost/zones
+              echo
+              if [ $? -eq 0 ]; then
+                echo "OK."
+                break
+              else
+                echo "Failed."
+              fi
+              sleep 10
+            done
+          else
+            echo "Zone already exists."
+          fi
+      restartPolicy: Never
