@@ -1,0 +1,6 @@
+apiVersion: v2
+name: keycloak-webhook-router
+description: A Helm chart to deploy keycloak webhook router.
+type: application
+version: 0.1.0
+appVersion: "main"
