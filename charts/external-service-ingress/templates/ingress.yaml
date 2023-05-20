@@ -7,17 +7,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $ingressName | quote }}
+  {{- $ingressAnnotations := mergeOverwrite (dict) $.Values.shared.ingressAnnotations ($ingress.ingressAnnotations | default dict) }}
+  {{- if $ingressAnnotations }}
+  {{- $augmented := set (mustDeepCopy $) "Ingress" $ingress }}
+  {{- $augmented = set $augmented "IngressName" $ingressName }}
   annotations:
-    kubernetes.io/ingress.class: {{ $ingress.ingressClass | default $.Values.defaults.ingressClass | quote }}
-    {{- $augmented := set (mustDeepCopy $) "Ingress" $ingress }}
-    {{- $augmented = set $augmented "IngressName" $ingressName }}
-    {{- range $name, $value := $.Values.shared.ingressAnnotations }}
+    {{- range $name, $value := $ingressAnnotations }}
     {{ $name }}: {{ tpl $value $augmented | quote }}
     {{- end }}
-    {{- range $name, $value := $ingress.ingressAnnotations }}
-    {{ $name }}: {{ tpl $value $augmented | quote }}
-    {{- end }}
-
+  {{- end }}
 spec:
   ingressClassName: {{ $ingress.ingressClass | default $.Values.defaults.ingressClass | quote }}
   rules:
