@@ -37,6 +37,5 @@ spec:
             serviceName: {{ $fullName }}
             servicePort: {{ $svcPort }}
           path: /
-        paths:
     {{- end }}
 {{- end }}
