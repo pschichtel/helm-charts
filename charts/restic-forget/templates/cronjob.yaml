@@ -1,0 +1,30 @@
+{{- range $repo := .Values.repos }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ print "restic-forget-" $repo.name | quote }}
+spec:
+  schedule: {{ $.Values.restic.forget.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ $.Values.serviceAccountName | quote }}
+          restartPolicy: OnFailure
+          containers:
+          - name: forget
+            image: {{ print "restic/restic:" ($.Values.restic.version | default $.Chart.AppVersion) | quote }}
+            imagePullPolicy: IfNotPresent
+            command:
+              - 'restic'
+              - '--no-cache'
+              - 'forget'
+              {{- range $entry := ($repo.policy | default $.Values.restic.forget.policy) }}
+              - {{ $entry | quote }}
+              {{- end }}
+              - '--prune'
+            envFrom:
+            - secretRef:
+                name: {{ print $repo.name "-repo-passphrase" | quote }}
+{{- end }}

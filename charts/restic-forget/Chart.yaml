@@ -1,0 +1,6 @@
+apiVersion: v2
+name: restic-jobs
+description: A helm chart to deploy restic jobs for backup cleaning.
+type: application
+version: 0.1.0
+appVersion: 0.15.2

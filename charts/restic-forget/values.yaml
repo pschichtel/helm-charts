@@ -1,0 +1,16 @@
+serviceAccountName: restic-forget
+roleName: restic-forget
+
+restic:
+  version: null
+  forget:
+    schedule: '0 5 * * Sat'
+    policy: ['--keep-within-hourly', '2d1h', '--keep-within-daily', '15d', '--keep-within-weekly', '2m7d', '--keep-within-monthly', '1y1m', '--keep-within-yearly', '3y', '--keep-yearly', '2', '--keep-tag', 'permanent']
+
+repos: []
+# - name: some-job
+#   repo: https://s3.example.org/some-repo
+#   password: 'some-password'
+#   extraEnv:
+#     AWS_ACCESS_KEY_ID: 'some-access-key'
+#     AWS_SECRET_ACCESS_KEY: 'some-secret-key'
