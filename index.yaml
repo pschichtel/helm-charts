@@ -45,6 +45,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/external-service-ingress-0.1.0/external-service-ingress-0.1.0.tgz
     version: 0.1.0
+  keycloak-webhook-router:
+  - apiVersion: v2
+    appVersion: main
+    created: "2023-05-20T21:59:46.082022137Z"
+    description: A Helm chart to deploy keycloak webhook router.
+    digest: d95803df0036d852e03ca438b9323c41fc2d581b62b2a9bdbce336da98c70ebc
+    name: keycloak-webhook-router
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-webhook-router-0.1.0/keycloak-webhook-router-0.1.0.tgz
+    version: 0.1.0
   powerdns:
   - apiVersion: v2
     appVersion: 4.3.1
@@ -122,4 +133,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/powerdns-admin-0.1.0/powerdns-admin-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-20T21:06:27.175190609Z"
+generated: "2023-05-20T21:59:46.082042337Z"
