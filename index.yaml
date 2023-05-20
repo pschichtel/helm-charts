@@ -3,6 +3,17 @@ entries:
   external-service-ingress:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2023-05-20T20:44:41.918470024Z"
+    description: This is a simple chart to consistently generate ingresses for external
+      services.
+    digest: 731c7b7686039ebb1ea7d3805846e0a1941dc90dce52de1aa8c8172a7945c39e
+    name: external-service-ingress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/external-service-ingress-0.2.0/external-service-ingress-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2023-05-20T20:18:08.583912615Z"
     description: This is a simple chart to consistently generate ingresses for external
       services.
@@ -89,4 +100,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/powerdns-admin-0.1.0/powerdns-admin-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-20T20:18:08.583928115Z"
+generated: "2023-05-20T20:44:41.918490025Z"
