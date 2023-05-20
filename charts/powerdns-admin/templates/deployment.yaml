@@ -35,6 +35,8 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
+          - name: PORT
+            value: {{ .Values.service.port | quote }}
           - name: SECRET_KEY
             {{- if .Values.powerdnsAdmin.config.secretKeySecret }}
             valueFrom:
