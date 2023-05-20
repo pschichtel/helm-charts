@@ -64,6 +64,11 @@ affinity: {}
 
 powerdnsAdmin:
   config:
+    # This value is the signing key for session cookies, it must be configured to a long random string (e.g. `pwgen -y 50`)
+    secretKey: null
+    secretKeySecret: {}
+    #  secret: secret
+    #  key: key
     databaseUri: "mysql://username:password@host/databasename"
     databaseUriSecret: {}
     #  secret: secret

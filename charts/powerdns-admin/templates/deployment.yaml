@@ -35,6 +35,15 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           env:
+          - name: SECRET_KEY
+            {{- if .Values.powerdnsAdmin.config.secretKeySecret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.powerdnsAdmin.config.secretKeySecret.secret | quote }}
+                key: {{ .Values.powerdnsAdmin.config.secretKeySecret.key | quote }}
+            {{- else }}
+            value: {{ .Values.powerdnsAdmin.config.secretKey | required ".Values.powerdnsAdmin.config.secretKey or .Values.powerdnsAdmin.config.secretKeySecret is required!" | quote }}
+            {{- end }}
           - name: SQLALCHEMY_DATABASE_URI
             {{- if .Values.powerdnsAdmin.config.databaseUriSecret }}
             valueFrom:
