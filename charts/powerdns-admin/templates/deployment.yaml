@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "powerdns-admin.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "powerdns-admin.selectorLabels" . | nindent 6 }}
@@ -24,7 +22,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "powerdns-admin.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -39,7 +36,14 @@ spec:
               protocol: TCP
           env:
           - name: SQLALCHEMY_DATABASE_URI
-            value: {{ .Values.powerdnsAdmin.config.databaseUri | required ".Values.powerdnsAdmin.config.databaseUri is required!" | quote }}
+            {{- if .Values.powerdnsAdmin.config.databaseUriSecret }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.powerdnsAdmin.config.databaseUriSecret.secret | quote }}
+                key: {{ .Values.powerdnsAdmin.config.databaseUriSecret.key | quote }}
+            {{- else }}
+            value: {{ .Values.powerdnsAdmin.config.databaseUri | required ".Values.powerdnsAdmin.config.databaseUri or .Values.powerdnsAdmin.config.databaseUriSecret is required!" | quote }}
+            {{- end }}
           - name: LOG_LEVEL
             value: {{ .Values.powerdnsAdmin.config.logLevel | default "DEBUG" | quote }}
           livenessProbe:

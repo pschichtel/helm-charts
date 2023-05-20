@@ -65,3 +65,6 @@ affinity: {}
 powerdnsAdmin:
   config:
     databaseUri: "mysql://username:password@host/databasename"
+    databaseUriSecret: {}
+    #  secret: secret
+    #  key: key
