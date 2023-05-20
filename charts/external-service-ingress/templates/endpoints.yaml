@@ -1,0 +1,18 @@
+{{- range $ingressName, $ingress := .Values.ingresses }}
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: {{ print "external-" $ingressName | quote }}
+subsets:
+- addresses:
+  {{- range ($ingress.externalIps | required "externalIps are required!") }}
+  - ip: {{ . | quote }}
+  {{- end }}
+  ports:
+  {{- range $routeName, $route := $ingress.routes }}
+  - name: {{ $routeName | quote }}
+    port: {{ $route.port }}
+    protocol: TCP
+  {{- end }}
+{{- end }}

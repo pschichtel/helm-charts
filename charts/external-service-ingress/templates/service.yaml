@@ -1,0 +1,15 @@
+{{- range $ingressName, $ingress := .Values.ingresses }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ print "external-" $ingressName | quote }}
+spec:
+  ports:
+  {{- range $routeName, $route := $ingress.routes }}
+  - protocol: TCP
+    name: {{ $routeName | quote }}
+    port: {{ $route.port }}
+    targetPort: {{ $route.port }}
+  {{- end }}
+{{- end }}

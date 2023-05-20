@@ -1,0 +1,79 @@
+{{- $root := . }}
+{{- range $ingressName, $ingress := .Values.ingresses }}
+{{- $domain := $ingress.host | required "a host is required!" }}
+{{- $tlsEnabled := $ingress.enableTls | default $.Values.defaults.enableTls }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $ingressName | quote }}
+  annotations:
+    kubernetes.io/ingress.class: {{ $ingress.ingressClass | default $.Values.defaults.ingressClass | quote }}
+    {{- $augmented := set (mustDeepCopy $) "Ingress" $ingress }}
+    {{- $augmented = set $augmented "IngressName" $ingressName }}
+    {{- range $name, $value := $.Values.shared.ingressAnnotations }}
+    {{ $name }}: {{ tpl $value $augmented | quote }}
+    {{- end }}
+    {{- range $name, $value := $ingress.ingressAnnotations }}
+    {{ $name }}: {{ tpl $value $augmented | quote }}
+    {{- end }}
+
+spec:
+  ingressClassName: {{ $ingress.ingressClass | default $.Values.defaults.ingressClass | quote }}
+  rules:
+  - host: {{ $domain | quote }}
+    http:
+      paths:
+      {{- range $routeName, $route := $ingress.routes }}
+      - pathType: Prefix
+        backend:
+          service:
+            name: {{ print "external-" $ingressName | quote }}
+            port:
+              number: {{ $route.port }}
+        path: {{ $route.prefix | quote }}
+      {{- end }}
+  {{- if $tlsEnabled }}
+  tls:
+  - hosts:
+    - {{ $domain | quote }}
+    secretName: {{ $ingress.tlsSecretName | default (print (replace "." "-" $domain) "-tls") | quote }}
+  {{- end }}
+{{- if $ingress.redirectFrom }}
+{{- $redirectDomain := $ingress.redirectFrom.host }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ print $ingressName "-from-" (replace "." "-" $redirectDomain) | quote }}
+  annotations:
+    kubernetes.io/ingress.class: {{ $ingress.ingressClass | default $.Values.defaults.ingressClass | quote }}
+    {{- $augmented := set (mustDeepCopy $augmented) "Ingress" (set (mustDeepCopy $ingress) "host" $redirectDomain) }}
+    {{- range $name, $value := $.Values.shared.ingressAnnotations }}
+    {{ $name }}: {{ tpl $value $augmented | quote }}
+    {{- end }}
+    {{- if $tlsEnabled }}
+    nginx.ingress.kubernetes.io/rewrite-target: {{ print "https://" $ingress.host "/$1" | quote }}
+    {{- else }}
+    nginx.ingress.kubernetes.io/rewrite-target: {{ print "http://" $ingress.host "/$1" | quote }}
+    {{- end }}
+spec:
+  rules:
+  - host: {{ $ingress.redirectFrom.host | quote }}
+    http:
+      paths:
+      - pathType: Prefix
+        backend:
+          service:
+            name: {{ print "external-" $ingressName | quote }}
+            port:
+              number: {{ (get $ingress.routes (mustFirst (keys $ingress.routes))).port }}
+        path: /(.*)
+  {{- if $tlsEnabled }}
+  tls:
+  - hosts:
+    - {{ $ingress.redirectFrom.host | quote }}
+    secretName: {{ $ingress.redirectFrom.tlsSecretName | default (print (replace "." "-" $redirectDomain) "-tls") | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}

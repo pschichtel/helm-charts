@@ -1,0 +1,17 @@
+defaults:
+  ingressClass: nginx
+  enableTls: true
+
+shared:
+  ingressAnnotations: {}
+
+ingresses: {}
+#  some-name:
+#    host: example.org
+#    externalIps:
+#    - '127.0.0.1'
+#    ingressAnnotations: {}
+#    routes:
+#      default:
+#        port: 80
+#        prefix: /
