@@ -12,4 +12,10 @@ spec:
     port: {{ $route.port }}
     targetPort: {{ $route.port }}
   {{- end }}
+  {{- range $portName, $port := ($ingress.proxied | default dict) }}
+  - protocol: TCP
+    name: {{ $portName | quote }}
+    port: {{ $port }}
+    targetPort: {{ $port }}
+  {{- end }}
 {{- end }}
