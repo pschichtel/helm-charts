@@ -26,6 +26,10 @@ spec:
             - name: 'RESTIC_INIT_REPOSITORY'
               value: 'true'
             {{- end }}
+            - name: 'RESTIC_EXTRA_ARGS'
+              value: {{ .Values.s3Backup.resticArgs.global | default "" | quote }}
+            - name: 'RESTIC_BACKUP_EXTRA_ARGS'
+              value: {{ .Values.s3Backup.resticArgs.backup | default "" | quote }}
             envFrom:
             - secretRef:
                 {{- if .Values.s3Backup.secrets.existingSecret }}

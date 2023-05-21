@@ -13,6 +13,9 @@ s3Backup:
   resticRepository:
     location: s3:https://s3.target.example.org/backup
     init: true
+  resticArgs:
+    global: ''
+    backup: ''
   buckets: []
   secrets:
     existingSecret: null
