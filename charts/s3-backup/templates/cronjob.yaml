@@ -1,0 +1,35 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.s3Backup.jobName | quote }}
+spec:
+  schedule: {{ $.Values.s3Backup.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ $.Values.s3Backup.serviceAccountName | quote }}
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: {{ print .Values.image.repository ":" ($.Values.image.tag | default $.Chart.AppVersion) | quote }}
+            imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+            env:
+            - name: 'SOURCE_S3_ENDPOINT'
+              value: {{ .Values.s3Backup.sourceEndpoint | quote }}
+            - name: 'SOURCE_BUCKETS'
+              value: {{ .Values.s3Backup.buckets | required "At least one source bucket needs to be configured" | join " " | quote }}
+            - name: 'RESTIC_REPOSITORY'
+              value: {{ .Values.s3Backup.resticRepository.location | required "The restic repo location is required!" | quote }}
+            {{- if .Values.s3Backup.resticRepository.init }}
+            - name: 'RESTIC_INIT_REPOSITORY'
+              value: 'true'
+            {{- end }}
+            envFrom:
+            - secretRef:
+                {{- if .Values.s3Backup.secrets.existingSecret }}
+                name: {{ .Values.s3Backup.secrets.existingSecret | quote }}
+                {{- else }}
+                name: {{ print .Values.s3Backup.jobName "-secrets" | quote }}
+                {{- end }}

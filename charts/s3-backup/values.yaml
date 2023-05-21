@@ -1,0 +1,25 @@
+image:
+  # github: https://github.com/pschichtel/s3-backup
+  repository: ghcr.io/pschichtel/s3-backup
+  tag: null
+  pullPolicy: Always
+
+s3Backup:
+  serviceAccountName: s3-backup
+  roleName: s3-backup
+  jobName: s3-backup
+  schedule: '0 6 * * *'
+  sourceEndpoint: https://s3.source.example.org
+  resticRepository:
+    location: s3:https://s3.target.example.org/backup
+    init: true
+  buckets: []
+  secrets:
+    existingSecret: null
+    sourceAccessKey: 'source-access-key'
+    sourceSecretKey: 'source-secret-key'
+    resticPassword: 'restic-password'
+    resticEnvVars:
+      AWS_ACCESS_KEY_ID: 'target-access-key'
+      AWS_SECRET_ACCESS_KEY: 'target-secret-key'
+

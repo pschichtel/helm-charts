@@ -1,0 +1,6 @@
+apiVersion: v2
+name: s3-backup
+description: A helm chart to deploy s3-backup jobs.
+type: application
+version: 0.1.0
+appVersion: main
