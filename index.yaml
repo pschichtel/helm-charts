@@ -57,6 +57,18 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/external-service-ingress-0.1.0/external-service-ingress-0.1.0.tgz
     version: 0.1.0
+  gickup:
+  - apiVersion: v2
+    appVersion: 0.10.15
+    created: "2023-05-21T23:49:58.160636092Z"
+    description: A helm chart to deploy gickup.
+    digest: 9c2a44e6741d3ba09018f76e4fdd8f0db12bacb01045608a30a83b9a699d8e58
+    home: https://github.com/cooperspencer/gickup
+    name: gickup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.1/gickup-0.0.1.tgz
+    version: 0.0.1
   keycloak-webhook-router:
   - apiVersion: v2
     appVersion: main
@@ -207,4 +219,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/s3-backup-0.1.0/s3-backup-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-21T17:26:30.580903045Z"
+generated: "2023-05-21T23:49:58.160843502Z"
