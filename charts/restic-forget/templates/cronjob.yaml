@@ -26,5 +26,5 @@ spec:
               - '--prune'
             envFrom:
             - secretRef:
-                name: {{ print $repo.name "-repo-passphrase" | quote }}
+                name: {{ print "restic-forget-" $repo.name "-secrets" | quote }}
 {{- end }}
