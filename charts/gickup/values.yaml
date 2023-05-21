@@ -1,0 +1,15 @@
+image:
+  repo: buddyspencer/gickup
+  tag: null
+  pullPolicy: IfNotPresent
+
+localVolume:
+  enabled: false
+  storageClassName: ''
+  size: 10Gi
+  mountPoint: /local
+
+gickupConfig:
+  source: {}
+
+  cron: 0 3 * * *

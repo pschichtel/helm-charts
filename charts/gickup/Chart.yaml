@@ -1,0 +1,7 @@
+apiVersion: v2
+name: gickup
+description: A helm chart to deploy gickup.
+home: https://github.com/cooperspencer/gickup
+type: application
+version: 0.0.1
+appVersion: 0.10.15

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gickup
+  labels:
+    k8s-app: gickup
+    version: v1
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: gickup
+      labels:
+        k8s-app: gickup
+        version: v1
+        config-hash: {{ .Values.gickupConfig | toYaml | adler32sum | quote }}
+    spec:
+      containers:
+      - name: gickup
+        image: {{ print .Values.image.repo ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}
+        volumeMounts:
+        {{- if .Values.localVolume.enabled }}
+        - name: gickup-local-volume-pvc
+          mountPath: {{ .Values.localVolume.mountPoint | quote }}
+        {{- end }}
+        - name: gickup-config
+          subPath: config
+          mountPath: /gickup/conf.yml
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 50m
+          limits:
+            memory: 200Mi
+            cpu: 1
+      volumes:
+      {{- if .Values.localVolume.enabled }}
+      - name: gickup-local-volume-pvc
+        persistentVolumeClaim:
+          claimName: gickup-local-volume-pvc
+      {{- end }}
+      - name: gickup-config
+        secret:
+          secretName: gickup-config
+  selector:
+    matchLabels:
+      k8s-app: gickup

@@ -1,0 +1,13 @@
+{{- if .Values.localVolume.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gickup-local-volume-pvc
+spec:
+  storageClassName: {{ .Values.localVolume.storageClassName | quote }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.localVolume.size | quote }}
+{{- end }}
