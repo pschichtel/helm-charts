@@ -11,12 +11,6 @@ spec:
         spec:
           serviceAccountName: {{ $.Values.s3Backup.serviceAccountName | quote }}
           restartPolicy: OnFailure
-          securityContext:
-            # TODO a device plugin for fuse devices would be better
-            privileged: true
-            capabilities:
-              add:
-                - SYS_ADMIN
           containers:
           - name: backup
             image: {{ print .Values.image.repository ":" ($.Values.image.tag | default $.Chart.AppVersion) | quote }}
@@ -47,3 +41,9 @@ spec:
                 {{- else }}
                 name: {{ print .Values.s3Backup.jobName "-secrets" | quote }}
                 {{- end }}
+            securityContext:
+              # TODO a device plugin for fuse devices would be better
+              privileged: true
+              capabilities:
+                add:
+                  - SYS_ADMIN
