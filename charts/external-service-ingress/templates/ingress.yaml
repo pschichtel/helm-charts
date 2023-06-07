@@ -55,6 +55,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: {{ print "http://" $ingress.host "/$1" | quote }}
     {{- end }}
 spec:
+  ingressClassName: {{ $ingress.ingressClass | default $.Values.defaults.ingressClass | quote }}
   rules:
   - host: {{ $ingress.redirectFrom.host | quote }}
     http:
