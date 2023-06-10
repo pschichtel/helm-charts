@@ -179,6 +179,30 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.1/gickup-0.0.1.tgz
     version: 0.0.1
+  graylog:
+  - apiVersion: v2
+    appVersion: 5.1.1-1
+    created: "2023-06-10T16:16:22.735714415Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: c4074736ed5e2f801cb8bcb16bb28fcc292e1f6c4dc8059b7fd2c0e88655bcc9
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.1.0/graylog-0.1.0.tgz
+    version: 0.1.0
   keycloak-webhook-router:
   - apiVersion: v2
     appVersion: main
@@ -359,4 +383,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/s3-backup-0.1.0/s3-backup-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-10T13:12:36.081078718Z"
+generated: "2023-06-10T16:16:22.735782315Z"
