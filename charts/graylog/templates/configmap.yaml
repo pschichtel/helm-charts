@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "graylog.fullname" . }}
+  labels:
+{{ include "graylog.metadataLabels" . | indent 4 }}
+data:
+  log4j2.xml: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Configuration packages="org.graylog2.log4j" shutdownHook="disable">
+        <Appenders>
+            <Console name="STDOUT" target="SYSTEM_OUT">
+              {{- if .Values.graylog.logInJson }}
+                <JsonLayout eventEOL="true" compact="true"/>
+              {{- else }}
+                <PatternLayout pattern="%d %-5p: %c - %m%n"/>
+              {{- end }}
+            </Console>
+
+            <!-- Internal Graylog log appender. Please do not disable. This makes internal log messages available via REST calls. -->
+            <Memory name="graylog-internal-logs" bufferSize="500"/>
+        </Appenders>
+        <Loggers>
+            <!-- Application Loggers -->
+            <Logger name="org.graylog2" level="info"/>
+            <Logger name="com.github.joschi.jadconfig" level="warn"/>
+            <!-- Prevent DEBUG message about Lucene Expressions not found. -->
+            <Logger name="org.elasticsearch.script" level="warn"/>
+            <!-- Disable messages from the version check -->
+            <Logger name="org.graylog2.periodical.VersionCheckThread" level="off"/>
+            <!-- Silence chatty natty -->
+            <Logger name="com.joestelmach.natty.Parser" level="warn"/>
+            <!-- Silence Kafka log chatter -->
+            <Logger name="org.graylog.shaded.kafka09.log.Log" level="warn"/>
+            <Logger name="org.graylog.shaded.kafka09.log.OffsetIndex" level="warn"/>
+            <Logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="warn"/>
+            <!-- Silence useless session validation messages -->
+            <Logger name="org.apache.shiro.session.mgt.AbstractValidatingSessionManager" level="warn"/>
+            <!-- Silence Azure SDK messages -->
+            <Logger name="com.azure" level="warn"/>
+            <Root level="warn">
+                <AppenderRef ref="STDOUT"/>
+                <AppenderRef ref="graylog-internal-logs"/>
+            </Root>
+        </Loggers>
+    </Configuration>
+  graylog.conf: |-
+    leader_election_mode = automatic
+    node_id_file = /usr/share/graylog/data/journal/node-id
+    root_username = {{ .Values.graylog.rootUsername }}
+    root_email = {{ .Values.graylog.rootEmail }}
+    root_timezone = {{ default "UTC" .Values.graylog.rootTimezone }}
+  {{- $externalUri := include "graylog.url" . }}
+    http_bind_address = 0.0.0.0:9000
+    {{- if $externalUri }}
+    http_external_uri = {{ $externalUri }}/
+    {{- end }}
+    elasticsearch_hosts = {{ template "graylog.elasticsearch.hosts" . }}
+    allow_leading_wildcard_searches = {{ .Values.graylog.options.allowLeadingWildcardSearches }}
+    allow_highlighting = {{ .Values.graylog.options.allowHighlighting }}
+    output_batch_size = 500
+    output_flush_interval = 1
+    output_fault_count_threshold = 5
+    output_fault_penalty_seconds = 30
+    processbuffer_processors = {{ .Values.graylog.options.processbufferProcessors | default 5 }}
+    outputbuffer_processors = {{ .Values.graylog.options.outputbufferProcessors | default 3 }}
+    processor_wait_strategy = blocking
+    ring_size = {{ .Values.graylog.options.ringSize | default 65536 }}
+    inputbuffer_ring_size = {{ .Values.graylog.options.inputBufferRingSize | default 65536 }}
+    inputbuffer_processors = {{ .Values.graylog.options.inputbufferProcessors | default 2 }}
+    inputbuffer_wait_strategy = blocking
+    message_journal_enabled = true
+    # Do not change `message_journal_dir` location
+    message_journal_dir = {{ .Values.graylog.journalDir }}
+    message_journal_max_size = {{ .Values.graylog.journal.maxSize }}
+    lb_recognition_period_seconds = 3
+    # Use a replica set instead of a single host
+    mongodb_uri = {{ template "graylog.mongodb.uri" . }}
+    mongodb_max_connections = {{ default 1000 .Values.graylog.mongodb.maxConnections }}
+    mongodb_threads_allowed_to_block_multiplier = 5
+    # Email transport
+    transport_email_enabled = {{ default false .Values.graylog.transportEmail.enabled }}
+    transport_email_hostname = {{ default .Values.graylog.transportEmail.hostname }}
+    transport_email_port = {{ default .Values.graylog.transportEmail.port }}
+    transport_email_use_auth = {{ default .Values.graylog.transportEmail.useAuth }}
+    transport_email_use_tls = {{ default .Values.graylog.transportEmail.useTls }}
+    transport_email_use_ssl = {{ default false .Values.graylog.transportEmail.useSsl }}
+    transport_email_auth_username = {{ default .Values.graylog.transportEmail.authUsername }}
+    transport_email_auth_password = {{ default .Values.graylog.transportEmail.authPassword }}
+    transport_email_subject_prefix = {{ default .Values.graylog.transportEmail.subjectPrefix }}
+    transport_email_from_email = {{ default .Values.graylog.transportEmail.fromEmail }}
+  {{- if .Values.graylog.options.gc_warning_threshold }}
+    gc_warning_threshold = {{ .Values.graylog.options.gc_warning_threshold }}
+  {{- end }}
+  {{- if $externalUri }}
+    transport_email_web_interface_url = {{ $externalUri }}
+  {{- end }}
+    content_packs_dir = /usr/share/graylog/data/contentpacks
+    content_packs_auto_load = grok-patterns.json
+    proxied_requests_thread_pool_size = 32
+  {{- if .Values.graylog.metrics.enabled }}
+    prometheus_exporter_enabled = true
+    prometheus_exporter_bind_address = 0.0.0.0:9833
+  {{- end }}
+  {{- if .Values.graylog.trustedProxies }}
+    trusted_proxies = {{ .Values.graylog.trustedProxies }}
+  {{- end }}
+  {{- if .Values.graylog.config }}
+{{ .Values.graylog.config | indent 4 }}
+  {{- end }}
+  entrypoint.sh: |-
+    #!/usr/bin/env bash
+
+    cacarts_keystore='/var/tmp/custom-cacerts.keystore'
+    cp "$JAVA_HOME/lib/security/cacerts" "$cacarts_keystore"
+    shopt -s nullglob
+    for cert in /certs/*.crt
+    do
+      name="${cert%.crt}"
+      name="${name#/certs/}"
+      echo "Importing $cert as $name..."
+      keytool -storepass changeit -import -trustcacerts -noprompt -file "$cert" -alias "$name" -keystore "$cacarts_keystore"
+    done
+    export GRAYLOG_SERVER_JAVA_OPTS="-Djavax.net.ssl.trustStore=$cacarts_keystore $GRAYLOG_SERVER_JAVA_OPTS"
+
+    GRAYLOG_HOME=/usr/share/graylog
+    export GRAYLOG_PLUGIN_DIR=${GRAYLOG_HOME}/plugin
+    # Graylog 4.0.2 images move plugin dir to `plugins-default`
+    find ${GRAYLOG_HOME}/plugins-default/ -type f -exec cp {} ${GRAYLOG_PLUGIN_DIR} \;
+
+    # Download plugins
+  {{- if .Values.graylog.plugins.locations }}
+    echo "Downloading Graylog Plugins..."
+
+  {{- range .Values.graylog.plugins.locations }}
+    echo "Downloading {{ .url }} ..."
+    {{- if or (hasSuffix ".tgz" .url) (hasSuffix ".gz" .url) }}
+
+    curl -s --location --retry 3 -o /tmp/{{ .name }} "{{ .url }}"
+    curlreturn=$?
+    if [[ $curlreturn -eq 0 ]]; then
+      echo "Extracting {{ .name }} ..."
+      tar xvzf /tmp/{{ .name }} -C ${GRAYLOG_HOME} --strip-components 1 && chown -R graylog:graylog ${GRAYLOG_HOME}/bin ${GRAYLOG_PLUGIN_DIR}
+      rm -f /tmp/{{ .name }}
+    fi
+    {{- else }}
+    curl -s --location --retry 3 -o ${GRAYLOG_PLUGIN_DIR}/{{ .name }} "{{ .url }}"
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.graylog.geoip.enabled }}
+    echo "Downloading Maxmind GeoLite2 ..."
+    curl -s --location --retry 3 -o /tmp/GeoLite2-City.tar.gz "{{ .Values.graylog.geoip.mmdbUri }}"
+    curlreturn=$?
+    if [[ $curlreturn -eq 0 ]]; then
+      mkdir -p ${GRAYLOG_HOME}/geoip && cd ${GRAYLOG_HOME}/geoip && tar xvzf /tmp/GeoLite2-City.tar.gz --wildcards "*.mmdb" --strip-components=1 -C ${GRAYLOG_HOME}/geoip && chown -R graylog:graylog ${GRAYLOG_HOME}/geoip
+    fi
+  {{- end }}
+    sed 's/"/\\\"/g;s/.*/echo "&"/e' "${GRAYLOG_HOME}/config/graylog.conf" > "${GRAYLOG_HOME}/data/config/graylog.conf"
+    # Start Graylog
+    echo "Starting graylog"
+    exec /docker-entrypoint.sh "$@"
