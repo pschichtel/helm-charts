@@ -214,6 +214,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/keycloak-webhook-router-0.1.0/keycloak-webhook-router-0.1.0.tgz
     version: 0.1.0
+  mindustry:
+  - apiVersion: v2
+    appVersion: v145.1
+    created: "2023-07-08T14:10:13.265898502Z"
+    description: A Helm chart for deploying a Mindustry dedicated game server to Kubernetes.
+    digest: 6fa8f802786e7441c51f54d2d6f54cc67c788721bbfbbd8f203b482298e737d7
+    name: mindustry
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mindustry-0.1.0/mindustry-0.1.0.tgz
+    version: 0.1.0
   powerdns:
   - apiVersion: v2
     appVersion: 4.3.1
@@ -383,4 +394,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/s3-backup-0.1.0/s3-backup-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-10T16:16:22.735782315Z"
+generated: "2023-07-08T14:10:13.265958503Z"
