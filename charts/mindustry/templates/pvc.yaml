@@ -1,0 +1,10 @@
+{{- if .Values.persistentVolumeClaim.enable }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mindustry.fullname" . }}-pvc
+  labels:
+    {{- include "mindustry.labels" . | nindent 4 }}
+spec:
+    {{- toYaml .Values.persistentVolumeClaim.spec | nindent 4 }}
+{{- end }}

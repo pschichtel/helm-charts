@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mindustry.fullname" . }}
+  labels:
+    {{- include "mindustry.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "mindustry.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mindustry.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.mindustry.plugins }}
+      initContainers:
+        - name: plugin-download
+          image: 'curlimages/curl:7.86.0'
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['curl']
+          args:
+            - '-s'
+            - '-L'
+          {{- range $name, $url := .Values.mindustry.plugins }}
+            - '-o'
+            - '/opt/mindustry/config/mods/{{ $name }}.jar'
+            - {{ $url | quote }}
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.persistentVolumeClaim.enable }}
+            - mountPath: /opt/mindustry/config
+              name: {{ include "mindustry.fullname" . }}-pv
+          {{- end }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.mindustry.script | empty }}
+          args: []
+          {{- else }}
+          args:
+            {{- range $cmd := .Values.mindustry.script }}
+            - {{ $cmd | quote }}
+            {{- end }}
+          {{- end }}
+          ports:
+            {{- range $port := .Values.service.ports }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.targetPort }}
+              protocol: {{ $port.protocol }}
+            {{- end }}
+          {{- if .Values.env }}
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+          {{- end }}
+          envFrom:
+            {{- if .Values.envFrom }}
+            {{- toYaml .Values.envFrom | nindent 12 }}
+            {{- end }}
+          stdin: {{ .Values.mindustry.keepStdIn }}
+          tty: {{ .Values.mindustry.keepStdIn }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          {{- if .Values.persistentVolumeClaim.enable }}
+            - mountPath: /opt/mindustry/config
+              name: {{ include "mindustry.fullname" . }}-pv
+          {{- end }}
+      volumes:
+      {{- if .Values.persistentVolumeClaim.enable }}
+        - name: {{ include "mindustry.fullname" . }}-pv
+          persistentVolumeClaim:
+            claimName: {{ include "mindustry.fullname" . }}-pvc
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
