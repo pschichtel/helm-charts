@@ -102,5 +102,5 @@ spec:
             claimName: {{ print (include "wordpress.fullname" .) "-pvc" | quote }}
         - name: configmap
           configMap:
-            defaultMode: 644
+            defaultMode: 0644
             name: {{ include "wordpress.fullname" . }}
