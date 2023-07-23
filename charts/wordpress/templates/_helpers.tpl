@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "wordpress.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "wordpress.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "wordpress.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
