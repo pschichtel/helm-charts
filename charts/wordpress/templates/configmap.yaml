@@ -1,0 +1,263 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "wordpress.fullname" . }}
+  labels:
+    {{- include "wordpress.labels" . | nindent 4 }}
+data:
+  nginx.conf: |-
+    {{- /*
+        This is to support the uploads-webpc plugin
+    */}}
+    map $http_accept $load_avif {
+        ~image/avif "/wp-content/uploads-webpc/$path.$ext.avif";
+    }
+    map $http_accept $load_webp {
+        ~image/webp "/wp-content/uploads-webpc/$path.$ext.webp";
+    }
+
+    {{- /* for more robust HTTPS detection in fcgi applications */}}
+    map $http_x_forwarded_proto $fastcgi_https {
+        default '';
+        https 'on';
+    }
+
+    server {
+        listen       80 default;
+        server_name  _;
+        charset      utf-8;
+        
+        root         /app;
+        
+        server_tokens off;
+
+        # Enable Gzip compression
+        gzip          on;
+
+        # Compression level (1-9)
+        gzip_comp_level     5;
+
+        # Don't compress anything under 256 bytes
+        gzip_min_length     256;
+
+        # Compress output of these MIME-types
+        gzip_types
+            application/atom+xml
+            application/javascript
+            application/json
+            application/rss+xml
+            application/vnd.ms-fontobject
+            application/x-font-ttf
+            application/x-font-opentype
+            application/x-font-truetype
+            application/x-javascript
+            application/x-web-app-manifest+json
+            application/xhtml+xml
+            application/xml
+            font/eot
+            font/opentype
+            font/otf
+            image/svg+xml
+            image/x-icon
+            image/vnd.microsoft.icon
+            text/css
+            text/plain
+            text/javascript
+            text/x-component;
+
+        # Disable gzip for bad browsers
+        gzip_disable  "MSIE [1-6]\.(?!.*SV1)";
+
+        location / {
+            index  index.html index.htm index.php;
+            try_files $uri $uri/ /index.php?$args;
+        }
+
+        location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+        }
+
+        location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+        }
+
+        # Set browser cachig for JavaScript, CSS and text files
+        location ~* \.(txt|xml|js|css)$ {
+            expires 1y;
+            log_not_found off;
+        }
+
+        # Set browser cachig for all media files
+        location ~* \.(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4|m4v|ogg|webm|aac|eot|ttf|otf|woff|woff2|svg)$ {
+            expires 1y;
+            log_not_found off;
+        }
+
+        # Set browser cachig for all image files
+        location ~* \.(jpg|jpeg|png|gif|ico|swf|webp)$ {
+            expires 1y;
+            log_not_found off;
+        }
+
+        #error_page  404              /404.html;
+
+        error_page  500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+
+        location ~ ^(.+\.php)((?:\?|/).*)?$ {
+            include                 fastcgi_params;
+
+            fastcgi_pass            127.0.0.1:9000;
+            fastcgi_param           PATH_INFO          $fastcgi_path_info;
+            fastcgi_param           SCRIPT_FILENAME    ${FCGI_ROOT}$fastcgi_script_name;
+            
+            fastcgi_connect_timeout   3m;
+            fastcgi_read_timeout      3m;
+            fastcgi_send_timeout      3m;
+            fastcgi_split_path_info   ^(.+\.php)((?:\?|/).*)?$;
+            fastcgi_request_buffering off;
+
+            client_max_body_size 0;
+
+            try_files $fastcgi_script_name =404;
+
+            include /php-location/*.conf;
+        }
+
+        location ~ /\.ht {
+            deny  all;
+        }
+
+        location ~ /wp-content/(?<path>.+)\.(?<ext>jpe?g|png|gif)$ {
+            add_header Vary Accept;
+            add_header Cache-Control "private" always;
+            expires 365d;
+            try_files $load_avif $load_webp $uri =404;
+        }
+
+        include /default-server/*.conf;
+    }
+  types.conf: |-
+    types {
+        text/html                             html htm shtml;
+        text/css                              css;
+        text/xml                              xml rss;
+        image/gif                             gif;
+        image/jpeg                            jpeg jpg;
+        application/x-javascript              js;
+        text/plain                            txt;
+        text/x-component                      htc;
+        text/mathml                           mml;
+        image/png                             png;
+        image/x-icon                          ico;
+        image/x-jng                           jng;
+        image/vnd.wap.wbmp                    wbmp;
+        image/webp                            webp;
+        image/avif                            avif;
+        application/java-archive              jar war ear;
+        application/mac-binhex40              hqx;
+        application/pdf                       pdf;
+        application/x-cocoa                   cco;
+        application/x-java-archive-diff       jardiff;
+        application/x-java-jnlp-file          jnlp;
+        application/x-makeself                run;
+        application/x-perl                    pl pm;
+        application/x-pilot                   prc pdb;
+        application/x-rar-compressed          rar;
+        application/x-redhat-package-manager  rpm;
+        application/x-sea                     sea;
+        application/x-shockwave-flash         swf;
+        application/x-stuffit                 sit;
+        application/x-tcl                     tcl tk;
+        application/x-x509-ca-cert            der pem crt;
+        application/x-xpinstall               xpi;
+        application/zip                       zip;
+        application/octet-stream              deb;
+        application/octet-stream              bin exe dll;
+        application/octet-stream              dmg;
+        application/octet-stream              eot;
+        application/octet-stream              iso img;
+        application/octet-stream              msi msp msm;
+        audio/mpeg                            mp3;
+        audio/x-realaudio                     ra;
+        video/mpeg                            mpeg mpg;
+        video/quicktime                       mov;
+        video/x-flv                           flv;
+        video/x-msvideo                       avi;
+        video/x-ms-wmv                        wmv;
+        video/x-ms-asf                        asx asf;
+        video/x-mng                           mng;
+    }
+  fastcgi_params: |-
+    fastcgi_param  QUERY_STRING       $query_string;
+    fastcgi_param  REQUEST_METHOD     $request_method;
+    fastcgi_param  CONTENT_TYPE       $content_type;
+    fastcgi_param  CONTENT_LENGTH     $content_length;
+
+    fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+    fastcgi_param  REQUEST_URI        $request_uri;
+    fastcgi_param  DOCUMENT_URI       $document_uri;
+    fastcgi_param  DOCUMENT_ROOT      $document_root;
+    fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+    fastcgi_param  REQUEST_SCHEME     $scheme;
+    fastcgi_param  HTTPS              $fastcgi_https if_not_empty;
+
+    fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+    fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+    fastcgi_param  REMOTE_ADDR        $remote_addr;
+    fastcgi_param  REMOTE_PORT        $remote_port;
+    fastcgi_param  SERVER_ADDR        $server_addr;
+    fastcgi_param  SERVER_PORT        $server_port;
+    fastcgi_param  SERVER_NAME        $server_name;
+
+    # PHP only, required if PHP was built with --enable-force-cgi-redirect
+    fastcgi_param  REDIRECT_STATUS    200;
+
+  php.ini: |-
+    ; Sicherstellen, dass der Upload eingeschaltet ist
+    file_uploads = On
+
+    ; Memory Limit auf 128 MB erhöhen
+    ; remember to update docker's resource limits when you change this
+    memory_limit = 128M
+
+    ; Maximale Dateigröße für Uploads
+    ; Auf 64 MB setzen
+    upload_max_filesize = 64M
+
+    ; Maximale Größe für POST Requests
+    post_max_size = 64M
+
+    opcache.enable=1;
+    opcache.enable_cli=0;
+    opcache.memory_consumption=128;
+    opcache.interned_strings_buffer=16;
+    opcache.max_accelerated_files=10000;
+    opcache.validate_timestamps=1;
+    opcache.revalidate_freq=60;
+    opcache.revalidate_path=1;
+    opcache.fast_shutdown=1;
+    opcache.max_file_size=0;
+    opcache.file_update_protection=0;
+    opcache.file_cache=/tmp;
+
+    expose_php = off
+php-fpm.ini: |-
+    ; when chaning this file, also change the name of the config object in docker deployment
+    [www]
+    listen = 127.0.0.1:9000
+    user = www-data
+    group = www-data
+    pm = dynamic
+    ; remember to update docker's resource limits when you change this
+    pm.max_children = 20
+    pm.min_spare_servers = 2
+    pm.max_spare_servers = 4
+    pm.max_requests = 200
+
