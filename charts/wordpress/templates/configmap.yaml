@@ -248,8 +248,8 @@ data:
     opcache.file_cache=/tmp;
 
     expose_php = off
-php-fpm.ini: |-
-    ; when chaning this file, also change the name of the config object in docker deployment
+  php-fpm.ini: |-
+    ; when changing this file, also change the resource limits of the deployment accordingly
     [www]
     listen = 127.0.0.1:9000
     user = www-data
