@@ -41,12 +41,12 @@ spec:
             httpGet:
               path: /
               port: http
-            timeoutSeconds: 5
+            timeoutSeconds: {{ .Values.httpProbeTimeout }}
           readinessProbe:
             httpGet:
               path: /
               port: http
-            timeoutSeconds: 5
+            timeoutSeconds: {{ .Values.httpProbeTimeout }}
           resources:
             {{- toYaml .Values.nginxResources | nindent 12 }}
           volumeMounts:
