@@ -248,16 +248,19 @@ data:
     opcache.file_cache=/tmp;
 
     expose_php = off
+
+    display_errors = 1
+    log_errors = 1
+    fastcgi.logging = 1
+    {{- tpl .Values.configs.php $ | nindent 4 }}
   php-fpm.ini: |-
     ; when changing this file, also change the resource limits of the deployment accordingly
     [www]
-    listen = 127.0.0.1:9000
-    user = www-data
-    group = www-data
     pm = dynamic
     ; remember to update docker's resource limits when you change this
     pm.max_children = 20
     pm.min_spare_servers = 2
     pm.max_spare_servers = 4
     pm.max_requests = 200
+    {{- tpl .Values.configs.phpfpm $ | nindent 4 }}
 

@@ -96,3 +96,7 @@ persistence:
     resources:
       requests:
         storage: 5Gi
+
+configs:
+  php: ''
+  phpfpm: ''
