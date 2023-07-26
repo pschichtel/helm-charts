@@ -64,7 +64,7 @@ spec:
         - name: wordpress
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-php8.2-fpm") }}"
+          image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
           imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
           ports:
             - name: fpm
