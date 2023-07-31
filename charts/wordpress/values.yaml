@@ -98,5 +98,45 @@ persistence:
         storage: 5Gi
 
 configs:
-  php: ''
-  phpfpm: ''
+  phpConfig:
+    # Sicherstellen, dass der Upload eingeschaltet ist
+    file_uploads: 'On'
+
+    # Memory Limit auf 128 MB erhöhen
+    # remember to update docker's resource limits when you change this
+    memory_limit: '128M'
+
+    # Maximale Dateigröße für Uploads
+    # Auf 64 MB setzen
+    upload_max_filesize: '64M'
+
+    # Maximale Größe für POST Requests
+    post_max_size: '64M'
+
+    opcache.enable: '1'
+    opcache.enable_cli: '0'
+    opcache.memory_consumption: '128'
+    opcache.interned_strings_buffer: '16'
+    opcache.max_accelerated_files: '10000'
+    opcache.validate_timestamps: '1'
+    opcache.revalidate_freq: '60'
+    opcache.revalidate_path: '1'
+    opcache.fast_shutdown: '1'
+    opcache.max_file_size: '0'
+    opcache.file_update_protection: '0'
+    opcache.file_cache: '/tmp'
+
+    expose_php: 'off'
+
+    display_errors: '1'
+    log_errors: '1'
+    fastcgi.logging: '1'
+  rawPhpConfig: ''
+  phpFpmPoolConfig:
+    pm: 'dynamic'
+    # remember to update the deployment's resource limits when you change this
+    pm.max_children: '20'
+    pm.min_spare_servers: '2'
+    pm.max_spare_servers: '4'
+    pm.max_requests: '200'
+  rawPhpFpmConfig: ''
