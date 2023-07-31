@@ -28,6 +28,36 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+        - name: wordpress
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
+          imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
+          ports:
+            - name: fpm
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: fpm
+          readinessProbe:
+            tcpSocket:
+              port: fpm
+          resources:
+            {{- toYaml .Values.wordpressResources | nindent 12 }}
+          volumeMounts:
+            - name: wordpress-data
+              mountPath: /var/www/html
+            - name: configmap
+              subPath: 'php.ini'
+              mountPath: /usr/local/etc/php/conf.d/99-custom.ini
+            - name: configmap
+              subPath: 'php-fpm.ini'
+              mountPath: /usr/local/etc/php-fpm.d/z-www.conf
+            {{- if .Values.php.opcache.enabled }}
+            - name: opcache
+              mountPath: /opcache
+            {{- end }}
         - name: nginx
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -61,36 +91,6 @@ spec:
             - name: configmap
               subPath: 'types.conf'
               mountPath: /etc/nginx/conf.d/types.conf
-        - name: wordpress
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
-          imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
-          ports:
-            - name: fpm
-              containerPort: 9000
-              protocol: TCP
-          livenessProbe:
-            tcpSocket:
-              port: fpm
-          readinessProbe:
-            tcpSocket:
-              port: fpm
-          resources:
-            {{- toYaml .Values.wordpressResources | nindent 12 }}
-          volumeMounts:
-            - name: wordpress-data
-              mountPath: /var/www/html
-            - name: configmap
-              subPath: 'php.ini'
-              mountPath: /usr/local/etc/php/conf.d/99-custom.ini
-            - name: configmap
-              subPath: 'php-fpm.ini'
-              mountPath: /usr/local/etc/php-fpm.d/z-www.conf
-            {{- if .Values.php.opcache.enabled }}
-            - name: opcache
-              mountPath: /opcache
-            {{- end }}
         {{- if .Values.exporter.enabled }}
         - name: exporter
           securityContext:
