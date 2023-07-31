@@ -91,6 +91,22 @@ spec:
             - name: opcache
               mountPath: /opcache
             {{- end }}
+        {{- if .Values.exporter.enabled }}
+        - name: exporter
+          securityContext:
+            {{- toYaml .Values.exporter.securityContext | nindent 12 }}
+          image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
+          imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
+          ports:
+            - name: exporter
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: PHP_FPM_SCRAPE_URI
+              value: {{ print "tcp://127.0.0.1:9000" .Values.exporter.statusPath | quote }}
+          resources:
+            {{- toYaml .Values.exporter.resources | nindent 12 }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

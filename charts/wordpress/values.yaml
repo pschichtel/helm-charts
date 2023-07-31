@@ -53,12 +53,16 @@ ingress:
   #      - chart-example.local
 
 nginxResources:
-  limits:
-    cpu: 100m
-    memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
 
 # Minimum expected memory usage is: php.ini(memory_limit) * php-fpm.ini(pm.max_children) * per-process-buffer + php.ini(opcache.memory_consumption) + global-buffer
 # Given the default from this chart and assuming a 10% per-process buffer and 50Mi of global buffer:
@@ -138,3 +142,30 @@ php:
     pm.max_spare_servers: '4'
     pm.max_requests: '200'
   rawFpmPoolIni: ''
+
+exporter:
+  enabled: false
+  image:
+    repository: docker.io/hipages/php-fpm_exporter
+    tag: '2.2.0'
+  statusPath: /status
+  securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+  resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  serviceMonitor:
+    enabled: false
