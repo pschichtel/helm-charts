@@ -8,7 +8,7 @@ metadata:
 spec:
   endpoints:
   - interval: 30s
-    targetPort: 9090
+    targetPort: exporter
     path: /metrics
   namespaceSelector:
     matchNames:

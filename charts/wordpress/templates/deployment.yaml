@@ -99,7 +99,7 @@ spec:
           imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
           ports:
             - name: exporter
-              containerPort: 9090
+              containerPort: 9253
               protocol: TCP
           env:
             - name: PHP_FPM_SCRAPE_URI
