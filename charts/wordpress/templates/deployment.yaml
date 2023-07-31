@@ -87,6 +87,10 @@ spec:
             - name: configmap
               subPath: 'php-fpm.ini'
               mountPath: /usr/local/etc/php-fpm.d/z-www.conf
+            {{- if .Values.php.opcache.enabled }}
+            - name: opcache
+              mountPath: /opcache
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -107,3 +111,11 @@ spec:
           configMap:
             defaultMode: 0644
             name: {{ include "wordpress.fullname" . }}
+        {{- if .Values.php.opcache.enabled }}
+        - name: opcache
+          emptyDir:
+            {{- with .Values.php.opcache.medium }}
+            medium: {{ . | quote }}
+            {{- end }}
+            sizeLimit: {{ .Values.php.opcache.size | quote }}
+        {{- end -}}

@@ -52,18 +52,17 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-nginxResources: {}
-# We usually recommend not to specify default resources and to leave this as a conscious
-# choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. If you do want to specify resources, uncomment the following
-# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# limits:
-#   cpu: 100m
-#   memory: 128Mi
-# requests:
-#   cpu: 100m
-#   memory: 128Mi
+nginxResources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
 
+# Minimum expected memory usage is: php.ini(memory_limit) * php-fpm.ini(pm.max_children) * per-process-buffer + php.ini(opcache.memory_consumption) + global-buffer
+# Given the default from this chart and assuming a 10% per-process buffer and 50Mi of global buffer:
+# 64Mi * 10 * 1.10 + 128Mi + 50Mi = 882Mi
 wordpressResources: {}
 # We usually recommend not to specify default resources and to leave this as a conscious
 # choice for the user. This also increases chances charts run on environments with little
@@ -97,23 +96,20 @@ persistence:
       requests:
         storage: 5Gi
 
-configs:
-  phpConfig:
-    # Sicherstellen, dass der Upload eingeschaltet ist
-    file_uploads: 'On'
+php:
+  ini:
+    # Allow uploads
 
-    # Memory Limit auf 128 MB erhöhen
-    # remember to update docker's resource limits when you change this
-    memory_limit: '128M'
-
-    # Maximale Dateigröße für Uploads
-    # Auf 64 MB setzen
-    upload_max_filesize: '64M'
+    # single process/execution memory limit, align this with PHP-FPM, opcache and pod resources
+    memory_limit: '64M'
 
     # Maximale Größe für POST Requests
     post_max_size: '64M'
 
-    opcache.enable: '1'
+    # Maximum upload size, align this with your reverse proxy
+    file_uploads: 'On'
+    upload_max_filesize: '{{ .Values.php.ini.post_max_size }}'
+
     opcache.enable_cli: '0'
     opcache.memory_consumption: '128'
     opcache.interned_strings_buffer: '16'
@@ -124,19 +120,21 @@ configs:
     opcache.fast_shutdown: '1'
     opcache.max_file_size: '0'
     opcache.file_update_protection: '0'
-    opcache.file_cache: '/tmp'
 
     expose_php: 'off'
 
     display_errors: '1'
     log_errors: '1'
     fastcgi.logging: '1'
-  rawPhpConfig: ''
-  phpFpmPoolConfig:
+  rawIni: ''
+  opcache:
+    enabled: true
+    size: 200Mi
+  # make sure to align the pod resources with PHP-FPM
+  fpmPoolIni:
     pm: 'dynamic'
-    # remember to update the deployment's resource limits when you change this
-    pm.max_children: '20'
+    pm.max_children: '10'
     pm.min_spare_servers: '2'
     pm.max_spare_servers: '4'
     pm.max_requests: '200'
-  rawPhpFpmConfig: ''
+  rawFpmPoolIni: ''
