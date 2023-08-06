@@ -3,6 +3,7 @@ roleName: restic-forget
 
 restic:
   version: null
+  retryLockTimeout: 1h
   forget:
     schedule: '0 5 * * Sat'
     policy: ['--keep-within-hourly', '2d1h', '--keep-within-daily', '15d', '--keep-within-weekly', '2m7d', '--keep-within-monthly', '1y1m', '--keep-within-yearly', '3y', '--keep-yearly', '2', '--keep-tag', 'permanent']

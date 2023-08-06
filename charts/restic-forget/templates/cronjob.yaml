@@ -14,11 +14,15 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: forget
-            image: {{ print "restic/restic:" ($.Values.restic.version | default $.Chart.AppVersion) | quote }}
+            image: {{ print "ghcr.io/restic/restic:" ($.Values.restic.version | default $.Chart.AppVersion) | quote }}
             imagePullPolicy: IfNotPresent
             command:
               - 'restic'
               - '--no-cache'
+              {{- with .Values.restic.retryLockTimeout }}
+              - '--retry-lock'
+              - {{ . | quote }}
+              {{- end}}
               - 'forget'
               {{- range $entry := ($repo.policy | default $.Values.restic.forget.policy) }}
               - {{ $entry | quote }}
