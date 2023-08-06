@@ -9,6 +9,7 @@ s3Backup:
   roleName: s3-backup
   jobName: s3-backup
   schedule: '0 6 * * *'
+  retryLockTimeout: 10m
   sourceEndpoint: https://s3.source.example.org
   resticRepository:
     location: s3:https://s3.target.example.org/backup

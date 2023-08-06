@@ -34,6 +34,10 @@ spec:
             - name: 'RESTIC_BACKUP_EXTRA_ARGS'
               value: {{ .Values.s3Backup.resticArgs.backup | quote }}
             {{- end }}
+            {{- with .Values.retryLockTimeout }}
+            - name: 'RESTIC_RETRY_LOCK_TIMEOUT'
+              value: {{ . | quote }}
+            {{- end }}
             envFrom:
             - secretRef:
                 {{- if .Values.s3Backup.secrets.existingSecret }}
