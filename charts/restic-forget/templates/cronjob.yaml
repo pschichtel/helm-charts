@@ -19,7 +19,7 @@ spec:
             command:
               - 'restic'
               - '--no-cache'
-              {{- with .Values.restic.retryLockTimeout }}
+              {{- with $.Values.restic.retryLockTimeout }}
               - '--retry-lock'
               - {{ . | quote }}
               {{- end}}
