@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cert-manager-webhook-cloudns.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ include "cert-manager-webhook-cloudns.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "cert-manager-webhook-cloudns.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cert-manager-webhook-cloudns.name" . }}
+    spec:
+      serviceAccountName: {{ include "cert-manager-webhook-cloudns.fullname" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --tls-cert-file=/certs/tls.crt
+            - --tls-private-key-file=/certs/tls.key
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: GROUP_NAME
+              value: {{ .Values.groupName | quote }}
+            - name: CLOUDNS_AUTH_ID_FILE
+              value: {{.Values.clouDNS.credentialsDir | printf "%s/auth_id" | quote}}
+            - name: CLOUDNS_AUTH_PASSWORD_FILE
+              value: {{.Values.clouDNS.credentialsDir | printf "%s/auth_password" | quote}}
+            - name: CLOUDNS_AUTH_ID_TYPE
+              value: {{ .Values.clouDNS.authIdType }}
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /healthz
+              port: https
+          readinessProbe:
+            httpGet:
+              scheme: HTTPS
+              path: /healthz
+              port: https
+          volumeMounts:
+            - name: certs
+              mountPath: /certs
+              readOnly: true
+            - name: creds
+              mountPath: {{.Values.clouDNS.credentialsDir}}
+              readOnly: true
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+        - name: certs
+          secret:
+            secretName: {{ include "cert-manager-webhook-cloudns.servingCertificate" . }}
+        - name: creds
+          secret:
+            secretName: {{ .Values.secretName }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
