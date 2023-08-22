@@ -17,8 +17,8 @@ spec:
     spec:
       serviceAccountName: {{ include "cert-manager-webhook-cloudns.fullname" . }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: {{ .Chart.Name | quote }}
+          image: {{ print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --tls-cert-file=/certs/tls.crt
