@@ -4,8 +4,11 @@ clouDNS:
   # one of 'auth-id' or 'sub-auth-id'
   authIdType: "auth-id"
   credentialsDir: "/creds"
+  auth_id: ''
+  auth_password: ''
 
-secretName: cert-manager-webhook-cloudns-api-secret
+
+secretName: ''
 replicaCount: 1
 
 certManager:

@@ -65,7 +65,11 @@ spec:
             secretName: {{ include "cert-manager-webhook-cloudns.servingCertificate" . }}
         - name: creds
           secret:
+            {{- if .Values.secretName }}
             secretName: {{ .Values.secretName }}
+            {{- else }}
+            secretName: {{ include "cert-manager-webhook-cloudns.fullname" . }}
+            {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
