@@ -3,6 +3,15 @@ entries:
   cert-manager-webhook-cloudns:
   - apiVersion: v1
     appVersion: 1.0.5
+    created: "2023-08-23T20:43:20.584780068Z"
+    description: A helm chart for cert-manager-webhook-cloudns
+    digest: 4b21088c73a97e06b342c9d22d7944b82a48527587bfccb8222df3fcf51b7eb9
+    name: cert-manager-webhook-cloudns
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/cert-manager-webhook-cloudns-1.1.2/cert-manager-webhook-cloudns-1.1.2.tgz
+    version: 1.1.2
+  - apiVersion: v1
+    appVersion: 1.0.5
     created: "2023-08-23T14:10:17.118092658Z"
     description: A helm chart for cert-manager-webhook-cloudns
     digest: 373975e311b90642951eec720cd1693873407bee1aa8641556f69fd0fde1c133
@@ -573,4 +582,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-23T14:10:17.118191261Z"
+generated: "2023-08-23T20:43:20.58490227Z"
