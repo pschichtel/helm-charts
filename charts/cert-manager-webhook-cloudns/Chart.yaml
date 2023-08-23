@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "1.0.5"
 description: A helm chart for cert-manager-webhook-cloudns
 name: cert-manager-webhook-cloudns
-version: 1.1.1
+version: 1.1.2
