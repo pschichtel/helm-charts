@@ -6,7 +6,7 @@ metadata:
   name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
   labels:
     {{- include "external-service-monitor.labels" $ | nindent 4 }}
-    external-service-monitor: {{ $serviceMonitorName | quote }}
+    schich.tel/external-service-monitor: {{ $serviceMonitorName | quote }}
 spec:
   endpoints:
   {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
@@ -20,5 +20,5 @@ spec:
   selector:
     matchLabels:
       {{- include "external-service-monitor.selectorLabels" $ | nindent 6 }}
-      external-service-monitor: {{ $serviceMonitorName | quote }}
+      schich.tel/external-service-monitor: {{ $serviceMonitorName | quote }}
 {{- end }}
