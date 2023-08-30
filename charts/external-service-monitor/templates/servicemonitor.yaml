@@ -7,7 +7,7 @@ metadata:
 spec:
   endpoints:
   {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
-  - interval: 30s
+  - interval: {{ $exporter.interval | default $.Values.defaults.interval | required "each exporter needs an interval!" | quote }}
     targetPort: {{ $exporterName | quote }}
     path: {{ $exporter.endpoint | default $.Values.defaults.endpoint | required "each exporter needs an endpoint!" | quote }}
   {{- end }}
