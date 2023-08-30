@@ -7,6 +7,9 @@ metadata:
   labels:
     {{- include "external-service-monitor.labels" $ | nindent 4 }}
     schich.tel/external-service-monitor: {{ $serviceMonitorName | quote }}
+    {{- with $serviceMonitor.jobLabel }}
+    {{ .name | quote }}: {{ .value | quote }}
+    {{- end }}
 spec:
   ports:
   {{- range $exporterName, $exporter := $serviceMonitor.exporters }}

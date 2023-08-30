@@ -7,7 +7,13 @@ metadata:
   labels:
     {{- include "external-service-monitor.labels" $ | nindent 4 }}
     schich.tel/external-service-monitor: {{ $serviceMonitorName | quote }}
+    {{- with $serviceMonitor.jobLabel }}
+    {{ .name | quote }}: {{ .value | quote }}
+    {{- end }}
 spec:
+  {{- with $serviceMonitor.jobLabel }}
+  jobLabel: {{ .name | quote }}
+  {{- end }}
   endpoints:
   {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
   - interval: {{ $exporter.interval | default $.Values.defaults.interval | required "each exporter needs an interval!" | quote }}
