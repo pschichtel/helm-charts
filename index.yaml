@@ -207,6 +207,17 @@ entries:
   external-service-monitor:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2023-08-30T22:51:22.768624579Z"
+    description: This is a simple chart to consistently generate ServiceMonitors for
+      external services.
+    digest: 571de17790d3bbc9dd48da448a367ef61c5a5835883bede3efbc74f0c9bdd574
+    name: external-service-monitor
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/external-service-monitor-0.1.6/external-service-monitor-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2023-08-30T22:28:10.654098818Z"
     description: This is a simple chart to consistently generate ServiceMonitors for
       external services.
@@ -649,4 +660,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-30T22:28:10.654187717Z"
+generated: "2023-08-30T22:51:22.768728781Z"
