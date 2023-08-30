@@ -6,7 +6,7 @@ metadata:
   name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
 spec:
   ports:
-  {{- range $exporterName, $exporter := $serviceMonitor.routes }}
+  {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
   - protocol: TCP
     name: {{ $exporterName | quote }}
     port: {{ $exporter.port }}
