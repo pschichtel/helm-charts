@@ -4,6 +4,9 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
+  labels:
+    {{- include "external-service-monitor.labels" $ | nindent 4 }}
+    external-service-monitor: {{ $serviceMonitorName | quote }}
 spec:
   ports:
   {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
