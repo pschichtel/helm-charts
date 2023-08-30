@@ -11,7 +11,7 @@ spec:
   endpoints:
   {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
   - interval: {{ $exporter.interval | default $.Values.defaults.interval | required "each exporter needs an interval!" | quote }}
-    targetPort: {{ $exporterName | quote }}
+    port: {{ $exporterName | quote }}
     path: {{ $exporter.endpoint | default $.Values.defaults.endpoint | required "each exporter needs an endpoint!" | quote }}
   {{- end }}
   namespaceSelector:
