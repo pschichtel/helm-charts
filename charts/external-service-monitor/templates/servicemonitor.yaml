@@ -1,0 +1,20 @@
+{{- range $serviceMonitorName, $serviceMonitor := .Values.serviceMonitors }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
+spec:
+  endpoints:
+  {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
+  - interval: 30s
+    targetPort: {{ $exporterName | quote }}
+    path: {{ $exporter.endpoint | default $.Values.defaults.endpoint | required "each exporter needs an endpoint!" | quote }}
+  {{- end }}
+  namespaceSelector:
+    matchNames:
+    - {{ $.Release.Namespace }}
+  selector:
+    matchLabels:
+      name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
+{{- end }}

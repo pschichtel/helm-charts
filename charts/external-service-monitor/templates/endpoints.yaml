@@ -1,0 +1,18 @@
+{{- range $serviceMonitorName, $serviceMonitor := .Values.serviceMonitors }}
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
+subsets:
+- addresses:
+  {{- range ($serviceMonitor.externalIps | required "externalIps are required!") }}
+  - ip: {{ . | quote }}
+  {{- end }}
+  ports:
+  {{- range $exporterName, $exporter := $serviceMonitor.exporters }}
+  - name: {{ $exporterName | quote }}
+    port: {{ $exporter.port }}
+    protocol: TCP
+  {{- end }}
+{{- end }}

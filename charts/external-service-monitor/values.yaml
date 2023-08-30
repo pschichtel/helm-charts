@@ -1,0 +1,13 @@
+defaults:
+  endpoint: '/metrics'
+  interval: '30s'
+
+serviceMonitors: {}
+#  some-name:
+#    externalIps:
+#    - '127.0.0.1'
+#    exporters:
+#      node:
+#        port: 9100
+#        prefix: /metrics
+#        interval: 30s

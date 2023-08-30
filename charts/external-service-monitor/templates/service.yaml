@@ -1,0 +1,15 @@
+{{- range $serviceMonitorName, $serviceMonitor := .Values.serviceMonitors }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ print $.Release.Name "-external-" $serviceMonitorName | quote }}
+spec:
+  ports:
+  {{- range $exporterName, $exporter := $serviceMonitor.routes }}
+  - protocol: TCP
+    name: {{ $exporterName | quote }}
+    port: {{ $exporter.port }}
+    targetPort: {{ $exporter.port }}
+  {{- end }}
+{{- end }}

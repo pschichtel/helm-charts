@@ -1,0 +1,6 @@
+apiVersion: v2
+name: external-service-monitor
+description: This is a simple chart to consistently generate ServiceMonitors for external services.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
