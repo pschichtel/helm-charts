@@ -135,7 +135,7 @@ php:
     enabled: true
     size: 200Mi
   fpmGlobalIni: {}
-  rawFpmGlobalIni: '''
+  rawFpmGlobalIni: ''
   # make sure to align the pod resources with PHP-FPM
   fpmPoolIni:
     pm: 'dynamic'
