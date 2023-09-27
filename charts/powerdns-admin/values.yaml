@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: ngoduykhanh/powerdns-admin
-  pullPolicy: IfNotPresent
+  repository: ghcr.io/pschichtel/powerdns-admin
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
