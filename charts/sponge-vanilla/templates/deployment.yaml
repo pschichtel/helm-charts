@@ -13,7 +13,9 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        {{- range $name, $value := . }}
+        {{ $name }}: {{ tpl $value $ | quote }}
+        {{- end }}
       {{- end }}
       labels:
         {{- include "sponge-vanilla.selectorLabels" . | nindent 8 }}

@@ -10,6 +10,8 @@ podSecurityContext:
 
 service:
   type: ClusterIP
+  loadBalancerIP: null
+  extraPorts: []
 
 nodeSelector: {}
 

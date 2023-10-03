@@ -6,6 +6,9 @@ metadata:
     {{- include "sponge-vanilla.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- with .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
   ports:
     - port: {{ .Values.minecraft.ports.minecraft.port }}
       targetPort: mc
@@ -30,6 +33,12 @@ spec:
       protocol: {{ $port.protocol | default "TCP" | quote }}
       name: {{ $name | quote }}
     {{- end }}
+    {{- end }}
+    {{- range $name, $port := .Values.service.extraPorts }}
+    - port: {{ $port.port }}
+      targetPort: {{ $name | quote }}
+      protocol: {{ $port.protocol | default "TCP" | quote }}
+      name: {{ $name | quote }}
     {{- end }}
   selector:
     {{- include "sponge-vanilla.selectorLabels" . | nindent 4 }}
