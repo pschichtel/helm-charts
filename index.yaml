@@ -574,6 +574,16 @@ entries:
   sponge-vanilla:
   - apiVersion: v2
     appVersion: 1.20.2-11.0.0-RC1375
+    created: "2023-10-03T14:39:22.429547625Z"
+    description: A Helm chart for Sponge Vanilla
+    digest: 103e36d1f2fa318f34c6a4bec44fde4430669839397c04c2f60a917733f286cb
+    name: sponge-vanilla
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/sponge-vanilla-0.1.1/sponge-vanilla-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.20.2-11.0.0-RC1375
     created: "2023-10-03T14:31:58.443258003Z"
     description: A Helm chart for Sponge Vanilla
     digest: 16f4159f73cac9ecb1d0355414fd1639ea2ffc7c89a46f0d6fd89561ced01f42
@@ -724,4 +734,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-03T14:31:58.443353102Z"
+generated: "2023-10-03T14:39:22.429661424Z"
