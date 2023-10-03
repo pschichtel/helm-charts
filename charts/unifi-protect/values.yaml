@@ -38,7 +38,7 @@ extraVolumeMounts: []
 
 service:
   type: LoadBalancer
-#  loadBalancerIP: 80
+#  loadBalancerIP: 172.18.1.225
 
 ingress:
   enabled: false
