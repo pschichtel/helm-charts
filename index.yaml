@@ -605,6 +605,16 @@ entries:
   unifi-protect:
   - apiVersion: v2
     appVersion: latest
+    created: "2023-10-03T21:28:27.169154972Z"
+    description: A helm chart for markdegroot/unifi-protect
+    digest: 15887829453ae91b238874bb37336696ab5ecd7783e65ae7cbe53c9528a654df
+    name: unifi-protect
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/unifi-protect-0.5.0/unifi-protect-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
+    appVersion: latest
     created: "2023-10-03T20:08:19.871834422Z"
     description: A helm chart for markdegroot/unifi-protect
     digest: 1791cef34c5a568fd955065d1b66756bf4d7cbef618e909f82aa9ef1eceba756
@@ -764,4 +774,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-03T20:08:19.872023925Z"
+generated: "2023-10-03T21:28:27.169370089Z"
