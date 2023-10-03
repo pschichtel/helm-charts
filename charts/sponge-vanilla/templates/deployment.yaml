@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sponge-vanilla.fullname" . }}
+  labels:
+    {{- include "sponge-vanilla.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "sponge-vanilla.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "sponge-vanilla.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: minecraft
+          securityContext:
+            {{- toYaml .Values.minecraft.securityContext | nindent 12 }}
+          image: "{{ .Values.minecraft.image.repository }}:{{ .Values.minecraft.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.minecraft.image.pullPolicy }}
+          env:
+          - name: SERVER_PORT
+            version: {{ .Values.minecraft.ports.minecraft.port | quote }}
+          - name: QUERY_PORT
+            version: {{ .Values.minecraft.ports.query.port | quote }}
+          - name: RCON_PORT
+            version: {{ .Values.minecraft.ports.rcon.port | quote }}
+          {{- range $name, $value := .Values.minecraft.env }}
+          - name: {{ $name | quote }}
+            value: {{ $value | quote }}
+          {{- end }}
+          ports:
+            - name: mc
+              containerPort: {{ .Values.minecraft.ports.minecraft.port }}
+              protocol: TCP
+            {{- if ne .Values.minecraft.ports.query.port .Values.minecraft.ports.minecraft.port }}
+            - name: mc-query
+              containerPort: {{ .Values.minecraft.ports.minecraft.port }}
+              protocol: TCP
+            {{- end }}
+            - name: mc-rcon
+              containerPort: {{ .Values.minecraft.ports.rcon.port }}
+              protocol: TCP
+            {{- range $name, $port := .Values.minecraft.extraPorts }}
+            - name: {{ $name | quote }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol | default "TCP" | quote }}
+            {{- end }}
+          {{- with .Values.minecraft.healthcheck }}
+          startupProbe:
+            initialDelaySeconds: 60
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
+            {{- . | toYaml | nindent 12 }}
+          livenessProbe:
+            {{- . | toYaml | nindent 12 }}
+          readinessProbe:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: persistence
+            mountPath: /minecraft
+          {{- with .Values.minecraft.extraVolumeMounts }}
+          {{- . | toYaml | nindent 10 }}
+          {{- end }}
+        {{- with .Values.extraContainers }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+      volumes:
+      - name: persistence
+        {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | default (include "sponge-vanilla.fullname" .) }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 120

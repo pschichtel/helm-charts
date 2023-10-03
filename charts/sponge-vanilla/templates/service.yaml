@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sponge-vanilla.fullname" . }}
+  labels:
+    {{- include "sponge-vanilla.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.minecraft.ports.minecraft.port }}
+      targetPort: mc
+      protocol: TCP
+      name: mc
+    {{- if and .Values.minecraft.ports.query.expose (ne .Values.minecraft.ports.query.port .Values.minecraft.ports.minecraft.port) }}
+    - port: {{ .Values.minecraft.ports.query.port }}
+      targetPort: mc-query
+      protocol: TCP
+      name: mc-query
+    {{- end }}
+    {{- if .Values.minecraft.ports.rcon.expose }}
+    - port: {{ .Values.minecraft.ports.rcon.port }}
+      targetPort: mc-rcon
+      protocol: TCP
+      name: mc-rcon
+    {{- end }}
+    {{- range $name, $port := .Values.minecraft.extraPorts }}
+    {{- if $port.expose }}
+    - port: {{ $port.port }}
+      targetPort: {{ $name | quote }}
+      protocol: {{ $port.protocol | default "TCP" | quote }}
+      name: {{ $name | quote }}
+    {{- end }}
+    {{- end }}
+  selector:
+    {{- include "sponge-vanilla.selectorLabels" . | nindent 4 }}
