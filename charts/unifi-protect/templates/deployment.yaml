@@ -38,6 +38,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
             - name: http-ui
               containerPort: 7080
               protocol: TCP

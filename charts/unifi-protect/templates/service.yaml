@@ -14,6 +14,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: 443
+      targetPort: https
+      protocol: TCP
+      name: https
     - port: 7080
       targetPort: 7080
       protocol: TCP

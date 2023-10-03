@@ -2,5 +2,5 @@ apiVersion: v2
 name: unifi-protect
 description: A helm chart for markdegroot/unifi-protect
 type: application
-version: 0.7.1
+version: 0.8.0
 appVersion: "latest"
