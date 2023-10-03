@@ -2,7 +2,6 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ include "unifi-protect.fullname" . }}
-  namespace: default
 data:
   pg_hba.conf: |
     local   all             postgres                                peer
