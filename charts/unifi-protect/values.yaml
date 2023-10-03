@@ -37,8 +37,8 @@ extraVolumes: []
 extraVolumeMounts: []
 
 service:
-  type: ClusterIP
-  port: 80
+  type: LoadBalancer
+#  loadBalancerIP: 80
 
 ingress:
   enabled: false
