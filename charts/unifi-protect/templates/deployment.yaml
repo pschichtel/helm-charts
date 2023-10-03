@@ -6,6 +6,8 @@ metadata:
     {{- include "unifi-protect.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "unifi-protect.selectorLabels" . | nindent 6 }}
