@@ -38,13 +38,16 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe:
+          startupProbe:
             initialDelaySeconds: 180
             httpGet:
               path: /
               port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
           readinessProbe:
-            initialDelaySeconds: 180
             httpGet:
               path: /
               port: http
