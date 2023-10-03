@@ -1,0 +1,6 @@
+apiVersion: v2
+name: unifi-protect
+description: A helm chart for markdegroot/unifi-protect
+type: application
+version: 0.1.0
+appVersion: "latest"
