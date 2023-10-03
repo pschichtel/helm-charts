@@ -36,7 +36,28 @@ spec:
           {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: 80
+              protocol: TCP
+            - name: http-ui
+              containerPort: 7080
+              protocol: TCP
+            - name: https-ui
+              containerPort: 7443
+              protocol: TCP
+            - name: cam-upd
+              containerPort: 7444
+              protocol: TCP
+            - name: cam-mgmt
+              containerPort: 7442
+              protocol: TCP
+            - name: rtsp1
+              containerPort: 7446
+              protocol: TCP
+            - name: rtsp2
+              containerPort: 7447
+              protocol: TCP
+            - name: stream
+              containerPort: 7550
               protocol: TCP
           startupProbe:
             initialDelaySeconds: 180

@@ -6,10 +6,41 @@ metadata:
     {{- include "unifi-protect.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- with .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: 80
       targetPort: http
       protocol: TCP
       name: http
+    - port: 7080
+      targetPort: 7080
+      protocol: TCP
+      name: http-ui
+    - port: 7443
+      targetPort: 7443
+      protocol: TCP
+      name: https-ui
+    - port: 7444
+      targetPort: 7444
+      protocol: TCP
+      name: cam-upd
+    - port: 7442
+      targetPort: 7442
+      protocol: TCP
+      name: cam-mgmt
+    - port: 7446
+      targetPort: 7446
+      protocol: TCP
+      name: rtsp1
+    - port: 7447
+      targetPort: 7447
+      protocol: TCP
+      name: rtsp2
+    - port: 7550
+      targetPort: 7550
+      protocol: TCP
+      name: stream      
   selector:
     {{- include "unifi-protect.selectorLabels" . | nindent 4 }}
