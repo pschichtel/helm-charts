@@ -82,13 +82,13 @@ spec:
           - name: cgroup
             mountPath: /sys/fs/cgroup
           - name: storage
-            mountPath: /storage/srv
+            mountPath: /srv
             subPath: srv
           - name: storage
-            mountPath: /storage/data
+            mountPath: /data
             subPath: data
           - name: storage
-            mountPath: /storage/persistent
+            mountPath: /persistent
             subPath: persistent
           {{- with .Values.extraVolumes }}
           {{- . | toYaml | nindent 10 }}
