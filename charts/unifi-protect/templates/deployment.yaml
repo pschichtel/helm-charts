@@ -13,10 +13,11 @@ spec:
       {{- include "unifi-protect.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "unifi-protect.selectorLabels" . | nindent 8 }}
     spec:
@@ -80,6 +81,12 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+          - name: config
+            mountPath: /etc/postgresql/14/main/pg_hba.conf
+            subPath: pg_hba.conf
+          - name: config
+            mountPath: /etc/postgresql/9.6/main/pg_hba.conf
+            subPath: pg_hba.conf
           - name: run
             mountPath: /run
           - name: tmp
@@ -99,6 +106,9 @@ spec:
           {{- . | toYaml | nindent 10 }}
           {{- end }}
       volumes:
+      - name: config
+        configMap:
+          name: {{ include "unifi-protect.fullname" . }}
       - name: run
         emptyDir:
           medium: Memory
