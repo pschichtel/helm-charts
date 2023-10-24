@@ -91,7 +91,7 @@ spec:
         {{- end }}
         - name: configs
           configMap:
-            name: teamspeak
+            name: {{ include "teamspeak.fullname" . }}
         {{- if .Values.extraVolumeMounts }}
 {{ toYaml .Values.extraVolumes | indent 8 }}
         {{- end }}
