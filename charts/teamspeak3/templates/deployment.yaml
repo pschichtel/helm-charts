@@ -85,7 +85,7 @@ spec:
         - name: data
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" (.Release.Name) "data") | quote  }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "teamspeak.fullname" .) | quote }}
         {{- else }}
           emptyDir: {}
         {{- end }}
