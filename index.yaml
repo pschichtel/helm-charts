@@ -625,6 +625,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/sponge-vanilla-0.1.0/sponge-vanilla-0.1.0.tgz
     version: 0.1.0
+  teamspeak3:
+  - apiVersion: v2
+    appVersion: 3.13.7
+    created: "2023-10-24T21:22:44.453243811Z"
+    description: teamspeak3 server
+    digest: e3050829c2b0b932ffd8dcb37919d665d77551d4642fc5b7ded4c79fcc96b3f2
+    name: teamspeak3
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/teamspeak3-1.0.0/teamspeak3-1.0.0.tgz
+    version: 1.0.0
   unifi-protect:
   - apiVersion: v2
     appVersion: latest
@@ -887,4 +898,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-22T13:23:24.243957846Z"
+generated: "2023-10-24T21:22:44.453352012Z"
