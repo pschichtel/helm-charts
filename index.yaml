@@ -464,6 +464,16 @@ entries:
     version: 0.1.0
   restic-forget:
   - apiVersion: v2
+    appVersion: 0.16.1
+    created: "2023-10-24T22:51:55.010422757Z"
+    description: A helm chart to deploy restic jobs for backup cleaning.
+    digest: ce12bd38d14872b9c70252810557d168f1724785b31f1fbb006537a3bcf54834
+    name: restic-forget
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/restic-forget-0.2.2/restic-forget-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
     appVersion: 0.16.0
     created: "2023-08-13T21:29:47.239399928Z"
     description: A helm chart to deploy restic jobs for backup cleaning.
@@ -918,4 +928,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-24T21:35:33.895314716Z"
+generated: "2023-10-24T22:51:55.010733678Z"
