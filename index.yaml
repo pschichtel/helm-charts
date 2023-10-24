@@ -628,6 +628,16 @@ entries:
   teamspeak3:
   - apiVersion: v2
     appVersion: 3.13.7
+    created: "2023-10-24T21:35:33.895158114Z"
+    description: teamspeak3 server
+    digest: 65087698f45965ccc2209e3191635f07b8ee92fba50797ac8d36e4e70a234745
+    name: teamspeak3
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/teamspeak3-1.0.2/teamspeak3-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 3.13.7
     created: "2023-10-24T21:31:48.872274839Z"
     description: teamspeak3 server
     digest: 6fb16a8560cd5eae89eec3d560469035bee5e673b215d35302fff839932ec954
@@ -908,4 +918,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-10-24T21:31:48.87240914Z"
+generated: "2023-10-24T21:35:33.895314716Z"
