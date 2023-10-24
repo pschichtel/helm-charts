@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "teamspeak.fullname" . }}
+  labels:
+    {{- include "teamspeak.labels" . | nindent 4 }}
+{{- if .Values.service.annotations }}
+  annotations:
+{{ tpl (toYaml .Values.service.annotations) . | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if and (eq .Values.service.type "LoadBalancer") ( .Values.service.ip ) }}
+  loadBalancerIP: {{ .Values.service.ip }}
+  {{- end }}
+  {{- if and (eq .Values.service.type "LoadBalancer") ( .Values.service.externalIPs ) }}
+  externalIPs:
+  {{- toYaml .Values.service.externalIPs | nindent 6 }}
+  {{- end }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  ports:
+    {{- range .Values.voicePorts }}
+    - name: "voice-{{ .containerPort }}"
+      targetPort: {{ .containerPort }}
+      protocol: UDP
+      port: {{ .containerPort }}
+      {{- if .nodePort }}
+      nodePort: {{ .nodePort }}
+      {{- end }}
+    {{- end }}
+    - name: serverquery
+      port: 10011
+      targetPort: 10011
+      protocol: TCP
+    - name: filetransfer
+      port: 30033
+      targetPort: 30033
+      protocol: TCP
+  selector:
+    {{- include "teamspeak.selectorLabels" . | nindent 4 }}

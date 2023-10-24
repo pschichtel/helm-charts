@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "teamspeak.fullname" . }}
+  labels:
+    {{- include "teamspeak.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "teamspeak.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+    {{- if .Values.podAnnotations }}
+{{ toYaml .Values.podAnnotations | indent 8 }}
+    {{- end }}
+      labels:
+        {{- include "teamspeak.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: teamspeak-server
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        {{- range .Values.voicePorts }}
+          - name: "voice-{{ .containerPort }}"
+            containerPort: {{ .containerPort }}
+            protocol: UDP
+        {{- end }}
+          - name: serverquery
+            containerPort: 10011
+            protocol: TCP
+          - name: filetransfer
+            containerPort: 30033
+            protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        env:
+          - name: TS3SERVER_LICENSE
+            value: accept
+        {{- if .Values.configs.allowlist }}
+          - name: TS3SERVER_IP_ALLOWLIST
+            value: /allowlist.txt
+        {{- end }}
+          {{- range .Values.extraEnv }}
+          - name: {{ .name | quote }}
+            value: {{ .value | quote }}
+          {{- end }}
+        volumeMounts:
+          - name: data
+            mountPath: /var/ts3server/
+        {{- if .Values.configs.allowlist }}
+          - name: configs
+            mountPath: /allowlist.txt
+            subPath: allowlist.txt
+        {{- end }}
+        {{- if .Values.extraVolumeMounts }}
+{{ toYaml .Values.extraVolumeMounts | indent 10 }}
+        {{- end }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+      {{- end }}
+      volumes:
+        - name: data
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (printf "%s-%s" (.Release.Name) "data") | quote  }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: configs
+          configMap:
+            name: teamspeak
+        {{- if .Values.extraVolumeMounts }}
+{{ toYaml .Values.extraVolumes | indent 8 }}
+        {{- end }}
