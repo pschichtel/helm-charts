@@ -75,3 +75,6 @@ persistence:
     resources:
       requests:
         storage: 500Mi
+
+tls:
+  mountIngressCerts: false

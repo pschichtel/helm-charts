@@ -64,7 +64,7 @@ spec:
           volumeMounts:
           - name: data
             mountPath: /znc-data
-          {{- if .Values.ingress.enabled }}
+          {{- if and .Values.ingress.enabled .Values.tls.mountIngressCerts }}
           {{- range $cert := .Values.ingress.tls }}
           - name: cert-{{ $cert.secretName | replace "." "-" }}
             mountPath: /certs/{{ $cert.secretName }}
@@ -90,7 +90,7 @@ spec:
         {{- else }}
         emptyDir: {}
         {{- end }}
-      {{- if .Values.ingress.enabled }}
+      {{- if and .Values.ingress.enabled .Values.tls.mountIngressCerts }}
       {{- range $cert := .Values.ingress.tls }}
       - name: cert-{{ $cert.secretName | replace "." "-" }}
         secret:
