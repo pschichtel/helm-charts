@@ -971,6 +971,16 @@ entries:
   znc:
   - apiVersion: v2
     appVersion: 1.8.2
+    created: "2023-11-05T18:56:08.472970455Z"
+    description: A Helm chart for the ZNC IRC bouncer
+    digest: 7bf1eb545b3c3f8304110f70c657bbf5511538d066cbf02d33b0507eeb90abc8
+    name: znc
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.1/znc-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.8.2
     created: "2023-11-05T18:46:31.880407283Z"
     description: A Helm chart for the ZNC IRC bouncer
     digest: 6681aabe536b733109417f8376bba7a6171870d9a28215f36fa7a91b1e99ab7e
@@ -979,4 +989,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2023-11-05T18:46:31.880560485Z"
+generated: "2023-11-05T18:56:08.4733586Z"
