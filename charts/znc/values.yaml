@@ -69,4 +69,9 @@ affinity: {}
 
 persistence:
   enabled: false
-  # pvc:
+  pvc:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 500Mi
