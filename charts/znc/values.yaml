@@ -78,3 +78,10 @@ persistence:
 
 tls:
   mountIngressCerts: false
+  request:
+    enabled: false
+    dnsNames: null
+    issuerRef:
+      kind: ClusterIssuer
+      # name: letsencrypt-prod
+    secretName: ''

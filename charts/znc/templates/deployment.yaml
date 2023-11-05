@@ -67,8 +67,12 @@ spec:
           {{- if and .Values.ingress.enabled .Values.tls.mountIngressCerts }}
           {{- range $cert := .Values.ingress.tls }}
           - name: cert-{{ $cert.secretName | replace "." "-" }}
-            mountPath: /certs/{{ $cert.secretName }}
+            mountPath: /ingress-certs/{{ $cert.secretName }}
           {{- end }}
+          {{- end }}
+          {{- if .Values.tls.request.enabled }}
+          - name: tls
+            mountPath: /tls
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -96,4 +100,9 @@ spec:
         secret:
           secretName: {{ $cert.secretName }}
       {{- end }}
+      {{- end }}
+      {{- if .Values.tls.request.enabled }}
+      - name: tls
+        secret:
+          secretName: {{ .Values.tls.request.secretName | required "the secret name is required!" }}
       {{- end }}
