@@ -968,4 +968,15 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.1.0/wordpress-0.1.0.tgz
     version: 0.1.0
-generated: "2023-11-01T22:27:22.040183651Z"
+  znc:
+  - apiVersion: v2
+    appVersion: 1.8.2
+    created: "2023-11-05T18:46:31.880407283Z"
+    description: A Helm chart for the ZNC IRC bouncer
+    digest: 6681aabe536b733109417f8376bba7a6171870d9a28215f36fa7a91b1e99ab7e
+    name: znc
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-11-05T18:46:31.880560485Z"
