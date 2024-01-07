@@ -14,6 +14,7 @@ spec:
   loadBalancerIP: {{ . }}
   {{- end }}
   externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  allocateLoadBalancerNodePorts: {{ .Values.service.allocateLoadBalancerNodePorts }}
   ports:
     - name: turn-tcp
       port: {{ .Values.coturn.ports.listening }}
