@@ -37,6 +37,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/cert-manager-webhook-cloudns-1.0.0/cert-manager-webhook-cloudns-1.0.0.tgz
     version: 1.0.0
+  coturn:
+  - apiVersion: v2
+    appVersion: 4.6.2-r7
+    created: "2024-01-07T03:47:07.002392963Z"
+    description: A Helm chart for coturn
+    digest: 7ba08aec52de74b23022fd42504a9eae72ee6549636fa12f9c4f9bc21520dba6
+    name: coturn
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/coturn-0.1.0/coturn-0.1.0.tgz
+    version: 0.1.0
   docspell:
   - apiVersion: v2
     appVersion: 0.40.0
@@ -1065,4 +1076,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2023-12-16T13:01:55.989589642Z"
+generated: "2024-01-07T03:47:07.002582106Z"
