@@ -39,5 +39,7 @@ data:
     {{- else }}
     no-cli
     {{- end }}
-  extra: {{ .Values.coturnExtraConfig | quote }}
+  {{- with .Values.coturnExtraConfig }}
+  extra.conf: {{ . | quote }}
+  {{- end }}
   entrypoint.sh: {{ $.Files.Get "src/entrypoint.sh" | quote }}
