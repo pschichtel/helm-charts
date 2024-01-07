@@ -6,7 +6,7 @@ metadata:
     {{- include "coturn.labels" . | nindent 4 }}
 spec:
   replicas: 1
-  updateStrategy: {{ .Values.updateStrategy | toYaml | nindent 4 }}
+  strategy: {{ .Values.strategy | toYaml | nindent 4 }}
   selector:
     matchLabels:
       {{- include "coturn.selectorLabels" . | nindent 6 }}

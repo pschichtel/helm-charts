@@ -63,7 +63,7 @@ tolerations: []
 
 affinity: {}
 
-updateStrategy:
+strategy:
   type: Recreate
 
 metrics:
