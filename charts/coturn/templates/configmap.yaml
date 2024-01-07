@@ -4,6 +4,7 @@ metadata:
   name: {{ include "coturn.fullname" . }}
 data:
   base.conf: |-
+    lt-cred-mech
     realm={{ .Values.coturn.realm }}
     listening-ip=0.0.0.0
     listening-port={{ .Values.coturn.ports.listening }}
