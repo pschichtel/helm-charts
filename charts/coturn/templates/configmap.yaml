@@ -56,6 +56,6 @@ data:
     {{- end }}
     {{- end }}
   {{- with .Values.coturn.extraConfig }}
-  extra.conf: {{ . | quote }}
+  extra.conf: {{ tpl . $ | quote }}
   {{- end }}
   entrypoint.sh: {{ $.Files.Get "src/entrypoint.sh" | quote }}
