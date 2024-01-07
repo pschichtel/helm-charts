@@ -4,7 +4,13 @@ metadata:
   name: {{ include "coturn.fullname" . }}
 data:
   base.conf: |-
+    {{- if or .Values.coturn.staticSecret.secretName .Values.coturn.staticSecret.value }}
+    use-auth-secret
+    {{- else if or .Values.coturn.staticUsers.secretName .Values.coturn.staticUsers.users }}
     lt-cred-mech
+    {{- else }}
+    {{- fail "Either static users or a static secret is required!" }}
+    {{- end }}
     realm={{ .Values.coturn.realm }}
     listening-ip=0.0.0.0
     listening-port={{ .Values.coturn.ports.listening }}
