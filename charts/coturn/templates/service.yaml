@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "coturn.fullname" . }}
+  labels:
+    {{- include "coturn.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- with .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  ports:
+    - name: turn-tcp
+      port: {{ .Values.coturn.ports.listening }}
+      protocol: TCP
+      targetPort: {{ .Values.coturn.ports.listening }}
+    - name: turn-udp
+      port: {{ .Values.coturn.ports.listening }}
+      protocol: UDP
+      targetPort: {{ .Values.coturn.ports.listening }}
+    {{- if .Values.coturn.tls.enabled }}
+    - name: turn-tcp-tls
+      port: {{ .Values.coturn.ports.tlsListening }}
+      protocol: TCP
+      targetPort: {{ .Values.coturn.ports.tlsListening }}
+    - name: turn-udp-dtls
+      port: {{ .Values.coturn.ports.tlsListening }}
+      protocol: UDP
+      targetPort: {{ .Values.coturn.ports.tlsListening }}
+    {{- end }}
+    {{- range untilStep (.Values.coturn.ports.relay.min | int) (add .Values.coturn.ports.relay.max 1 | int) 1 }}
+    - name: relay-{{ . }}
+      port: {{ . }}
+      protocol: UDP
+      targetPort: {{ . }}
+    {{- end }}
+  selector:
+    {{- include "coturn.selectorLabels" . | nindent 4 }}

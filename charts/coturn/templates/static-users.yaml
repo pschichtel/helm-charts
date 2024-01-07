@@ -1,0 +1,11 @@
+{{- if and (not .Values.coturn.staticUsers.secretName) .Values.coturn.staticUsers }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "coturn.fullname" . }}-static-users
+type: Opaque
+data:
+  {{- range $name, $password := .Values.coturn.staticUsers.users }}
+  {{ $name | quote }}: {{ $password | b64enc | quote }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "coturn.fullname" . }}
+  labels:
+    {{- include "coturn.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "coturn.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "coturn.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/entrypoint.sh"]
+          ports:
+          - name: turn-tcp
+            containerPort: {{ .Values.coturn.ports.listening }}
+            protocol: TCP
+          - name: turn-udp
+            containerPort: {{ .Values.coturn.ports.listening }}
+            protocol: UDP
+          {{- if .Values.metrics.enabled }}
+          - name: prometheus
+            containerPort: 9641
+            protocol: TCP
+          {{- end }}
+          {{- if .Values.coturn.tls.secretName }}
+          - name: turn-tcp-tls
+            containerPort: {{ .Values.coturn.ports.tlsListening }}
+            protocol: TCP
+          - name: turn-udp-dtls
+            containerPort: {{ .Values.coturn.ports.tlsListening }}
+            protocol: UDP
+          {{- end }}
+          {{- range untilStep (.Values.coturn.ports.relay.min | int) (add .Values.coturn.ports.relay.max 1 | int) 1 }}
+          - name: relay-{{ . }}
+            containerPort: {{ . }}
+            protocol: UDP
+          {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: http
+          readinessProbe:
+            tcpSocket:
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          
+          volumeMounts:
+          - name: config
+            mountPath: /config/base.conf
+            subPath: base.conf
+            readOnly: true
+          - name: config
+            mountPath: /config/extra.conf
+            subPath: extra.conf
+            readOnly: true
+          - name: entrypoint
+            mountPath: /entrypoint.sh
+            subPath: entrypoint.sh
+            readOnly: true
+          {{- if or .Values.coturn.staticUsers.secretName .Values.coturn.staticUsers.users }}
+          - name: static-users
+            mountPath: /static-users
+            readOnly: true
+          {{- end }}
+          {{- if .Values.coturn.tls.secretName }}
+          - name: tls
+            mountPath: /tls
+            readOnly: true
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "coturn.fullname" . }}
+      - name: entrypoint
+        configMap:
+          name: {{ include "coturn.fullname" . }}
+          defaultMode: 0755
+      {{- if .Values.coturn.staticUsers.secretName }}
+      - name: static-users
+        secret:
+          secretName: {{ .Values.coturn.staticUsers.secretName }}
+      {{- else if .Values.coturn.staticUsers.users }}
+      - name: static-users
+        secret:
+          secretName: {{ include "coturn.fullname" . }}-static-users
+      {{- end }}
+      {{- with .Values.coturn.tls.secretName }}
+      - name: tls
+        secret:
+          secretName: {{ . }}
+      {{- end }}
+      {{- with .Values.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

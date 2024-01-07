@@ -1,0 +1,23 @@
+{{- if and .Values.coturn.tls.secretName .Values.coturn.tls.certManager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "coturn.fullname" . }}
+spec:
+  secretName:  {{ .Values.coturn.tls.secretName }}
+  {{- with .Values.coturn.tls.certManager.issuerRef | required "issuerRef is required for certManager!"}}
+  issuerRef: {{ . | toYaml | nindent 4 }}
+  {{- end }}
+  commonName: {{ .Values.coturn.realm | quote }}
+  {{- with .Values.coturn.tls.certManager.issuerRef | required "issuerRef is required for certManager!"}}
+  issuerRef: {{ . | toYaml | nindent 4 }}
+  {{- end }}
+  {{- with .Values.coturn.tls.certManager.privateKey }}
+  privateKey: {{ . | toYaml | nindent 4 }}
+  {{- end }}
+  dnsNames:
+    - {{ .Values.coturn.realm | quote }}
+    {{- range .Values.coturn.tls.certManager.extraDnsNames }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}

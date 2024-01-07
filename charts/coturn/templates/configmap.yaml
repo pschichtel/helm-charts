@@ -1,0 +1,42 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "coturn.fullname" . }}
+data:
+  base.conf: |-
+    realm={{ .Values.coturn.realm }}
+    listening-ip=0.0.0.0
+    listening-port={{ .Values.coturn.ports.listening }}
+    {{- with .Values.coturn.externalIp }}
+    external-ip={{ . }}
+    {{- end }}
+    {{- if .Values.coturn.tls.secretName }}
+    no-tlsv1
+    no-tlsv1_1
+    no-tlsv1_2
+    tls-listening-port={{ .Values.coturn.ports.tlsListening }}
+    pkey=/tls/tls.key
+    cert=/tls/tls.crt
+    {{- else }}
+    no-tls
+    no-dtls
+    {{- end }}
+    min-port={{ .Values.coturn.ports.min }}
+    max-port={{ .Values.coturn.ports.max }}
+    {{- if .Values.coturn.mobility }}
+    mobility
+    {{- end }}
+    log-file=stdout
+    pidfile=/tmp/turnserver.pid
+    {{- if .Values.metrics.enabled }}
+    prometheus
+    {{- end }}
+    {{- if .Values.coturn.cliPasswordHash }}
+    cli-ip=127.0.0.1
+    cli-port=5766
+    cli-password={{ .Values.coturn.cliPasswordHash }}
+    {{- else }}
+    no-cli
+    {{- end }}
+  extra: {{ .Values.coturnExtraConfig | quote }}
+  entrypoint.sh: {{ $.Files.Get "src/entrypoint.sh" | quote }}

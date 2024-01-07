@@ -1,0 +1,16 @@
+{{- if .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "coturn.fullname" . }}
+spec:
+  endpoints:
+  - port: prometheus
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "coturn.selectorLabels" . | nindent 6 }}
+{{- end }}
