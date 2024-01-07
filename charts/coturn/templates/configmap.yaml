@@ -55,7 +55,7 @@ data:
     log-binding
     {{- end }}
     {{- end }}
-  {{- with .Values.coturnExtraConfig }}
+  {{- with .Values.coturn.extraConfig }}
   extra.conf: {{ . | quote }}
   {{- end }}
   entrypoint.sh: {{ $.Files.Get "src/entrypoint.sh" | quote }}
