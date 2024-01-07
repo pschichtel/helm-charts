@@ -23,7 +23,7 @@ spec:
       port: {{ .Values.coturn.ports.listening }}
       protocol: UDP
       targetPort: {{ .Values.coturn.ports.listening }}
-    {{- if .Values.coturn.tls.enabled }}
+    {{- if .Values.coturn.tls.secretName }}
     - name: turn-tcp-tls
       port: {{ .Values.coturn.ports.tlsListening }}
       protocol: TCP
