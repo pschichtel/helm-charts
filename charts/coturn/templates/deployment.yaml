@@ -62,13 +62,12 @@ spec:
           {{- end }}
           livenessProbe:
             tcpSocket:
-              port: http
+              port: turn-tcp
           readinessProbe:
             tcpSocket:
-              port: http
+              port: turn-tcp
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          
           volumeMounts:
           - name: config
             mountPath: /config/base.conf
