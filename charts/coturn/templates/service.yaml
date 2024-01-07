@@ -4,7 +4,8 @@ metadata:
   name: {{ include "coturn.fullname" . }}
   labels:
     {{- include "coturn.labels" . | nindent 4 }}
-  {{- with .Values.service.annotations }}
+  {{- $annotations := mergeOverwrite (deepCopy .Values.service.annotations) .Values.service.mainAnnotations }}
+  {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -34,11 +35,13 @@ spec:
       protocol: UDP
       targetPort: {{ .Values.coturn.ports.tlsListening }}
     {{- end }}
+    {{- if not .Values.service.separateRelayService }}
     {{- range untilStep (.Values.coturn.ports.relay.min | int) (add .Values.coturn.ports.relay.max 1 | int) 1 }}
     - name: relay-{{ . }}
       port: {{ . }}
       protocol: UDP
       targetPort: {{ . }}
+    {{- end }}
     {{- end }}
   selector:
     {{- include "coturn.selectorLabels" . | nindent 4 }}

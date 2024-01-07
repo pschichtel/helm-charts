@@ -1,0 +1,29 @@
+{{- if .Values.service.separateRelayService }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "coturn.fullname" . }}-relay
+  labels:
+    {{- include "coturn.labels" . | nindent 4 }}
+  {{- $annotations := mergeOverwrite (deepCopy .Values.service.annotations) .Values.service.relayAnnotations }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- with .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  allocateLoadBalancerNodePorts: {{ .Values.service.allocateLoadBalancerNodePorts }}
+  ports:
+    {{- range untilStep (.Values.coturn.ports.relay.min | int) (add .Values.coturn.ports.relay.max 1 | int) 1 }}
+    - name: relay-{{ . }}
+      port: {{ . }}
+      protocol: UDP
+      targetPort: {{ . }}
+    {{- end }}
+  selector:
+    {{- include "coturn.selectorLabels" . | nindent 4 }}
+{{- end }}

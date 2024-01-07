@@ -24,6 +24,9 @@ securityContext: {}
 
 service:
   annotations: {}
+  mainAnnotations: {}
+  relayAnnotations: {}
+  separateRelayService: false
   type: ClusterIP
   loadBalancerIP: null
   externalTrafficPolicy: Local
