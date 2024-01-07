@@ -87,6 +87,10 @@ coturn:
       extraDnsNames: []
   # generate using `turnadmin -P -p <password>` if wanted
   cliPasswordHash: null
+  staticSecret:
+    secretName: null
+    secretKey: secret
+    value: null
   staticUsers:
     secretName: null
     users: {}

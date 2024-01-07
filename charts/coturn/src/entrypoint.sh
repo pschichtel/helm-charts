@@ -15,6 +15,11 @@ do
     fi
 done
 
+if [ -e /static-secret ]
+then
+    echo "static-auth-secret=$(cat "/static-secret")" >> "$config"
+fi
+
 # shellcheck disable=SC2005
 echo "$(cat /config/extra.conf)" >> "$config"
 

@@ -14,6 +14,7 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
         checksum/static-users: {{ include (print $.Template.BasePath "/static-users.yaml") $ | sha256sum }}
+        checksum/static-secret: {{ include (print $.Template.BasePath "/static-secret.yaml") $ | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -87,6 +88,12 @@ spec:
             mountPath: /static-users
             readOnly: true
           {{- end }}
+          {{- if or .Values.coturn.staticSecret.secretName .Values.coturn.staticSecret.value }}
+          - name: static-secret
+            mountPath: /static-secret
+            subPath: {{ .Values.coturn.staticSecret.secretKey | quote }}
+            readOnly: true
+          {{- end }}
           {{- if .Values.coturn.tls.secretName }}
           - name: tls
             mountPath: /tls
@@ -111,6 +118,15 @@ spec:
       - name: static-users
         secret:
           secretName: {{ include "coturn.fullname" . }}-static-users
+      {{- end }}
+      {{- if .Values.coturn.staticSecret.secretName }}
+      - name: static-secret
+        secret:
+          secretName: {{ .Values.coturn.staticSecret.secretName }}
+      {{- else if .Values.coturn.staticSecret.value }}
+      - name: static-secret
+        secret:
+          secretName: {{ include "coturn.fullname" . }}-static-secret
       {{- end }}
       {{- with .Values.coturn.tls.secretName }}
       - name: tls
