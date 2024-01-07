@@ -94,3 +94,7 @@ coturn:
   staticUsers:
     secretName: null
     users: {}
+  logging:
+    verbose: true
+    veryVerbose: false
+    logBinding: false

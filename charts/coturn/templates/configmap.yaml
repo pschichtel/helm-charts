@@ -39,6 +39,16 @@ data:
     {{- else }}
     no-cli
     {{- end }}
+    {{- if .Values.coturn.logging.verbose }}
+    {{- if .Values.coturn.logging.veryVerbose }}
+    Verbose
+    {{- else }}
+    verbose
+    {{- end }}
+    {{- if .Values.coturn.logging.logBinding }}
+    log-binding
+    {{- end }}
+    {{- end }}
   {{- with .Values.coturnExtraConfig }}
   extra.conf: {{ . | quote }}
   {{- end }}
