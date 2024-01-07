@@ -22,8 +22,8 @@ data:
     no-tls
     no-dtls
     {{- end }}
-    min-port={{ .Values.coturn.ports.min }}
-    max-port={{ .Values.coturn.ports.max }}
+    min-port={{ .Values.coturn.ports.relay.min }}
+    max-port={{ .Values.coturn.ports.relay.max }}
     {{- if .Values.coturn.mobility }}
     mobility
     {{- end }}
