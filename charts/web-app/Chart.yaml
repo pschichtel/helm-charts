@@ -1,0 +1,6 @@
+apiVersion: v2
+name: web-app
+description: A Helm chart to deploy a very simple stateless web app.
+type: application
+version: 0.1.0
+appVersion: "latest"
