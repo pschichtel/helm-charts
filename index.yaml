@@ -1045,6 +1045,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/unifi-protect-0.1.0/unifi-protect-0.1.0.tgz
     version: 0.1.0
+  web-app:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2024-01-31T01:39:49.725424755Z"
+    description: A Helm chart to deploy a very simple stateless web app.
+    digest: 5a3c03a9f5eaccf8fd40255d33ae60db817766ba290e4bd1645b6e54cb9ff893
+    name: web-app
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/web-app-0.1.0/web-app-0.1.0.tgz
+    version: 0.1.0
   wordpress:
   - apiVersion: v2
     appVersion: 6.2.2
@@ -1207,4 +1218,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-01-31T01:21:35.484238859Z"
+generated: "2024-01-31T01:39:49.725623685Z"
