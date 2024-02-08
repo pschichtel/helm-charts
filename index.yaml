@@ -564,6 +564,17 @@ entries:
     version: 0.1.0
   powerdns-admin:
   - apiVersion: v2
+    appVersion: 0.4.2
+    created: "2024-02-08T22:22:11.181187813Z"
+    description: A PowerDNS web interface with advanced features
+    digest: 86523f26e1a7110837f2b4638aa76d4ded623a18706f3f2d923ec6850fedf40e
+    home: https://github.com/PowerDNS-Admin/PowerDNS-Admin
+    name: powerdns-admin
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/powerdns-admin-0.5.1/powerdns-admin-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v2
     appVersion: 0.4.1
     created: "2023-09-27T22:19:02.340398329Z"
     description: A PowerDNS web interface with advanced features
@@ -1247,4 +1258,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-02-06T19:13:49.551752621Z"
+generated: "2024-02-08T22:22:11.181442697Z"
