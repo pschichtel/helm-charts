@@ -437,6 +437,29 @@ entries:
     version: 0.0.1
   graylog:
   - apiVersion: v2
+    appVersion: 5.2.4-1
+    created: "2024-02-22T00:06:58.335852112Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: 0716acac02772b2295b3b39ef869ba05c021471bdf84b85e4a3d24e5465062b3
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.1.4/graylog-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
     appVersion: 5.2.2-1
     created: "2023-12-15T22:32:34.564976839Z"
     description: Graylog is the centralized log management solution built to open
@@ -1258,4 +1281,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-02-08T22:22:11.181442697Z"
+generated: "2024-02-22T00:06:58.336004955Z"
