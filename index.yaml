@@ -425,6 +425,17 @@ entries:
     version: 0.1.0
   gickup:
   - apiVersion: v2
+    appVersion: 0.10.28
+    created: "2024-03-04T00:44:34.708341248Z"
+    description: A helm chart to deploy gickup.
+    digest: 4135bc02f90c6e2f2f9d3c53a9d664c79eb53b4f6b059ff5b594750e10422b1b
+    home: https://github.com/cooperspencer/gickup
+    name: gickup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.2/gickup-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     appVersion: 0.10.15
     created: "2023-05-21T23:49:58.160636092Z"
     description: A helm chart to deploy gickup.
@@ -1301,4 +1312,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-02-27T01:23:25.364333838Z"
+generated: "2024-03-04T00:44:34.708602487Z"
