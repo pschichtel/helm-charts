@@ -40,6 +40,8 @@ spec:
           env:
           - name: PORT
             value: {{ .Values.service.port | quote }}
+          - name: LOG
+            value: {{ .Values.notify_push.logLevel | quote }}
           {{- with .Values.notify_push.databasePrefix }}
           - name: DATABASE_PREFIX
             value: {{ . | quote }}
@@ -49,10 +51,10 @@ spec:
           envFrom:
           - secretRef:
               name: {{ include "nextcloud-notify_push.fullname" . }}
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          // livenessProbe:
+          //   {{- toYaml .Values.livenessProbe | nindent 12 }}
+          // readinessProbe:
+          //   {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
