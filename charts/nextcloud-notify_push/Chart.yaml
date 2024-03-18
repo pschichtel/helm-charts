@@ -2,5 +2,5 @@ apiVersion: v2
 name: nextcloud-notify_push
 description: A Helm chart for nextcloud's push_notify server
 type: application
-version: 0.1.5
+version: 0.1.6
 appVersion: "0.6.9"
