@@ -41,12 +41,10 @@ resources: {}
 #   memory: 128Mi
 
 livenessProbe:
-  httpGet:
-    path: /
+  tcpSocket:
     port: http
 readinessProbe:
-  httpGet:
-    path: /
+  tcpSocket:
     port: http
 
 nodeSelector: {}
