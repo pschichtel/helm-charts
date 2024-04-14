@@ -3,7 +3,9 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ print "restic-forget-" $repo.name | quote }}
+  name: {{ print (include "restic-forget.fullname" $) "-" $repo.name | quote }}
+  labels:
+    {{- include "restic-forget.labels" $ | nindent 4 }}
 spec:
   schedule: {{ $.Values.restic.forget.schedule | quote }}
   concurrencyPolicy: Forbid
@@ -11,7 +13,7 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: {{ $.Values.serviceAccountName | quote }}
+          serviceAccountName: {{ include "restic-forget.fullname" $ }}
           restartPolicy: OnFailure
           containers:
           - name: forget
@@ -29,7 +31,7 @@ spec:
             {{- end}}
             envFrom:
             - secretRef:
-                name: {{ print "restic-forget-" $repo.name "-secrets" | quote }}
+                name: {{ print (include "restic-forget.fullname" $) "-" $repo.name | quote }}
             volumeMounts:
             - name: config
               readOnly: true
@@ -38,7 +40,7 @@ spec:
           volumes:
           - name: config
             configMap:
-              name: restic-forget
+              name: {{ include "restic-forget.fullname" $ }}
               defaultMode: 0755
               
 {{- end }}

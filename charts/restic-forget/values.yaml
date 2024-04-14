@@ -1,6 +1,3 @@
-serviceAccountName: restic-forget
-roleName: restic-forget
-
 restic:
   version: null
   retryLockTimeout: 1h

@@ -1,7 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ .Values.roleName | quote }}
+  name: {{ include "restic-forget.fullname" . }}
+  labels:
+    {{- include "restic-forget.labels" . | nindent 4 }}
 rules:
 - apiGroups: ['policy']
   resources: ['podsecuritypolicies']
