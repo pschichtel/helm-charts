@@ -6,6 +6,7 @@ metadata:
   name: {{ print "restic-forget-" $repo.name | quote }}
 spec:
   schedule: {{ $.Values.restic.forget.schedule | quote }}
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
