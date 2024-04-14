@@ -16,19 +16,28 @@ spec:
           - name: forget
             image: {{ print "ghcr.io/restic/restic:" ($.Values.restic.version | default $.Chart.AppVersion) | quote }}
             imagePullPolicy: IfNotPresent
-            command:
-              - 'restic'
-              - '--no-cache'
-              {{- with $.Values.restic.retryLockTimeout }}
-              - '--retry-lock'
-              - {{ . | quote }}
-              {{- end}}
-              - 'forget'
-              {{- range $entry := ($repo.policy | default $.Values.restic.forget.policy) }}
-              - {{ $entry | quote }}
-              {{- end }}
-              - '--prune'
+            command: [ /usr/local/bin/forget.sh ]
+            args:
+            {{- range $entry := ($repo.policy | default $.Values.restic.forget.policy) }}
+            - {{ $entry | quote }}
+            {{- end }}
+            {{- with $.Values.restic.retryLockTimeout }}
+            env:
+            - name: RETRY_LOCK_TIMEOUT
+              value: {{ . | quote }}
+            {{- end}}
             envFrom:
             - secretRef:
                 name: {{ print "restic-forget-" $repo.name "-secrets" | quote }}
+            volumeMounts:
+            - name: config
+              readOnly: true
+              subPath: forget.sh
+              mountPath: /usr/local/bin/forget.sh
+          volumes:
+          - name: config
+            configMap:
+              name: restic-forget
+              defaultMode: 0755
+              
 {{- end }}
