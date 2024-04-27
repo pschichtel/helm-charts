@@ -16,6 +16,9 @@ spec:
   {{- if .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
   {{- end }}
+  selector:
+    app: {{ template "pdns.name" . }}
+    release: {{ .Release.Name }}
   ports:
     - port: {{ .Values.powerdns.webserver.bindPort }}
       targetPort: {{ .Values.powerdns.webserver.bindPort }}
@@ -25,6 +28,7 @@ spec:
       targetPort: 53
       protocol: TCP
       name: dns-tcp
-  selector:
-    app: {{ template "pdns.name" . }}
-    release: {{ .Release.Name }}
+    - port: 53
+      targetPort: 53
+      protocol: UDP
+      name: dns-udp
