@@ -3,5 +3,5 @@ name: powerdns
 description: A Helm chart to deploy PowerDNS (psitrax/powerdns) to Kubernetes
 home: https://www.powerdns.com/
 type: application
-version: 0.1.1
-appVersion: "4.3.1"
+version: 0.2.0
+appVersion: "4.4.1"
