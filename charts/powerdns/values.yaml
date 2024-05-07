@@ -1,12 +1,8 @@
-# Default values for powerdns.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 replicaCount: 3
 
 image:
-  # github: https://github.com/psi-4ward/docker-powerdns
-  repository: psitrax/powerdns
+  # github: https://github.com/PowerDNS/pdns/blob/master/Docker-README.md
+  repository: docker.io/powerdns/pdns-auth-45
   tag: null
   pullPolicy: IfNotPresent
 
@@ -57,8 +53,16 @@ powerdns:
   dnsupdate:
     enabled: yes
   zoneName: "example.de."
-  mariadb:
-    db:
-      user: powerdns
-      password: powerdns
-      name: powerdns
+  db:
+    driver: gmysql
+    host: null
+    port: 3306
+    user: powerdns
+    password: powerdns
+    name: powerdns
+    configTemplate: |
+      {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.host | required "DB host is required!" }}
+      {{ .Values.powerdns.db.driver }}-port={{ .Values.powerdns.db.port }}
+      {{ .Values.powerdns.db.driver }}-dbname={{ .Values.powerdns.db.name }}
+      {{ .Values.powerdns.db.driver }}-user={{ .Values.powerdns.db.user }}
+      {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.password }}

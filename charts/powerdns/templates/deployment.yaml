@@ -24,26 +24,20 @@ spec:
           image: {{ print .Values.image.repository ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/entrypoint.sh"]
-          args: ["--api={{ .Values.powerdns.api.enabled }}", "--api-key=$(POWERDNS_API_KEY)", "--webserver=yes", "--webserver-port={{ .Values.powerdns.webserver.bindPort }}", "--webserver-address=0.0.0.0", "--webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}", "--slave=yes", "--dnsupdate={{ .Values.powerdns.dnsupdate.enabled }}"]
+          args:
+          - "--webserver=yes"
+          - "--webserver-port={{ .Values.powerdns.webserver.bindPort }}"
+          - "--webserver-address=0.0.0.0"
+          - "--webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}"
+          - "--slave=yes"
+          - "--dnsupdate={{ .Values.powerdns.dnsupdate.enabled }}"
           env:
-              - name: MYSQL_HOST
-              {{- if or (empty .Values.powerdns.mariadb.serviceDiscovery) (eq .Values.powerdns.mariadb.serviceDiscovery "dns") }}
-                value: {{ template "mariadb.fullname" . }}
-              {{- else if eq .Values.powerdns.mariadb.serviceDiscovery "env" }}
-                value: {{ (include "mariadb.fullname" .) | replace "-" "_" | upper | printf "$(%s_SERVICE_HOST)" }}
-              {{- end }}
-              - name: MYSQL_USER
-                value: "root"
-                value: {{ .Values.powerdns.mariadb.db.user | quote }}
-              - name: MYSQL_PASS
-                value: {{ .Values.powerdns.mariadb.db.password | quote }}
-              - name: MYSQL_DB
-                value: {{ .Values.powerdns.mariadb.db.name | quote }}
-              - name: POWERDNS_API_KEY
-                valueFrom:
-                  secretKeyRef:
-                    name: powerdns-api-key
-                    key: POWERDNS_API_KEY
+          - name: PDNS_AUTH_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "pdns.fullname" . }}
+                key: PDNS_AUTH_API_KEY
+                optional: false
           ports:
             - name: dns-udp
               containerPort: 53
