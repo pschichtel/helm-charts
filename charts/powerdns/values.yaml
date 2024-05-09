@@ -79,11 +79,11 @@ powerdns:
     driver: gmysql
     host: null
     port: 3306
+    name: powerdns
     username:
       key: null
     password:
       key: null
-    name: powerdns
     configTemplate: |
       launch={{ .Values.powerdns.db.driver }}
       {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.host | required "DB host is required!" }}
