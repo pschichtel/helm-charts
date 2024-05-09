@@ -1,6 +1,6 @@
 apiVersion: v2
 name: powerdns
-description: A Helm chart to deploy PowerDNS (psitrax/powerdns) to Kubernetes
+description: A Helm chart to deploy PowerDNS to Kubernetes
 home: https://www.powerdns.com/
 type: application
 version: 0.3.0
