@@ -9,7 +9,7 @@ data:
     local-address=0.0.0.0,::
     local-port=5353
     include-dir=/etc/powerdns/pdns.d
-    slave=yes
+    secondary=yes
   0-api.conf.j2: |
     api={{ .Values.powerdns.api.enabled | ternary "yes" "no" }}
     {{- if .Values.powerdns.api.enabled }}
