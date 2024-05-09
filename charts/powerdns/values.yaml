@@ -49,21 +49,12 @@ powerdns:
     key:
       value: null
       secretKeyRef: null
-    configTemplate: |
-      api-key={{ .Values.powerdns.api.key | required "key is required if api is enabled!" }}
   webserver:
     bindPort: 8081
     allowFrom: 0.0.0.0/0
     password:
       value: null
       secretKeyRef: null
-    configTemplate: |
-      webserver-address=0.0.0.0
-      webserver-port={{ .Values.powerdns.webserver.bindPort }}
-      webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}
-      {{- if or .Values.powerdns.webserver.password.value .Values.powerdns.webserver.password.secret }}
-      webserver-password={{ print "{{ PDNS_WEBSERVER_PASSWORD }}" }}
-      {{- end }}
   dnsupdate:
     enabled: true
   zoneName: "example.de."
