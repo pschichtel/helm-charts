@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   # github: https://github.com/PowerDNS/pdns/blob/master/Docker-README.md
-  repository: docker.io/powerdns/pdns-auth-45
+  repository: docker.io/powerdns/pdns-auth-46
   tag: null
   pullPolicy: IfNotPresent
 

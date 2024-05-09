@@ -37,10 +37,10 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: dns-udp
-              containerPort: 53
+              containerPort: 5353
               protocol: UDP
             - name: dns-tcp
-              containerPort: 53
+              containerPort: 5353
               protocol: TCP
             - name: webserver
               containerPort: {{ .Values.powerdns.webserver.bindPort }}
