@@ -16,12 +16,12 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
           - name: PDNS_HOST
-            value: "{{ template "pdns.fullname" . }}"
+            value: "{{ template "powerdns.fullname" . }}"
           - name: PDNS_PORT
             value: "{{ .Values.powerdns.webserver.bindPort }}"
           - name: ZONE
             value: {{ .Values.powerdns.zoneName }}
-          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
+          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
         command:
         - /bin/sh
         - -c

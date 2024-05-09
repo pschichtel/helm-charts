@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "pdns.fullname" . }}
+  name: {{ template "powerdns.fullname" . }}
   labels:
-    app: {{ template "pdns.name" . }}
-    chart: {{ template "pdns.chart" . }}
+    app: {{ template "powerdns.name" . }}
+    chart: {{ template "powerdns.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "pdns.name" . }}
+      app: {{ template "powerdns.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "pdns.name" . }}
+        app: {{ template "powerdns.name" . }}
         release: {{ .Release.Name }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
@@ -57,13 +57,13 @@ spec:
           env:
           - name: TEMPLATE_FILES
             value: '0-api.conf,1-webserver.conf,2-database.conf,3-dnsupdate.conf,4-additional.conf'
-          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
-          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_WEBSERVER_PASSWORD" "Ref" .Values.powerdns.webserver.password) | nindent 10 }}
-          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_USERNAME" "Ref" .Values.powerdns.db.username) | nindent 10 }}
-          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_PASSWORD" "Ref" .Values.powerdns.db.password) | nindent 10 }}
+          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
+          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_WEBSERVER_PASSWORD" "Ref" .Values.powerdns.webserver.password) | nindent 10 }}
+          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_USERNAME" "Ref" .Values.powerdns.db.username) | nindent 10 }}
+          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_PASSWORD" "Ref" .Values.powerdns.db.password) | nindent 10 }}
           envFrom:
           - secretRef:
-              name: {{ template "pdns.fullname" . }}
+              name: {{ template "powerdns.fullname" . }}
               optional: true
           volumeMounts:
           - name: config
@@ -76,7 +76,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: {{ template "pdns.fullname" . }}
+          name: {{ template "powerdns.fullname" . }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

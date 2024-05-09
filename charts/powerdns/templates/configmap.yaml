@@ -1,7 +1,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ template "pdns.fullname" . }}
+  name: {{ template "powerdns.fullname" . }}
 data:
   pdns.conf: |
     local-address=0.0.0.0,::
