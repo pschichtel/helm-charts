@@ -44,17 +44,17 @@ tolerations: []
 affinity: {}
 
 powerdns:
+  createSecret: null
+  commonSecret: null
   api:
     enabled: true
     key:
-      value: null
-      secretKeyRef: null
+      key: PDNS_API_KEY
   webserver:
     bindPort: 8081
     allowFrom: 0.0.0.0/0
     password:
-      value: null
-      secretKeyRef: null
+      key: null
   dnsupdate:
     enabled: true
   zoneName: "example.de."
@@ -63,21 +63,19 @@ powerdns:
     host: null
     port: 3306
     username:
-      value: null
-      secretKeyRef: null
+      key: null
     password:
-      value: null
-      secretKeyRef: null
+      key: null
     name: powerdns
     configTemplate: |
       launch={{ .Values.powerdns.db.driver }}
       {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.host | required "DB host is required!" }}
       {{ .Values.powerdns.db.driver }}-port={{ .Values.powerdns.db.port }}
       {{ .Values.powerdns.db.driver }}-dbname={{ .Values.powerdns.db.name }}
-      {{- if or .Values.powerdns.db.username.value .Values.powerdns.db.username.secretKeyRef }}
+      {{- if .Values.powerdns.db.username.key }}
       {{ .Values.powerdns.db.driver }}-user={{ print "{{ PDNS_DB_USERNAME }}" }}
       {{- end }}
-      {{- if or .Values.powerdns.db.password.value .Values.powerdns.db.password.secretKeyRef }}
+      {{- if .Values.powerdns.db.password.key }}
       {{ .Values.powerdns.db.driver }}-password={{ print "{{ PDNS_DB_PASSWORD }}" }}
       {{- end }}
   additionalConfig: ''

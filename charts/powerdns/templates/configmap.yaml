@@ -17,7 +17,7 @@ data:
     webserver-address=0.0.0.0
     webserver-port={{ .Values.powerdns.webserver.bindPort }}
     webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}
-    {{- if or .Values.powerdns.webserver.password.value .Values.powerdns.webserver.password.secretKeyRef }}
+    {{- if .Values.powerdns.webserver.password.key }}
     webserver-password={{ print "{{ PDNS_WEBSERVER_PASSWORD }}" }}
     {{- end }}
   2-database.conf.j2: {{ tpl .Values.powerdns.db.configTemplate $ | quote }}

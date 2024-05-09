@@ -36,7 +36,7 @@ spec:
             - name: api
               containerPort: {{ .Values.powerdns.webserver.bindPort }}
               protocol: TCP
-          {{- if or .Values.powerdns.webserver.password.value .Values.powerdns.webserver.password.secretKeyRef }}
+          {{- if .Values.powerdns.webserver.password.key }}
           livenessProbe:
             tcpSocket:
               port: api
@@ -57,34 +57,10 @@ spec:
           env:
           - name: TEMPLATE_FILES
             value: '0-api.conf,1-webserver.conf,2-database.conf,3-dnsupdate.conf,4-additional.conf'
-          {{- with .Values.powerdns.api.key.secretKeyRef }}
-          - name: PDNS_API_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ .name }}
-                key: {{ .key }}
-          {{- end }}
-          {{- with .Values.powerdns.webserver.password.secretKeyRef }}
-          - name: PDNS_WEBSERVER_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ .name }}
-                key: {{ .key }}
-          {{- end }}
-          {{- with .Values.powerdns.db.username.secretKeyRef }}
-          - name: PDNS_DB_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .name }}
-                key: {{ .key }}
-          {{- end }}
-          {{- with .Values.powerdns.db.password.secretKeyRef }}
-          - name: PDNS_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: {{ .name }}
-                key: {{ .key }}
-          {{- end }}
+          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
+          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_WEBSERVER_PASSWORD" "Ref" .Values.powerdns.webserver.password) | nindent 10 }}
+          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_USERNAME" "Ref" .Values.powerdns.db.username) | nindent 10 }}
+          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_PASSWORD" "Ref" .Values.powerdns.db.password) | nindent 10 }}
           envFrom:
           - secretRef:
               name: {{ template "pdns.fullname" . }}

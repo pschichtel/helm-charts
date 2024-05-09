@@ -31,6 +31,12 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "mariadb.fullname" -}}
-{{- printf "%s-%s" .Release.Name "mariadb" | trunc 63 | trimSuffix "-" -}}
+{{- define "pdns.secretRef" -}}
+{{- if .Ref.key -}}
+- name: {{ .Name }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Ref.name | default .Root.Values.powerdns.commonSecret | default (include "pdns.fullname" .Root) }}
+      key: {{ .Ref.key }}
+{{- end -}}
 {{- end -}}

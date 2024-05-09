@@ -21,18 +21,7 @@ spec:
             value: "{{ .Values.powerdns.webserver.bindPort }}"
           - name: ZONE
             value: {{ .Values.powerdns.zoneName }}
-          - name: PDNS_API_KEY
-            {{- if .Values.powerdns.api.key.value }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "pdns.fullname" . }}
-                key: PDNS_API_KEY
-            {{- else }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.powerdns.api.key.secretKeyRef.name }}
-                key: {{ .Values.powerdns.api.key.secretKeyRef.name }}
-            {{- end }}
+          {{ include "pdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
         command:
         - /bin/sh
         - -c
