@@ -18,26 +18,14 @@ spec:
       labels:
         app: {{ template "pdns.name" . }}
         release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") $ | sha256sum }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: {{ print .Values.image.repository ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
+          image: {{ print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/entrypoint.sh"]
-          args:
-          - "--webserver=yes"
-          - "--webserver-port={{ .Values.powerdns.webserver.bindPort }}"
-          - "--webserver-address=0.0.0.0"
-          - "--webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}"
-          - "--slave=yes"
-          - "--dnsupdate={{ .Values.powerdns.dnsupdate.enabled }}"
-          env:
-          - name: PDNS_AUTH_API_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "pdns.fullname" . }}
-                key: PDNS_AUTH_API_KEY
-                optional: false
           ports:
             - name: dns-udp
               containerPort: 53
@@ -48,6 +36,14 @@ spec:
             - name: api
               containerPort: {{ .Values.powerdns.webserver.bindPort }}
               protocol: TCP
+          {{- if or .Values.powerdns.webserver.password.value .Values.powerdns.webserver.password.secretKeyRef }}
+          livenessProbe:
+            tcpSocket:
+              port: api
+          readinessProbe:
+            tcpSocket:
+              port: api
+          {{- else }}
           livenessProbe:
             httpGet:
               path: /
@@ -56,8 +52,55 @@ spec:
             httpGet:
               path: /
               port: api
-          resources:
-{{ toYaml .Values.resources | indent 12 }}
+          {{- end }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          env:
+          - name: TEMPLATE_FILES
+            value: '0-api.conf,1-webserver.conf,2-database.conf,3-dnsupdate.conf,4-additional.conf'
+          {{- with .Values.powerdns.api.key.secretKeyRef }}
+          - name: PDNS_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .name }}
+                key: {{ .key }}
+          {{- end }}
+          {{- with .Values.powerdns.webserver.password.secretKeyRef }}
+          - name: PDNS_WEBSERVER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .name }}
+                key: {{ .key }}
+          {{- end }}
+          {{- with .Values.powerdns.db.username.secretKeyRef }}
+          - name: PDNS_DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .name }}
+                key: {{ .key }}
+          {{- end }}
+          {{- with .Values.powerdns.db.password.secretKeyRef }}
+          - name: PDNS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .name }}
+                key: {{ .key }}
+          {{- end }}
+          envFrom:
+          - secretRef:
+              name: {{ template "pdns.fullname" . }}
+              optional: true
+          volumeMounts:
+          - name: config
+            subPath: pdns.conf
+            mountPath: /etc/powerdns/pdns.conf
+            readOnly: true
+          - name: config
+            mountPath: /etc/powerdns/templates.d
+            readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "pdns.fullname" . }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}

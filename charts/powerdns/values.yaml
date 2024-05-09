@@ -45,24 +45,48 @@ affinity: {}
 
 powerdns:
   api:
-    enabled: yes
-    key: PowerDNSAPI
+    enabled: true
+    key:
+      value: null
+      secretKeyRef: null
+    configTemplate: |
+      api-key={{ .Values.powerdns.api.key | required "key is required if api is enabled!" }}
   webserver:
     bindPort: 8081
     allowFrom: 0.0.0.0/0
+    password:
+      value: null
+      secretKeyRef: null
+    configTemplate: |
+      webserver-address=0.0.0.0
+      webserver-port={{ .Values.powerdns.webserver.bindPort }}
+      webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}
+      {{- if or .Values.powerdns.webserver.password.value .Values.powerdns.webserver.password.secret }}
+      webserver-password={{ print "{{ PDNS_WEBSERVER_PASSWORD }}" }}
+      {{- end }}
   dnsupdate:
-    enabled: yes
+    enabled: true
   zoneName: "example.de."
   db:
     driver: gmysql
     host: null
     port: 3306
-    user: powerdns
-    password: powerdns
+    username:
+      value: null
+      secretKeyRef: null
+    password:
+      value: null
+      secretKeyRef: null
     name: powerdns
     configTemplate: |
+      launch={{ .Values.powerdns.db.driver }}
       {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.host | required "DB host is required!" }}
       {{ .Values.powerdns.db.driver }}-port={{ .Values.powerdns.db.port }}
       {{ .Values.powerdns.db.driver }}-dbname={{ .Values.powerdns.db.name }}
-      {{ .Values.powerdns.db.driver }}-user={{ .Values.powerdns.db.user }}
-      {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.password }}
+      {{- if or .Values.powerdns.db.username.value .Values.powerdns.db.username.secretKeyRef }}
+      {{ .Values.powerdns.db.driver }}-user={{ print "{{ PDNS_DB_USERNAME }}" }}
+      {{- end }}
+      {{- if or .Values.powerdns.db.password.value .Values.powerdns.db.password.secretKeyRef }}
+      {{ .Values.powerdns.db.driver }}-password={{ print "{{ PDNS_DB_PASSWORD }}" }}
+      {{- end }}
+  additionalConfig: ''

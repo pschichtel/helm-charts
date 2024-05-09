@@ -1,3 +1,4 @@
+{{- if .Values.powerdns.api.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -11,25 +12,35 @@ spec:
     spec:
       containers:
       - name: create-zone-if-not-exist-sh
-        image: curlimages/curl:8.1.0
+        image: docker.io/curlimages/curl:8.7.1
         imagePullPolicy: IfNotPresent
         env:
-          - name: POWERDNS_API
-            value: "{{ template "pdns.fullname" . }}.{{ .Release.Namespace }}"
+          - name: PDNS_HOST
+            value: "{{ template "pdns.fullname" . }}"
+          - name: PDNS_PORT
+            value: "{{ .Values.powerdns.webserver.bindPort }}"
           - name: ZONE
             value: {{ .Values.powerdns.zoneName }}
-          - name: POWERDNS_API_KEY
+          - name: PDNS_API_KEY
+            {{- if .Values.powerdns.api.key.value }}
             valueFrom:
               secretKeyRef:
-                name: powerdns-api-key
-                key: POWERDNS_API_KEY
+                name: {{ template "pdns.fullname" . }}
+                key: PDNS_API_KEY
+            {{- else }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.powerdns.api.key.secretKeyRef.name }}
+                key: {{ .Values.powerdns.api.key.secretKeyRef.name }}
+            {{- end }}
         command:
         - /bin/sh
         - -c
         - |
+          zones_api_url="http://$PDNS_HOST:$PDNS_PORT/api/v1/servers/localhost/zones"
           while true; do
-            echo -n "Fetching zones from PowerDNS (http://$POWERDNS_API:{{ .Values.powerdns.webserver.bindPort }}/api/v1/servers/localhost/zones)... "
-            ZONES=$(curl --fail -H "X-API-Key: $POWERDNS_API_KEY" http://$POWERDNS_API:{{ .Values.powerdns.webserver.bindPort }}/api/v1/servers/localhost/zones)
+            echo -n "Fetching zones from PowerDNS ($zones_api_url)... "
+            ZONES=$(curl -s --fail -H "X-API-Key: $PDNS_API_KEY" "$zones_api_url")
             if [ $? -eq 0 ]; then
               echo "OK."
               break
@@ -42,7 +53,7 @@ spec:
             echo "Zone is missing, creating... "
             while true; do
               echo -n "Creating zone: {\"name\":\"$ZONE\",\"type\":\"Zone\",\"nameservers\":[\"ns1-$ZONE\"],\"kind\":\"Native\"}... "
-              curl --fail -X POST -d "{\"name\":\"$ZONE\",\"type\":\"Zone\",\"nameservers\":[\"ns1-$ZONE\"],\"kind\":\"Native\"}" -H "X-API-Key: $POWERDNS_API_KEY" http://$POWERDNS_API:8081/api/v1/servers/localhost/zones
+              curl -s --fail -X POST -d "{\"name\":\"$ZONE\",\"type\":\"Zone\",\"nameservers\":[\"ns1-$ZONE\"],\"kind\":\"Native\"}" -H "X-API-Key: $PDNS_API_KEY" "$zones_api_url"
               echo
               if [ $? -eq 0 ]; then
                 echo "OK."
@@ -56,3 +67,4 @@ spec:
             echo "Zone already exists."
           fi
       restartPolicy: Never
+{{- end }}

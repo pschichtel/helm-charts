@@ -1,0 +1,26 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "pdns.fullname" . }}
+data:
+  pdns.conf: |
+    local-address=0.0.0.0,::
+    include-dir=/etc/powerdns/pdns.d
+  
+  0-api.conf.j2: |
+    api={{ .Values.powerdns.api.enabled | ternary "yes" "no" }}
+    {{- if .Values.powerdns.api.enabled }}
+    api-key={{ print "{{ PDNS_API_KEY }}" }}
+    {{- end }}
+  1-webserver.conf.j2: |
+    webserver=yes
+    webserver-address=0.0.0.0
+    webserver-port={{ .Values.powerdns.webserver.bindPort }}
+    webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}
+    {{- if or .Values.powerdns.webserver.password.value .Values.powerdns.webserver.password.secretKeyRef }}
+    webserver-password={{ print "{{ PDNS_WEBSERVER_PASSWORD }}" }}
+    {{- end }}
+  2-database.conf.j2: {{ tpl .Values.powerdns.db.configTemplate $ | quote }}
+  3-dnsupdate.conf.j2: |
+    dnsupdate={{ .Values.powerdns.dnsupdate.enabled | ternary "yes" "no" }}
+  4-additional.conf.j2: {{ tpl .Values.powerdns.additionalConfig $ | quote }}
