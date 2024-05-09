@@ -1,12 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "powerdns.fullname" . }}
+  name: {{ include "powerdns.fullname" . }}
   labels:
-    app: {{ template "powerdns.name" . }}
-    chart: {{ template "powerdns.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "powerdns.labels" . | nindent 4 }}
   {{- with .Values.service.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -16,14 +13,11 @@ spec:
   {{- if .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
   {{- end }}
-  selector:
-    app: {{ template "powerdns.name" . }}
-    release: {{ .Release.Name }}
   ports:
     - port: {{ .Values.powerdns.webserver.bindPort }}
       targetPort: {{ .Values.powerdns.webserver.bindPort }}
       protocol: TCP
-      name: api
+      name: webserver
     - port: 53
       targetPort: 53
       protocol: TCP
@@ -32,3 +26,5 @@ spec:
       targetPort: 53
       protocol: UDP
       name: dns-udp
+  selector:
+    {{- include "powerdns.selectorLabels" . | nindent 4 }}

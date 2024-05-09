@@ -3,27 +3,36 @@ kind: Deployment
 metadata:
   name: {{ template "powerdns.fullname" . }}
   labels:
-    app: {{ template "powerdns.name" . }}
-    chart: {{ template "powerdns.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    {{- include "powerdns.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "powerdns.name" . }}
-      release: {{ .Release.Name }}
+      {{- include "powerdns.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ template "powerdns.name" . }}
-        release: {{ .Release.Name }}
+        {{- include "powerdns.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") $ | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -33,27 +42,26 @@ spec:
             - name: dns-tcp
               containerPort: 53
               protocol: TCP
-            - name: api
+            - name: webserver
               containerPort: {{ .Values.powerdns.webserver.bindPort }}
               protocol: TCP
           {{- if .Values.powerdns.webserver.password.key }}
           livenessProbe:
             tcpSocket:
-              port: api
+              port: webserver
           readinessProbe:
             tcpSocket:
-              port: api
+              port: webserver
           {{- else }}
           livenessProbe:
             httpGet:
               path: /
-              port: api
+              port: webserver
           readinessProbe:
             httpGet:
               path: /
-              port: api
+              port: webserver
           {{- end }}
-          resources: {{ toYaml .Values.resources | nindent 12 }}
           env:
           - name: TEMPLATE_FILES
             value: '0-api.conf,1-webserver.conf,2-database.conf,3-dnsupdate.conf,4-additional.conf'
@@ -65,6 +73,8 @@ spec:
           - secretRef:
               name: {{ template "powerdns.fullname" . }}
               optional: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
           - name: config
             subPath: pdns.conf
@@ -77,15 +87,15 @@ spec:
       - name: config
         configMap:
           name: {{ template "powerdns.fullname" . }}
-    {{- with .Values.nodeSelector }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,10 +1,28 @@
-replicaCount: 3
+replicaCount: 1
 
 image:
   # github: https://github.com/PowerDNS/pdns/blob/master/Docker-README.md
   repository: docker.io/powerdns/pdns-auth-45
   tag: null
   pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -17,7 +35,6 @@ ingress:
   annotations: {}
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
-  path: /
   hosts:
   - chart-example.local
   tls: []
@@ -31,11 +48,11 @@ resources: {}
 # resources, such as Minikube. If you do want to specify resources, uncomment the following
 # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 # limits:
-#  cpu: 100m
-#  memory: 128Mi
+#   cpu: 100m
+#   memory: 128Mi
 # requests:
-#  cpu: 100m
-#  memory: 128Mi
+#   cpu: 100m
+#   memory: 128Mi
 
 nodeSelector: {}
 
