@@ -1,4 +1,4 @@
-{{- if .Values.powerdns.api.enabled }}
+{{- if and .Values.powerdns.zoneName .Values.powerdns.api.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
