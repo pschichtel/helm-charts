@@ -54,11 +54,11 @@ resources: {}
 
 livenessProbe:
   httpGet:
-    path: /
+    path: /__lbheartbeat__
     port: http
 readinessProbe:
   httpGet:
-    path: /
+    path: /__lbheartbeat__
     port: http
 
 # Additional volumes on the output Deployment definition.
