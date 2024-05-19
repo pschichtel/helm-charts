@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "powerdns.name" -}}
+{{- define "syncstorage.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "powerdns.fullname" -}}
+{{- define "syncstorage.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "powerdns.chart" -}}
+{{- define "syncstorage.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "powerdns.labels" -}}
-helm.sh/chart: {{ include "powerdns.chart" . }}
-{{ include "powerdns.selectorLabels" . }}
+{{- define "syncstorage.labels" -}}
+helm.sh/chart: {{ include "syncstorage.chart" . }}
+{{ include "syncstorage.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "powerdns.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "powerdns.name" . }}
+{{- define "syncstorage.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "syncstorage.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{- define "powerdns.secretRef" -}}
+{{- define "syncstorage.secretRef" -}}
 {{- if .Ref.key -}}
 - name: {{ .Name | quote }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Ref.name | default .Root.Values.powerdns.commonSecret | default (include "powerdns.fullname" .Root) | quote }}
+      name: {{ .Ref.name | default .Root.Values.syncstorage.commonSecret | default (include "syncstorage.fullname" .Root) | quote }}
       key: {{ .Ref.key | quote }}
 {{- end -}}
 {{- end -}}
