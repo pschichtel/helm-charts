@@ -1156,6 +1156,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/sponge-vanilla-0.1.0/sponge-vanilla-0.1.0.tgz
     version: 0.1.0
+  syncstorage:
+  - apiVersion: v2
+    appVersion: 0.15.8
+    created: "2024-05-19T10:25:10.404588068Z"
+    description: A Helm chart for deploying Mozilla's syncstorage service to Kubernetes
+    digest: ad0362df0b892047bddf8b965a11ab26222e074dab7b15cea8a1cfe6a91c7099
+    name: syncstorage
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/syncstorage-0.0.1/syncstorage-0.0.1.tgz
+    version: 0.0.1
   teamspeak3:
   - apiVersion: v2
     appVersion: 3.13.7
@@ -1511,4 +1522,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-05-09T19:41:40.478787544Z"
+generated: "2024-05-19T10:25:10.404982444Z"
