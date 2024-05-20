@@ -1372,6 +1372,16 @@ entries:
   vaultwarden:
   - apiVersion: v2
     appVersion: 1.30.5
+    created: "2024-05-20T18:10:54.466469955Z"
+    description: A Helm chart for Kubernetes
+    digest: f8c7a034548d981383ba93ba6ca966fb347227b19d35c4d8c3461b860eefbfdb
+    name: vaultwarden
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/vaultwarden-0.1.4/vaultwarden-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 1.30.5
     created: "2024-05-20T16:40:10.251234326Z"
     description: A Helm chart for Kubernetes
     digest: 28792037c07629854a4f088751898f95bd3594c1fc597ea8fa6a0858ac895088
@@ -1593,4 +1603,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-05-20T16:40:10.251461008Z"
+generated: "2024-05-20T18:10:54.466821606Z"
