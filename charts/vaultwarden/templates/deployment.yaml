@@ -99,7 +99,7 @@ spec:
       volumes:
       {{- if .Values.persistence.enabled }}
       - name: data
-        persistantVolumeClaim:
+        persistentVolumeClaim:
           claimName: {{ include "vaultwarden.fullname" . }}
           readOnly: false
       {{- end }}
