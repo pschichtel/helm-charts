@@ -81,6 +81,8 @@ tolerations: []
 affinity: {}
 
 syncstorage:
+  # see: https://github.com/mozilla-services/syncstorage-rs#rust_log
+  logLevel: info
   createSecret: null
   commonSecret: null
   masterSecret:
