@@ -11,10 +11,11 @@ spec:
       {{- include "vaultwarden.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") $ | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "vaultwarden.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -48,9 +49,13 @@ spec:
           {{- end }}
           - name: INVITATIONS_ALLOWED
             value: {{ .Values.vaultwarden.settings.invitationsAllowed | quote }}
+          - name: DISABLE_ADMIN_TOKEN
+            value: {{ .Values.vaultwarden.settings.disableAdminToken | quote }}
+          {{- if not .Values.vaultwarden.settings.disableAdminToken }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "ADMIN_TOKEN" "Ref" .Values.vaultwarden.settings.adminToken) | nindent 10 }}
+          {{- end }}
           - name: PUSH_ENABLED
-            value: {{ .Values.vaultwarden.settings.pushEnabled }}
+            value: {{ .Values.vaultwarden.settings.pushEnabled | quote }}
           {{- if .Values.vaultwarden.settings.pushEnabled }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "PUSH_INSTALLATION_ID" "Ref" .Values.vaultwarden.settings.pushInstallationId) | nindent 10 }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "PUSH_INSTALLATION_KEY" "Ref" .Values.vaultwarden.settings.pushInstallationKey) | nindent 10 }}
