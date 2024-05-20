@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vaultwarden.fullname" . }}
+  labels:
+    {{- include "vaultwarden.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "vaultwarden.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "vaultwarden.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+          - name: ROCKET_PORT
+            value: '8080'
+          - name: SIGNUPS_ALLOWED
+            value: {{ .Values.vaultwarden.settings.signupsAllowed | quote }}
+          {{- if .Values.vaultwarden.settings.signupsAllowed }}
+          - name: SIGNUPS_DOMAINS_WHITELIST
+            value: {{ .Values.vaultwarden.settings.signupsDomainsWhitelist | join "," | quote }}
+          {{- end }}
+          - name: INVITATIONS_ALLOWED
+            value: {{ .Values.vaultwarden.settings.invitationsAllowed | quote }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "ADMIN_TOKEN" "Ref" .Values.vaultwarden.settings.adminToken) | nindent 10 }}
+          - name: PUSH_ENABLED
+            value: {{ .Values.vaultwarden.settings.pushEnabled }}
+          {{- if .Values.vaultwarden.settings.pushEnabled }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "PUSH_INSTALLATION_ID" "Ref" .Values.vaultwarden.settings.pushInstallationId) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "PUSH_INSTALLATION_KEY" "Ref" .Values.vaultwarden.settings.pushInstallationKey) | nindent 10 }}
+          {{- end }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "DOMAIN" "Value" .Values.vaultwarden.settings.domain) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "YUBICO_SERVER" "Value" .Values.vaultwarden.settings.yubicoServer) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "YUBICO_CLIENT_ID" "Ref" .Values.vaultwarden.settings.yubicoClientId) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "YUBICO_SECRET_KEY" "Ref" .Values.vaultwarden.settings.yubicoSecretKey) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "ROCKET_LIMITS" "Value" .Values.vaultwarden.settings.rocketLimits) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "ROCKET_WORKERS" "Value" .Values.vaultwarden.settings.rocketWorkers) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "SMTP_HOST" "Value" .Values.vaultwarden.settings.smtpHost) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "SMTP_FROM" "Value" .Values.vaultwarden.settings.smtpFrom) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "SMTP_PORT" "Value" .Values.vaultwarden.settings.smtpPort) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "SMTP_SECURITY" "Value" .Values.vaultwarden.settings.smtpSecurity) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "SMTP_USERNAME" "Ref" .Values.vaultwarden.settings.smtpUsername) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "SMTP_PASSWORD" "Ref" .Values.vaultwarden.settings.smtpPassword) | nindent 10 }}
+          - name: SHOW_PASSWORD_HINT
+            value: {{ .Values.vaultwarden.settings.showPasswordHint | quote }}
+          - name: WEB_VAULT_ENABLED
+            value: {{ .Values.vaultwarden.settings.webVaultEnabled | quote }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "LOG_LEVEL" "Value" .Values.vaultwarden.settings.logLevel) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "EXTENDED_LOGGING" "Value" .Values.vaultwarden.settings.extendedLogging) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "VAULTWARDEN_DB_USERNAME" "Ref" .Values.vaultwarden.database.username) | nindent 10 }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "VAULTWARDEN_DB_PASSWORD" "Ref" .Values.vaultwarden.database.password) | nindent 10 }}
+          - name: DATABASE_URL
+            value: {{ .Values.vaultwarden.database.uri | quote }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          {{- if .Values.persistence.enabled }}
+          - name: data
+            mountPath: /data
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+      {{- if .Values.persistence.enabled }}
+      - name: data
+        persistantVolumeClaim:
+          claimName: {{ include "vaultwarden.fullname" . }}
+          readOnly: false
+      {{- end }}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
