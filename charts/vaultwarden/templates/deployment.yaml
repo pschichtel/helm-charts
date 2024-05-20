@@ -59,6 +59,8 @@ spec:
           {{- if .Values.vaultwarden.settings.pushEnabled }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "PUSH_INSTALLATION_ID" "Ref" .Values.vaultwarden.settings.pushInstallationId) | nindent 10 }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "PUSH_INSTALLATION_KEY" "Ref" .Values.vaultwarden.settings.pushInstallationKey) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "PUSH_RELAY_URI" "Value" .Values.vaultwarden.settings.pushRelayUri) | nindent 10 }}
+          {{- include "vaultwarden.optionalSetting" (dict "Name" "PUSH_IDENTITY_URI" "Value" .Values.vaultwarden.settings.pushIdentityUri) | nindent 10 }}
           {{- end }}
           {{- include "vaultwarden.optionalSetting" (dict "Name" "DOMAIN" "Value" .Values.vaultwarden.settings.domain) | nindent 10 }}
           {{- include "vaultwarden.optionalSetting" (dict "Name" "YUBICO_SERVER" "Value" .Values.vaultwarden.settings.yubicoServer) | nindent 10 }}

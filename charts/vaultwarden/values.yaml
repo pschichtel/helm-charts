@@ -105,6 +105,8 @@ vaultwarden:
       key: PUSH_INSTALLATION_ID
     pushInstallationKey:
       key: PUSH_INSTALLATION_KEY
+    pushRelayUri: null
+    pushIdentityUri: null
     domain: null
     yubicoServer: null
     # this must be a secretKeyRef with optional secret name
