@@ -1359,6 +1359,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/unifi-protect-0.1.0/unifi-protect-0.1.0.tgz
     version: 0.1.0
+  vaultwarden:
+  - apiVersion: v2
+    appVersion: 1.30.5
+    created: "2024-05-20T15:35:10.496467201Z"
+    description: A Helm chart for Kubernetes
+    digest: 46df2fd41943a02e78d6dc67b6657e12f5b721438a842d5e77e1f308c6bbb0dd
+    name: vaultwarden
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/vaultwarden-0.1.0/vaultwarden-0.1.0.tgz
+    version: 0.1.0
   web-app:
   - apiVersion: v2
     appVersion: latest
@@ -1542,4 +1553,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-05-20T11:32:50.979348722Z"
+generated: "2024-05-20T15:35:10.496772596Z"
