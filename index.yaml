@@ -1159,6 +1159,16 @@ entries:
   syncstorage:
   - apiVersion: v2
     appVersion: 0.15.8
+    created: "2024-05-20T16:12:33.907746766Z"
+    description: A Helm chart for deploying Mozilla's syncstorage service to Kubernetes
+    digest: 3af12eed76e1aad15ca7265fcc168366135c7f725604b1637a7526f17e39dadf
+    name: syncstorage
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/syncstorage-0.1.1/syncstorage-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 0.15.8
     created: "2024-05-20T11:32:50.979041897Z"
     description: A Helm chart for deploying Mozilla's syncstorage service to Kubernetes
     digest: ca8e6ddf476e21d2c747638ee7dc658b79ac09e3682128adafc66724a82a381b
@@ -1553,4 +1563,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-05-20T15:35:10.496772596Z"
+generated: "2024-05-20T16:12:33.907917396Z"
