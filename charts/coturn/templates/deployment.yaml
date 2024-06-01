@@ -63,12 +63,23 @@ spec:
             containerPort: {{ . }}
             protocol: UDP
           {{- end }}
+          {{- if .Values.metrics.enabled }}
+          livenessProbe:
+            httpGet:
+              port: prometheus
+              path: /
+          readinessProbe:
+            httpGet:
+              port: prometheus
+              path: /
+          {{- else }}
           livenessProbe:
             tcpSocket:
               port: turn-tcp
           readinessProbe:
             tcpSocket:
               port: turn-tcp
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
