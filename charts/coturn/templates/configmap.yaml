@@ -12,7 +12,6 @@ data:
     {{- fail "Either static users or a static secret is required!" }}
     {{- end }}
     realm={{ .Values.coturn.realm }}
-    listening-ip=0.0.0.0
     listening-port={{ .Values.coturn.ports.listening }}
     {{- with .Values.coturn.externalIp }}
     external-ip={{ . }}

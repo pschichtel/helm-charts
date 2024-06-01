@@ -4,8 +4,10 @@ set -eu
 
 config="/tmp/turnserver.conf"
 
+echo "listening-ip=${POD_IP:-"0.0.0.0"}" > "$config"
+
 # shellcheck disable=SC2005
-echo "$(cat /config/base.conf)" > "$config"
+echo "$(cat /config/base.conf)" >> "$config"
 
 
 if [ -e /static-secret ]
