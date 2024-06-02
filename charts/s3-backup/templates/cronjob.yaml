@@ -4,15 +4,16 @@ kind: CronJob
 metadata:
   name: {{ .Values.s3Backup.jobName | quote }}
 spec:
-  schedule: {{ $.Values.s3Backup.schedule | quote }}
+  schedule: {{ .Values.s3Backup.schedule | quote }}
   jobTemplate:
     spec:
       template:
         spec:
+          hostname: {{ .Values.s3Backup.hostname | default .Values.s3Backup.jobName | quote }}
           restartPolicy: OnFailure
           containers:
           - name: backup
-            image: {{ print .Values.image.repository ":" ($.Values.image.tag | default $.Chart.AppVersion) | quote }}
+            image: {{ print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}
             imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
             env:
             - name: 'SOURCE_S3_ENDPOINT'

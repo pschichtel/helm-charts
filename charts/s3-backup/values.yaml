@@ -5,6 +5,7 @@ image:
   pullPolicy: IfNotPresent
 
 s3Backup:
+  hostname: null
   serviceAccountName: s3-backup
   roleName: s3-backup
   jobName: s3-backup
