@@ -2,7 +2,7 @@ image:
   # github: https://github.com/pschichtel/s3-backup
   repository: ghcr.io/pschichtel/s3-backup
   tag: null
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
 
 s3Backup:
   serviceAccountName: s3-backup
