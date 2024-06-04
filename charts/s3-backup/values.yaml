@@ -18,6 +18,9 @@ s3Backup:
   resticArgs:
     global: ''
     backup: ''
+  job:
+    # 3 days by default
+    ttlSecondsAfterFinished: 259200
   buckets: []
   secrets:
     existingSecret: null
