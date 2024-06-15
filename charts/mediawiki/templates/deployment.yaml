@@ -1,0 +1,176 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mediawiki.fullname" . }}
+  labels:
+    {{- include "mediawiki.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mediawiki.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") $ | sha256sum }}
+      labels:
+        {{- include "mediawiki.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: copy-mediawiki
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.mediawikiImage.repository }}:{{ .Values.mediawikiImage.tag | default (print .Chart.AppVersion "-fpm") }}"
+          imagePullPolicy: {{ .Values.mediawikiImage.pullPolicy }}
+          command:
+            - bash
+            - -c
+            - cp -a /var/www/html/. /app
+          volumeMounts:
+            - name: application
+              mountPath: /app
+      containers:
+        - name: mediawiki
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.mediawikiImage.repository }}:{{ .Values.mediawikiImage.tag | default (print .Chart.AppVersion "-fpm") }}"
+          imagePullPolicy: {{ .Values.mediawikiImage.pullPolicy }}
+          ports:
+            - name: fpm
+              containerPort: 9000
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: fpm
+          readinessProbe:
+            tcpSocket:
+              port: fpm
+          resources:
+            {{- toYaml .Values.mediawikiResources | nindent 12 }}
+          volumeMounts:
+            {{- if .Values.persistence.enabled }}
+            - name: images
+              mountPath: /var/www/html/images
+            {{- end }}
+            - name: configmap
+              subPath: 'php.ini'
+              mountPath: /usr/local/etc/php/conf.d/99-custom.ini
+              readOnly: true
+            - name: configmap
+              subPath: 'php-fpm.ini'
+              mountPath: /usr/local/etc/php-fpm.d/z-www.conf
+              readOnly: true
+            - name: secret
+              subPath: 'LocalSettings.php'
+              mountPath: /var/www/html/LocalSettings.php
+              readOnly: true
+            {{- if .Values.php.opcache.enabled }}
+            - name: opcache
+              mountPath: /opcache
+            {{- end }}
+        - name: nginx
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.nginxImage.repository }}:{{ .Values.nginxImage.tag }}"
+          imagePullPolicy: {{ .Values.nginxImage.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            timeoutSeconds: {{ .Values.httpProbeTimeout }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            timeoutSeconds: {{ .Values.httpProbeTimeout }}
+          resources:
+            {{- toYaml .Values.nginxResources | nindent 12 }}
+          volumeMounts:
+            - name: application
+              mountPath: /app
+              readOnly: true
+            {{- if .Values.persistence.enabled }}
+            - name: images
+              mountPath: /app/images
+              readOnly: true
+            {{- end }}
+            - name: configmap
+              subPath: 'nginx.conf'
+              mountPath: /etc/nginx/conf.d/default.conf
+              readOnly: true
+            - name: configmap
+              subPath: 'fastcgi_params'
+              mountPath: /etc/nginx/fastcgi_params
+              readOnly: true
+            - name: configmap
+              subPath: 'types.conf'
+              mountPath: /etc/nginx/conf.d/types.conf
+              readOnly: true
+        {{- if .Values.exporter.enabled }}
+        - name: exporter
+          securityContext:
+            {{- toYaml .Values.exporter.securityContext | nindent 12 }}
+          image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
+          imagePullPolicy: {{ .Values.mediawikiImage.pullPolicy }}
+          ports:
+            - name: exporter
+              containerPort: 9253
+              protocol: TCP
+          env:
+            - name: PHP_FPM_SCRAPE_URI
+              value: {{ print "tcp://127.0.0.1:9000" .Values.exporter.statusPath | quote }}
+          resources:
+            {{- toYaml .Values.exporter.resources | nindent 12 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: application
+          emptyDir: {}
+        {{- if .Values.persistence.enabled }}
+        - name: images
+          persistentVolumeClaim:
+            claimName: {{ print (include "mediawiki.fullname" .) "-pvc" | quote }}
+        {{- end }}
+        - name: configmap
+          configMap:
+            defaultMode: 0644
+            name: {{ include "mediawiki.fullname" . }}
+        - name: secret
+          secret:
+            defaultMode: 0644
+            secretName: {{ include "mediawiki.fullname" . }}
+        {{- if .Values.php.opcache.enabled }}
+        - name: opcache
+          emptyDir:
+            {{- with .Values.php.opcache.medium }}
+            medium: {{ . | quote }}
+            {{- end }}
+            sizeLimit: {{ .Values.php.opcache.size | quote }}
+        {{- end -}}

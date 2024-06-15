@@ -1,0 +1,10 @@
+{{- if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ print (include "mediawiki.fullname" .) "-pvc" | quote }}
+  labels:
+    {{- include "mediawiki.labels" . | nindent 4 }}
+spec:
+    {{- toYaml .Values.persistence.pvc | nindent 4 }}
+{{- end }}
