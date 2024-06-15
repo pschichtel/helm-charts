@@ -603,6 +603,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/keycloak-webhook-router-0.1.0/keycloak-webhook-router-0.1.0.tgz
     version: 0.1.0
+  mediawiki:
+  - apiVersion: v2
+    appVersion: "1.41"
+    created: "2024-06-15T17:24:32.243552666Z"
+    description: A Helm chart for MediaWiki
+    digest: b254d2b1f7e6da997413781d457c49aff35e02461d322553221524bab38b5304
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.1.0/mediawiki-0.1.0.tgz
+    version: 0.1.0
   mindustry:
   - apiVersion: v2
     appVersion: v145.1
@@ -1673,4 +1684,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-15T15:47:51.586573178Z"
+generated: "2024-06-15T17:24:32.385984358Z"
