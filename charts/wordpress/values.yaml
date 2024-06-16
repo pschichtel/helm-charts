@@ -145,6 +145,11 @@ php:
     pm.max_requests: '200'
   rawFpmPoolIni: ''
 
+probes:
+  enabled: true
+  path: '/'
+  headers: []
+
 exporter:
   enabled: false
   image:

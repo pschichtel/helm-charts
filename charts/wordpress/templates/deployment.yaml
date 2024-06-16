@@ -67,16 +67,22 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- if .Values.probes.enabled }}
           livenessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.probes.path | quote }}
               port: http
+              httpHeaders:
+                {{ .Values.probes.headers | toYaml | nindent 16 }}
             timeoutSeconds: {{ .Values.httpProbeTimeout }}
           readinessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.probes.path | quote }}
               port: http
+              httpHeaders:
+                {{ .Values.probes.headers | toYaml | nindent 16 }}
             timeoutSeconds: {{ .Values.httpProbeTimeout }}
+          {{- end }}
           resources:
             {{- toYaml .Values.nginxResources | nindent 12 }}
           volumeMounts:
