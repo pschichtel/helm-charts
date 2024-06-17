@@ -67,7 +67,7 @@ spec:
       {{- if .Values.configs }}
         - name: {{ include "web-app.fullname" . }}
           configMap:
-            defaultMode: 644
+            defaultMode: 0644
             name: {{ include "web-app.fullname" . }}
       {{- end }}
       {{- with .Values.volumes }}
