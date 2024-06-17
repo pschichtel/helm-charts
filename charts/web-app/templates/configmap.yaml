@@ -1,0 +1,16 @@
+{{- if .Values.configs }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "web-app.fullname" . }}
+  labels:
+    {{- include "web-app.selectorLabels" . | nindent 4 }}
+data:
+{{- range $path, $content := .Values.configs }}
+{{- if not (eq (substr 0 1 $path) "/") }}
+{{- fail "Paths must start with '/'!" }}
+{{- else }}
+  {{ $path | sha256sum | quote }}: {{ $content | quote }}
+{{- end }}
+{{- end }}
+{{- end }}

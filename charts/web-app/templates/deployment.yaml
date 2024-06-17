@@ -13,10 +13,11 @@ spec:
       {{- include "web-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "web-app.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
@@ -49,13 +50,29 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+          {{- if or .Values.configs .volumes }}
           volumeMounts:
+          {{- range $path, $content := .Values.configs }}
+            - name: {{ include "web-app.fullname" $ }}
+              readOnly: true
+              subPath: {{ $path | sha256sum | quote }}
+              mountPath: {{ $path | quote }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{- with .Values.volumes }}
+          {{- end }}
+      {{- if or .Values.configs .volumes }}
       volumes:
+      {{- if .Values.configs }}
+        - name: {{ include "web-app.fullname" . }}
+          configMap:
+            defaultMode: 644
+            name: {{ include "web-app.fullname" . }}
+      {{- end }}
+      {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
