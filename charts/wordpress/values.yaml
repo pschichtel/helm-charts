@@ -5,7 +5,7 @@
 replicaCount: 1
 
 nginxImage:
-  repository: docker.io/library/nginx
+  repository: docker.io/nginxinc/nginx-unprivileged
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.27.0"
@@ -25,7 +25,13 @@ podAnnotations: {}
 podSecurityContext: {}
 # fsGroup: 2000
 
-securityContext: {}
+nginxSecurityContext:
+  allowPrivilegeEscalation: false
+  runAsUser: 31
+  runAsGroup: 31
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+wordpressSecurityContext: {}
 # capabilities:
 #   drop:
 #   - ALL
@@ -35,7 +41,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
 
 ingress:
   enabled: false

@@ -30,7 +30,7 @@ spec:
       containers:
         - name: wordpress
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.wordpressSecurityContext | nindent 12 }}
           image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
           imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
           ports:
@@ -60,7 +60,7 @@ spec:
             {{- end }}
         - name: nginx
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.nginxSecurityContext | nindent 12 }}
           image: "{{ .Values.nginxImage.repository }}:{{ .Values.nginxImage.tag }}"
           imagePullPolicy: {{ .Values.nginxImage.pullPolicy }}
           ports:
@@ -104,7 +104,7 @@ spec:
         {{- if .Values.exporter.enabled }}
         - name: exporter
           securityContext:
-            {{- toYaml .Values.exporter.securityContext | nindent 12 }}
+            {{- toYaml .Values.exporter.wordpressSecurityContext | nindent 12 }}
           image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
           imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
           ports:
