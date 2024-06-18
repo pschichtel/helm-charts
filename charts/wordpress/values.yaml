@@ -30,7 +30,6 @@ nginxSecurityContext:
   runAsUser: 31
   runAsGroup: 31
   runAsNonRoot: true
-  readOnlyRootFilesystem: true
 wordpressSecurityContext: {}
 # capabilities:
 #   drop:
