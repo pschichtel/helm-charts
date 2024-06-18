@@ -27,8 +27,8 @@ podSecurityContext: {}
 
 nginxSecurityContext:
   allowPrivilegeEscalation: false
-  runAsUser: 31
-  runAsGroup: 31
+  runAsUser: 33
+  runAsGroup: 33
   runAsNonRoot: true
 wordpressSecurityContext: {}
 # capabilities:
