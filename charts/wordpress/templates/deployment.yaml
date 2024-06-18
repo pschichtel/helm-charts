@@ -37,12 +37,31 @@ spec:
             - name: fpm
               containerPort: 9000
               protocol: TCP
+          {{- if .Values.probes.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.path | quote }}
+              port: http
+              httpHeaders:
+                {{ .Values.probes.headers | toYaml | nindent 16 }}
+            timeoutSeconds: {{ .Values.probes.timeout }}
+            periodSeconds: {{ .Values.probes.period }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.path | quote }}
+              port: http
+              httpHeaders:
+                {{ .Values.probes.headers | toYaml | nindent 16 }}
+            timeoutSeconds: {{ .Values.probes.timeout }}
+            periodSeconds: {{ .Values.probes.period }}
+          {{- else }}
           livenessProbe:
             tcpSocket:
               port: fpm
           readinessProbe:
             tcpSocket:
               port: fpm
+          {{- end }}
           resources:
             {{- toYaml .Values.wordpressResources | nindent 12 }}
           volumeMounts:
@@ -67,22 +86,6 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          {{- if .Values.probes.enabled }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.probes.path | quote }}
-              port: http
-              httpHeaders:
-                {{ .Values.probes.headers | toYaml | nindent 16 }}
-            timeoutSeconds: {{ .Values.httpProbeTimeout }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.probes.path | quote }}
-              port: http
-              httpHeaders:
-                {{ .Values.probes.headers | toYaml | nindent 16 }}
-            timeoutSeconds: {{ .Values.httpProbeTimeout }}
-          {{- end }}
           resources:
             {{- toYaml .Values.nginxResources | nindent 12 }}
           volumeMounts:

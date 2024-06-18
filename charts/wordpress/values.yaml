@@ -37,8 +37,6 @@ service:
   type: ClusterIP
   port: 80
 
-httpProbeTimeout: 2
-
 ingress:
   enabled: false
   className: ""
@@ -149,6 +147,8 @@ probes:
   enabled: true
   path: '/'
   headers: []
+  timeout: 2
+  period: 20
 
 exporter:
   enabled: false
