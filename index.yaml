@@ -1532,6 +1532,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/web-app-0.1.0/web-app-0.1.0.tgz
     version: 0.1.0
+  webdav:
+  - apiVersion: v2
+    appVersion: 1.22.1-bookworm
+    created: "2024-06-24T23:54:05.773033369Z"
+    description: A Helm chart to deploy a simple nginx-based webdav server
+    digest: 849ed4bc1ddb89f944e5af639ada8949a6505ada74723621db4b5fa7c21b20f4
+    name: webdav
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/webdav-0.1.0/webdav-0.1.0.tgz
+    version: 0.1.0
   wordpress:
   - apiVersion: v2
     appVersion: 6.5.4
@@ -1764,4 +1775,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-18T23:12:32.78610432Z"
+generated: "2024-06-24T23:54:05.773373247Z"
