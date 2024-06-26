@@ -6,16 +6,6 @@ metadata:
     {{- include "wordpress.selectorLabels" . | nindent 4 }}
 data:
   nginx.conf: |-
-    {{- /*
-        This is to support the uploads-webpc plugin
-    */}}
-    map $http_accept $load_avif {
-        ~image/avif "/wp-content/uploads-webpc/$path.$ext.avif";
-    }
-    map $http_accept $load_webp {
-        ~image/webp "/wp-content/uploads-webpc/$path.$ext.webp";
-    }
-
     {{- /* for more robust HTTPS detection in fcgi applications */}}
     map $http_x_forwarded_proto $fastcgi_https {
         default '';
@@ -31,9 +21,16 @@ data:
         
         server_tokens off;
 
+        # Enable Gzip compression
         gzip          on;
+
+        # Compression level (1-9)
         gzip_comp_level     5;
+
+        # Don't compress anything under 256 bytes
         gzip_min_length     256;
+
+        # Compress output of these MIME-types
         gzip_types
             application/atom+xml
             application/javascript
@@ -57,6 +54,8 @@ data:
             text/plain
             text/javascript
             text/x-component;
+
+        # Disable gzip for bad browsers
         gzip_disable  "MSIE [1-6]\.(?!.*SV1)";
 
         location / {
@@ -124,15 +123,10 @@ data:
             deny  all;
         }
 
-        location ~ /wp-content/(?<path>.+)\.(?<ext>jpe?g|png|gif)$ {
-            add_header Vary Accept;
-            add_header Cache-Control "private" always;
-            expires 365d;
-            try_files $load_avif $load_webp $uri =404;
-        }
-
         include /default-server/*.conf;
     }
+
+    include /nginx/*.conf
   types.conf: |-
     types {
         text/html                             html htm shtml;
