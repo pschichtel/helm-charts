@@ -58,7 +58,7 @@ spec:
             - name: opcache
               mountPath: /opcache
             {{- end }}
-            {{- with .Values.nginxVolumeMounts }}
+            {{- with .Values.wordpressVolumeMounts }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
         - name: nginx
@@ -104,7 +104,7 @@ spec:
             - name: configmap
               subPath: 'types.conf'
               mountPath: /etc/nginx/conf.d/types.conf
-            {{- with .Values.wordpressVolumeMounts }}
+            {{- with .Values.nginxVolumeMounts }}
             {{- . | toYaml | nindent 12 }}
             {{- end }}
         {{- if .Values.exporter.enabled }}
