@@ -126,7 +126,7 @@ data:
         include /default-server/*.conf;
     }
 
-    include /nginx/*.conf
+    include /nginx/*.conf;
   types.conf: |-
     types {
         text/html                             html htm shtml;
