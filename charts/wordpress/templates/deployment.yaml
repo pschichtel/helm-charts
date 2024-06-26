@@ -58,6 +58,9 @@ spec:
             - name: opcache
               mountPath: /opcache
             {{- end }}
+            {{- with .Values.nginxVolumeMounts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
         - name: nginx
           securityContext:
             {{- toYaml .Values.nginxSecurityContext | nindent 12 }}
@@ -101,6 +104,9 @@ spec:
             - name: configmap
               subPath: 'types.conf'
               mountPath: /etc/nginx/conf.d/types.conf
+            {{- with .Values.wordpressVolumeMounts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
         {{- if .Values.exporter.enabled }}
         - name: exporter
           securityContext:
@@ -145,3 +151,6 @@ spec:
             {{- end }}
             sizeLimit: {{ .Values.php.opcache.size | quote }}
         {{- end -}}
+        {{- with .Values.volumes }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}

@@ -103,6 +103,12 @@ persistence:
       requests:
         storage: 5Gi
 
+volumes: []
+
+nginxVolumeMounts: []
+
+wordpressVolumeMounts: []
+
 php:
   ini:
     # Allow uploads
