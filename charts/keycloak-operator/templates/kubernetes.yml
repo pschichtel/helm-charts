@@ -9,7 +9,6 @@ metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: 25.0.2
-    app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -282,7 +281,6 @@ metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: 25.0.2
-    app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
   ports:
@@ -304,7 +302,6 @@ metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: 25.0.2
-    app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
   replicas: {{ .Values.replicaCount }}
@@ -318,7 +315,6 @@ spec:
         app.quarkus.io/vcs-uri: https://github.com/stianst/keycloak.git
         app.quarkus.io/build-timestamp: 2024-07-18 - 07:20:41 +0000
       labels:
-        app.kubernetes.io/managed-by: quarkus
         app.kubernetes.io/name: keycloak-operator
         app.kubernetes.io/version: 25.0.2
     spec:
