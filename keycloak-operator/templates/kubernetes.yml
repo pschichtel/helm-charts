@@ -307,7 +307,7 @@ metadata:
     app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: keycloak-operator
@@ -330,8 +330,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: RELATED_IMAGE_KEYCLOAK
               value: quay.io/keycloak/keycloak:25.0.2
-          image: quay.io/keycloak/keycloak-operator:25.0.2
-          imagePullPolicy: Always
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -367,4 +367,18 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       serviceAccountName: keycloak-operator
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
