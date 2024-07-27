@@ -602,6 +602,28 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.1.0/graylog-0.1.0.tgz
     version: 0.1.0
+  keycloak-operator:
+  - apiVersion: v2
+    appVersion: 25.0.2
+    created: "2024-07-27T20:45:00.58534251Z"
+    description: A Helm chart for Kubernetes
+    digest: 140e7feb32350be817554187f5f175049a8de3085c39b0aee180adbb4cff155c
+    name: keycloak-operator
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-0.1.0/keycloak-operator-0.1.0.tgz
+    version: 0.1.0
+  keycloak-operator-crds:
+  - apiVersion: v2
+    appVersion: 25.0.2
+    created: "2024-07-27T20:45:00.703145221Z"
+    description: A Helm chart for Kubernetes
+    digest: b380c68bdd1368e6c8a466e8e206d12fc875cbb39a8cf3049fda5ed751ad8aa8
+    name: keycloak-operator-crds
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-crds-1.0.0/keycloak-operator-crds-1.0.0.tgz
+    version: 1.0.0
   keycloak-webhook-router:
   - apiVersion: v2
     appVersion: main
@@ -1844,4 +1866,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-07-09T23:13:20.220770129Z"
+generated: "2024-07-27T20:45:00.70375318Z"
