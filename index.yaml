@@ -219,6 +219,17 @@ entries:
     version: 0.1.0
   docspell:
   - apiVersion: v2
+    appVersion: 0.42.0
+    created: "2024-08-19T21:24:19.296066453Z"
+    description: A Helm chart to deploy docspell to Kubernetes
+    digest: e20b754579fa162691d68513fd122db18d23105c5582859bb0c2fff9aebe7d94
+    home: https://docspell.org/
+    name: docspell
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/docspell-0.0.12/docspell-0.0.12.tgz
+    version: 0.0.12
+  - apiVersion: v2
     appVersion: 0.41.0
     created: "2024-01-31T01:21:35.484004102Z"
     description: A Helm chart to deploy docspell to Kubernetes
@@ -1936,4 +1947,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-08-12T17:00:35.669331052Z"
+generated: "2024-08-19T21:24:19.296442193Z"
