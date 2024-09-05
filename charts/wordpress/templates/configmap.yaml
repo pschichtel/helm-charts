@@ -26,8 +26,10 @@ data:
 {{- $keys := keys .Values.nginxConfig.serverSnippets | sortAlpha }}
 {{- range $key := $keys }}
 {{- $value := get $.Values.nginxConfig.serverSnippets $key }}
+{{- if ne $value nil }}
         # Snippet: {{ $key }}
         {{- $value | nindent 8 }}
+{{- end }}
 {{- end }}
 
         include /default-server/*.conf;
