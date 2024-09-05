@@ -21,6 +21,8 @@ data:
         
         server_tokens off;
 
+        include /default-server-early/*.conf;
+
 {{- $keys := keys .Values.nginxConfig.serverSnippets | sortAlpha }}
 {{- range $key := $keys }}
 {{- $value := get $.Values.nginxConfig.serverSnippets $key }}
