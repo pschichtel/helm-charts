@@ -4,6 +4,9 @@ metadata:
   name: {{ include "wordpress.fullname" . }}
   labels:
     {{- include "wordpress.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations: {{ . | toYaml | nindent 4 }}
+  {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
