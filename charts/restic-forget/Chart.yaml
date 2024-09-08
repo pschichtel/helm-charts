@@ -2,5 +2,5 @@ apiVersion: v2
 name: restic-forget
 description: A helm chart to deploy restic jobs for backup cleaning.
 type: application
-version: 0.4.0
-appVersion: 0.17.0
+version: 0.4.1
+appVersion: 0.17.1
