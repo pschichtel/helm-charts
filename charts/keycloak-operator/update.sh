@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-version="25.0.6"
+version="26.0.1"
 
-curl -sLfo templates/kubernetes.yml "https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/${version}/kubernetes/kubernetes.yml"
+cd templates
+rm -v *
+
+curl -sLOf "https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/${version}/kubernetes/kubernetes.yml"
 
