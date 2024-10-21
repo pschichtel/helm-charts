@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-version="25.0.6"
+version="26.0.1"
 
 cd templates
 rm -v *
