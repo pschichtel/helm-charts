@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-version="26.0.2"
+version="$(yq .appVersion Chart.yaml)"
 
 cd templates
 rm -v *
