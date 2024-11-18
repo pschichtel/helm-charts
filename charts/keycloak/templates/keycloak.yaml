@@ -1,0 +1,53 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: {{ include "keycloak.fullname" . }}
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.replicaCount }}
+  {{- with .Values.bootstrapAdmin }}
+  bootstrapAdmin: {{- . | toYaml | nindent 4 }}
+  {{- end }}
+  db: {{- .Values.db | required ".db is required!" | toYaml | nindent 4 -}}
+  {{- with .Values.image }}
+  {{- if .digest }}
+  image: {{ print .repository "@" .digest | quote }}
+  imagePullPolicy: IfNotPresent
+  {{- else }}
+  image: {{ print .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
+  imagePullPolicy: {{ .pullPolicy | default "Always" }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets: {{- . | toYaml | nindent 4 }}
+  {{- end }}
+  http:
+    httpEnabled: true
+  proxy:
+    headers: xforwarded
+  hostname:
+    hostname: {{ .Values.hostname | required ".hostname is required!" | quote }}
+    {{- with .Values.adminHostname }}
+    admin: {{ . | quote }}
+    {{- end }}
+    strict: false
+    backchannelDynamic: true
+  ingress:
+    enabled: false
+  {{- if ne .Values.startOptimized nil }}
+  startOptimized: {{ .Values.startOptimized }}
+  {{- end }}
+  features: {{- .Values.features | toYaml | nindent 4 }}
+  {{- with .Values.resources }}
+  resources: {{- . | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if or .Values.affinity .Values.tolerations }}
+  scheduling:
+    {{- with .Values.affinity }}
+    affinity: {{ . | toYaml | nindent 6 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+    tolerations: {{ . | toYaml | nindent 6 }}
+    {{- end }}
+  {{- end -}}
