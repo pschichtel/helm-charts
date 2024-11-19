@@ -2,7 +2,8 @@ replicaCount: 1
 
 image:
   repository: quay.io/keycloak/keycloak
-  pullPolicy: IfNotPresent
+  # imagePullPolicy is not supported: https://github.com/keycloak/keycloak/issues/34829
+  # pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 

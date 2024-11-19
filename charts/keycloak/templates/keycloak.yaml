@@ -13,10 +13,8 @@ spec:
   {{- with .Values.image }}
   {{- if .digest }}
   image: {{ print .repository "@" .digest | quote }}
-  imagePullPolicy: IfNotPresent
   {{- else }}
   image: {{ print .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
-  imagePullPolicy: {{ .pullPolicy | default "Always" }}
   {{- end }}
   {{- end }}
   {{- with .Values.imagePullSecrets }}
