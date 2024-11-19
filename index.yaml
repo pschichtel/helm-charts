@@ -633,6 +633,22 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.1.0/graylog-0.1.0.tgz
     version: 0.1.0
+  keycloak:
+  - apiVersion: v2
+    appVersion: 26.0.5
+    created: "2024-11-19T21:04:24.437354331Z"
+    dependencies:
+    - condition: keycloak-operator.enabled
+      name: keycloak-operator
+      repository: https://schich.tel/helm-charts
+      version: 0.2.2
+    description: A Helm chart for Kubernetes
+    digest: 762949577b2dd88c4a0e4318aeacdf375df2746f372e8b96bbcdd3f9bb01241a
+    name: keycloak
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-0.1.0/keycloak-0.1.0.tgz
+    version: 0.1.0
   keycloak-operator:
   - apiVersion: v2
     appVersion: 26.0.5
@@ -2217,4 +2233,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-11-17T01:59:18.306511755Z"
+generated: "2024-11-19T21:04:24.437724344Z"
