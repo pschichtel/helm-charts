@@ -11,9 +11,10 @@ metadata:
     app.kubernetes.io/version: 26.0.5
     app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
+{{- .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: keycloak-operator-clusterrole
 rules:
@@ -23,9 +24,10 @@ rules:
       - ingresses
     verbs:
       - get
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: keycloakrealmimportcontroller-cluster-role
 rules:
@@ -57,7 +59,7 @@ rules:
       - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: keycloakcontroller-cluster-role
 rules:
@@ -109,21 +111,23 @@ rules:
       - get
       - list
       - watch
+{{- .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
   name: keycloak-operator-clusterrole-binding
 roleRef:
-  kind: ClusterRole
+  kind: Role
   apiGroup: rbac.authorization.k8s.io
   name: keycloak-operator-clusterrole
 subjects:
   - kind: ServiceAccount
     name: keycloak-operator
     namespace: keycloak
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -213,7 +217,7 @@ kind: RoleBinding
 metadata:
   name: keycloakrealmimportcontroller-role-binding
 roleRef:
-  kind: ClusterRole
+  kind: Role
   apiGroup: rbac.authorization.k8s.io
   name: keycloakrealmimportcontroller-cluster-role
 subjects:
@@ -225,7 +229,7 @@ kind: RoleBinding
 metadata:
   name: keycloakcontroller-role-binding
 roleRef:
-  kind: ClusterRole
+  kind: Role
   apiGroup: rbac.authorization.k8s.io
   name: keycloakcontroller-cluster-role
 subjects:
@@ -240,7 +244,7 @@ metadata:
     app.kubernetes.io/version: 26.0.5
   name: keycloak-operator-view
 roleRef:
-  kind: ClusterRole
+  kind: Role
   apiGroup: rbac.authorization.k8s.io
   name: view
 subjects:

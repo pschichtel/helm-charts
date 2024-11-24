@@ -34,3 +34,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+openshift:
+  enabled: false
