@@ -5,10 +5,10 @@ metadata:
   annotations:
     app.quarkus.io/quarkus-version: 3.15.1
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-    app.quarkus.io/build-timestamp: 2024-11-01 - 09:32:19 +0000
+    app.quarkus.io/build-timestamp: 2024-11-22 - 05:44:41 +0000
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.0.5
+    app.kubernetes.io/version: 26.0.6
     app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 {{- if .Values.openshift.enabled }}
@@ -241,7 +241,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.0.5
+    app.kubernetes.io/version: 26.0.6
   name: keycloak-operator-view
 roleRef:
   kind: Role
@@ -257,10 +257,10 @@ metadata:
   annotations:
     app.quarkus.io/quarkus-version: 3.15.1
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-    app.quarkus.io/build-timestamp: 2024-11-01 - 09:32:19 +0000
+    app.quarkus.io/build-timestamp: 2024-11-22 - 05:44:41 +0000
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.0.5
+    app.kubernetes.io/version: 26.0.6
     app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
@@ -279,10 +279,10 @@ metadata:
   annotations:
     app.quarkus.io/quarkus-version: 3.15.1
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-    app.quarkus.io/build-timestamp: 2024-11-01 - 09:32:19 +0000
+    app.quarkus.io/build-timestamp: 2024-11-22 - 05:44:41 +0000
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.0.5
+    app.kubernetes.io/version: 26.0.6
     app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
@@ -295,10 +295,10 @@ spec:
       annotations:
         app.quarkus.io/quarkus-version: 3.15.1
         app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-        app.quarkus.io/build-timestamp: 2024-11-01 - 09:32:19 +0000
+        app.quarkus.io/build-timestamp: 2024-11-22 - 05:44:41 +0000
       labels:
         app.kubernetes.io/managed-by: quarkus
-        app.kubernetes.io/version: 26.0.5
+        app.kubernetes.io/version: 26.0.6
         app.kubernetes.io/name: keycloak-operator
     spec:
       containers:
@@ -308,7 +308,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: RELATED_IMAGE_KEYCLOAK
-              value: quay.io/keycloak/keycloak:26.0.5
+              value: quay.io/keycloak/keycloak:26.0.6
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           livenessProbe:
@@ -336,6 +336,8 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           startupProbe:
             failureThreshold: 3
             httpGet:
@@ -346,8 +348,6 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 10
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
       serviceAccountName: keycloak-operator
       {{- with .Values.nodeSelector }}
       nodeSelector:
