@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/version: 26.0.5
     app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
-{{- .Values.openshift.enabled }}
+{{- if .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -111,7 +111,7 @@ rules:
       - get
       - list
       - watch
-{{- .Values.openshift.enabled }}
+{{- if .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
