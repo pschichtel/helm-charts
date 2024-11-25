@@ -42,3 +42,5 @@ ingress:
   enabled: false
   extraHosts: []
   tls: []
+
+additionalOptions: {}

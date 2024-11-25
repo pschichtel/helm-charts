@@ -49,6 +49,13 @@ spec:
     tolerations: {{ . | toYaml | nindent 6 }}
     {{- end }}
   {{- end -}}
+  {{- with .Values.additionalOptions }}
+  additionalOptions:
+  {{- range $name, $option := . }}
+  - name: {{ $name | quote }}
+    {{- $option | toYaml | nindent 4 }}
+  {{- end }}
+  {{- end }}
   {{- with .Values.unsupported }}
   unsupported: {{- . | toYaml | nindent 4 }}
   {{- end }}
