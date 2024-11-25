@@ -49,3 +49,6 @@ spec:
     tolerations: {{ . | toYaml | nindent 6 }}
     {{- end }}
   {{- end -}}
+  {{- with .Values.unsupported }}
+  unsupported: {{- . | toYaml | nindent 4 }}
+  {{- end }}
