@@ -1,0 +1,23 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "keycloak.fullname" . }}
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+spec:
+  endpoints:
+    - port: management
+      {{- with .Values.serviceMonitor.path }}
+      path: {{ . | quote }}
+      {{- end }}
+    {{- range $additionalPath := .Values.serviceMonitor.additionalPaths }}
+    - port: management
+      path: {{ $additionalPath | quote }}
+    {{- end }}
+  jobLabel: app
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ include "keycloak.fullname" . }}
+      app.kubernetes.io/managed-by: keycloak-operator
+{{- end }}

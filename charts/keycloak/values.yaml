@@ -44,3 +44,8 @@ ingress:
   tls: []
 
 additionalOptions: {}
+
+serviceMonitor:
+  enabled: false
+  path: /auth/metrics
+  additionalPaths: []
