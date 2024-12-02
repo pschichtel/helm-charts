@@ -11,9 +11,8 @@ spec:
       {{- with .Values.serviceMonitor.path }}
       path: {{ . | quote }}
       {{- end }}
-    {{- range $additionalPath := .Values.serviceMonitor.additionalPaths }}
-    - port: management
-      path: {{ $additionalPath | quote }}
+    {{- with .Values.serviceMonitor.additionalEndpoints }}
+    {{- . | toYaml | nindent 4 }}
     {{- end }}
   jobLabel: app
   selector:

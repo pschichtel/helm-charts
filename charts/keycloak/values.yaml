@@ -48,4 +48,4 @@ additionalOptions: {}
 serviceMonitor:
   enabled: false
   path: /auth/metrics
-  additionalPaths: []
+  additionalEndpoints: []
