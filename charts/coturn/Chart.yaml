@@ -3,5 +3,5 @@ name: coturn
 description: A Helm chart for coturn
 
 type: application
-version: 1.1.5
+version: 1.1.6
 appVersion: "4.6.3-r0"
