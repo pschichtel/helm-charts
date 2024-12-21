@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "satisfactory.fullname" . }}-env
+  labels:
+    {{- include "satisfactory.labels" . | nindent 4 }}
+data:
+  AUTOPAUSE: "{{ .Values.satisfactoryOpts.autopause }}"
+  AUTOSAVEINTERVAL: "{{ .Values.satisfactoryOpts.autosaveInterval }}"
+  AUTOSAVENUM: "{{ .Values.satisfactoryOpts.autosaveNum }}"
+  AUTOSAVEONDISCONNECT: "{{ .Values.satisfactoryOpts.autosaveOnDisconnect }}"
+  CRASHREPORT: "{{ .Values.satisfactoryOpts.crashReport }}"
+  DEBUG: "{{ .Values.satisfactoryOpts.debug }}"
+  DISABLESEASONALEVENTS: "{{ .Values.satisfactoryOpts.disableSeasonalEvents }}"
+  MAXPLAYERS: "{{ .Values.satisfactoryOpts.maxPlayers }}"
+  PGID: "{{ .Values.satisfactoryOpts.pgid }}"
+  PUID: "{{ .Values.satisfactoryOpts.puid }}"
+  SERVERGAMEPORT: "{{ .Values.satisfactoryOpts.serverGamePort }}"
+  SERVERIP: "{{ .Values.satisfactoryOpts.serverIP }}"
+  SKIPUPDATE: "{{ .Values.satisfactoryOpts.skipUpdate }}"
+  STEAMBETA: "{{ .Values.satisfactoryOpts.steamBeta }}"
