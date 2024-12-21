@@ -9,7 +9,6 @@ metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: 26.0.7
-    app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 {{- if .Values.openshift.enabled }}
 ---
@@ -261,7 +260,6 @@ metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: 26.0.7
-    app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
   ports:
@@ -283,7 +281,6 @@ metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: 26.0.7
-    app.kubernetes.io/managed-by: quarkus
   name: keycloak-operator
 spec:
   replicas: 1
