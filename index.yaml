@@ -1278,6 +1278,17 @@ entries:
   powerdns:
   - apiVersion: v2
     appVersion: 4.8.4
+    created: "2024-12-22T01:20:13.33826019Z"
+    description: A Helm chart to deploy PowerDNS to Kubernetes
+    digest: 8cbf319718837cd11fc1f950a3eaa3ad292b8203befa28e572ebf1db2211204d
+    home: https://www.powerdns.com/
+    name: powerdns
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/powerdns-0.8.0/powerdns-0.8.0.tgz
+    version: 0.8.0
+  - apiVersion: v2
+    appVersion: 4.8.4
     created: "2024-05-09T19:41:40.478564124Z"
     description: A Helm chart to deploy PowerDNS to Kubernetes
     digest: 94226cfe160d06bc95e06b36bf5a8509cb74873278b2556c3551846030aaf4de
@@ -2565,4 +2576,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2024-12-21T17:54:13.084299106Z"
+generated: "2024-12-22T01:20:13.338739045Z"
