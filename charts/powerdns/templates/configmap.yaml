@@ -11,8 +11,8 @@ data:
     include-dir=/etc/powerdns/pdns.d
     secondary=yes
   0-api.conf.j2: |
-    api={{ .Values.powerdns.api.enabled | ternary "yes" "no" }}
-    {{- if .Values.powerdns.api.enabled }}
+    {{- if .Values.powerdns.api.key }}
+    api=yes
     api-key={{ print "{{ PDNS_API_KEY }}" }}
     {{- end }}
   1-webserver.conf.j2: |
@@ -20,7 +20,7 @@ data:
     webserver-address=0.0.0.0
     webserver-port={{ .Values.powerdns.webserver.bindPort }}
     webserver-allow-from={{ .Values.powerdns.webserver.allowFrom }}
-    {{- if .Values.powerdns.webserver.password.key }}
+    {{- if .Values.powerdns.webserver.password }}
     webserver-password={{ print "{{ PDNS_WEBSERVER_PASSWORD }}" }}
     {{- end }}
   2-database.conf.j2: {{ tpl .Values.powerdns.db.configTemplate $ | quote }}

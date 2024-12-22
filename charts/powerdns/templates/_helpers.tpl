@@ -51,11 +51,25 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "powerdns.secretRef" -}}
-{{- if .Ref.key -}}
+{{- if and .Ref.name .Ref.key -}}
 - name: {{ .Name | quote }}
   valueFrom:
     secretKeyRef:
-      name: {{ .Ref.name | default .Root.Values.powerdns.commonSecret | default (include "powerdns.fullname" .Root) | quote }}
-      key: {{ .Ref.key | quote }}
+      name: {{ .Ref.name | quote }}
+      key: {{ .Ref.key | quote -}}
+{{- else if .Ref.value -}}
+- name: {{ .Name | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "powerdns.fullname" .Root | quote }}
+      key: {{ .Name | quote -}}
+{{- else if .Required -}}
+{{- fail (print "A value or secretRef must be provided for " .Name "!") -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "powerdns.secret" -}}
+{{- if .Ref.value -}}
+{{ .Name | quote }}: {{ .Ref.value | toString | b64enc }}
 {{- end -}}
 {{- end -}}

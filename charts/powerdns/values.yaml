@@ -61,38 +61,32 @@ tolerations: []
 affinity: {}
 
 powerdns:
-  createSecret: null
-  commonSecret: null
   api:
-    enabled: true
-    key:
-      key: PDNS_API_KEY
+    key: {}
   webserver:
     bindPort: 8081
     allowFrom: 0.0.0.0/0
-    password:
-      key: null
+    password: {}
   dnsupdate:
     enabled: true
   zoneName: "example.de."
   db:
     driver: gmysql
-    host: null
-    port: 3306
-    name: powerdns
-    username:
-      key: null
-    password:
-      key: null
+    host: {}
+    port:
+      value: 3306
+    name: {}
+    username: {}
+    password: {}
     configTemplate: |
       launch={{ .Values.powerdns.db.driver }}
-      {{ .Values.powerdns.db.driver }}-host={{ .Values.powerdns.db.host | required "DB host is required!" }}
-      {{ .Values.powerdns.db.driver }}-port={{ .Values.powerdns.db.port }}
-      {{ .Values.powerdns.db.driver }}-dbname={{ .Values.powerdns.db.name }}
-      {{- if .Values.powerdns.db.username.key }}
+      {{ .Values.powerdns.db.driver }}-host={{ print "{{ PDNS_DB_HOST }}" }}
+      {{ .Values.powerdns.db.driver }}-port={{ print "{{ PDNS_DB_PORT }}" }}
+      {{ .Values.powerdns.db.driver }}-dbname={{ print "{{ PDNS_DB_NAME }}" }}
+      {{- if .Values.powerdns.db.username }}
       {{ .Values.powerdns.db.driver }}-user={{ print "{{ PDNS_DB_USERNAME }}" }}
       {{- end }}
-      {{- if .Values.powerdns.db.password.key }}
+      {{- if .Values.powerdns.db.password }}
       {{ .Values.powerdns.db.driver }}-password={{ print "{{ PDNS_DB_PASSWORD }}" }}
       {{- end }}
   additionalConfig: ''

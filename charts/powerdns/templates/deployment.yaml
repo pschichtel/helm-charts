@@ -45,7 +45,7 @@ spec:
             - name: webserver
               containerPort: {{ .Values.powerdns.webserver.bindPort }}
               protocol: TCP
-          {{- if .Values.powerdns.webserver.password.key }}
+          {{- if .Values.powerdns.webserver.password }}
           livenessProbe:
             tcpSocket:
               port: webserver
@@ -65,14 +65,13 @@ spec:
           env:
           - name: TEMPLATE_FILES
             value: '0-api.conf,1-webserver.conf,2-database.conf,3-dnsupdate.conf,4-additional.conf'
-          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
-          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_WEBSERVER_PASSWORD" "Ref" .Values.powerdns.webserver.password) | nindent 10 }}
-          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_USERNAME" "Ref" .Values.powerdns.db.username) | nindent 10 }}
-          {{ include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_PASSWORD" "Ref" .Values.powerdns.db.password) | nindent 10 }}
-          envFrom:
-          - secretRef:
-              name: {{ template "powerdns.fullname" . }}
-              optional: true
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_API_KEY" "Ref" .Values.powerdns.api.key) | nindent 10 }}
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_WEBSERVER_PASSWORD" "Ref" .Values.powerdns.webserver.password) | nindent 10 }}
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_HOST" "Ref" .Values.powerdns.db.host "Required" true) | nindent 10 }}
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_PORT" "Ref" .Values.powerdns.db.port "Required" true) | nindent 10 }}
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_NAME" "Ref" .Values.powerdns.db.name "Required" true) | nindent 10 }}
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_USERNAME" "Ref" .Values.powerdns.db.username) | nindent 10 }}
+          {{- include "powerdns.secretRef" (dict "Root" $ "Name" "PDNS_DB_PASSWORD" "Ref" .Values.powerdns.db.password) | nindent 10 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
