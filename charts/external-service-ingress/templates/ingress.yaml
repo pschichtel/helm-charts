@@ -60,7 +60,7 @@ spec:
   - host: {{ $ingress.redirectFrom.host | quote }}
     http:
       paths:
-      - pathType: Prefix
+      - pathType: ImplementationSpecific
         backend:
           service:
             name: {{ print "external-" $ingressName | quote }}
