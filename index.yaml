@@ -403,6 +403,17 @@ entries:
   external-service-ingress:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-02-20T22:14:57.107941102Z"
+    description: This is a simple chart to consistently generate ingresses for external
+      services.
+    digest: 9fd0503783d2975e1d75676429a91d501d0ee8f98ed1e68b707a62bdf961bc5f
+    name: external-service-ingress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/external-service-ingress-0.2.4/external-service-ingress-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2023-06-07T11:52:10.294772625Z"
     description: This is a simple chart to consistently generate ingresses for external
       services.
@@ -2686,4 +2697,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-02-11T12:33:56.991470796Z"
+generated: "2025-02-20T22:14:57.108397557Z"
