@@ -103,8 +103,8 @@ spec:
           args:
             - -k
             - _
-      {{ $volumes := list (merge (deepCopy .Values.volume) (dict "name" "rustdesk-data")) }}
-      volumes: {{- $volumes | toYaml | nindent 6 }}
+      {{ $volume := ternary (deepCopy .Values.volume) (dict "emptyDir" dict) (not (not .Values.volume)) }}
+      volumes: {{- list (merge $volume (dict "name" "rustdesk-data")) | toYaml | nindent 6 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

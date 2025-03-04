@@ -86,8 +86,7 @@ resources:
   #   memory: 128Mi
 
   # Additional volumes on the output Deployment definition.
-volume:
-  emptyDir: {}
+volume: {}
 
 # - name: foo
 #   secret:
