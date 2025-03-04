@@ -36,7 +36,6 @@ service:
   hbbs:
     natPort:
       port: 21115
-      protocol: TCP
       targetPort: 21115
     registryPort:
       port: 21116
@@ -48,7 +47,6 @@ service:
       port: 21118
       targetPort: 21118
       enable: false
-      protocol: TCP
 
 ingress:
   enabled: false
