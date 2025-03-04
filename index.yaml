@@ -1785,6 +1785,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/restic-forget-0.1.0/restic-forget-0.1.0.tgz
     version: 0.1.0
+  rustdesk-server-oss:
+  - apiVersion: v2
+    appVersion: 1.1.12
+    created: "2025-03-04T22:16:28.000964088Z"
+    description: A Helm chart for rustdesk-server-oss
+    digest: 4785150d6c9ab59b990be28fcfb1a63e9205b9c6ff33cdd82d97a3300530dc3f
+    name: rustdesk-server-oss
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/rustdesk-server-oss-0.1.0/rustdesk-server-oss-0.1.0.tgz
+    version: 0.1.0
   s3-backup:
   - apiVersion: v2
     appVersion: 0.3.3
@@ -2747,4 +2758,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-02T12:20:10.735339925Z"
+generated: "2025-03-04T22:16:28.00140489Z"
