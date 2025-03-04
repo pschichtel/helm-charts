@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "rustdesk-server-oss.fullname" . }}
+  labels:
+    {{- include "rustdesk-server-oss.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "rustdesk-server-oss.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "rustdesk-server-oss.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{ $image := print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) }}
+      containers:
+        - name: "rustdesk-server-hbbr"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ $image | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: "relay-port"
+              containerPort: {{ .Values.service.hbbr.replayPort.targetPort }}
+              protocol: TCP
+            {{ if .Values.service.hbbr.clientPort.enable }}
+            - name: "client-port"
+              containerPort: {{ .Values.service.hbbr.clientPort.targetPort }}
+              protocol: TCP
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.hbbr.replayPort.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.hbbr.replayPort.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources.hbbrResource | nindent 12 }}
+          volumeMounts:
+          - name: rustdesk-data
+            mountPath: "/root"
+          command:
+            - hbbr
+          args:
+            - -k
+            - _
+        - name: "rustdesk-server-hbbs"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ $image | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: "nat-port"
+              containerPort: {{ .Values.service.hbbs.natPort.targetPort }}
+              protocol: TCP
+            - name: "registry-port"
+              containerPort: {{ .Values.service.hbbs.registryPort.targetPort }}
+              protocol: TCP
+            - name: "heartbeat-port"
+              containerPort: {{ .Values.service.hbbs.heartbeatPort.targetPort }}
+              protocol: UDP
+            {{ if .Values.service.hbbs.webPort.enable }}
+            - name: "web-port"
+              containerPort: {{ .Values.service.hbbs.webPort.targetPort }}
+              protocol: TCP
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.hbbs.natPort.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.hbbs.natPort.targetPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources.hbbsResource | nindent 12 }}
+          volumeMounts:
+          - name: rustdesk-data
+            mountPath: "/root"
+          command:
+            - hbbs
+          args:
+            - -k
+            - _
+      {{ $volumes := list (merge (deepCopy .Values.volume) (dict "name" "rustdesk-data")) }}
+      volumes: {{- $volumes | toYaml | nindent 6 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

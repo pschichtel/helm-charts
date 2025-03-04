@@ -1,0 +1,107 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/rustdesk/rustdesk-server
+  pullPolicy: IfNotPresent
+  tag: null
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {} # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  externalTrafficPolicy: Local
+  hbbr:
+    replayPort:
+      port: 21117
+      targetPort: 21117
+    clientPort:
+      enable: false
+      port: 21119
+      targetPort: 21119
+  hbbs:
+    natPort:
+      port: 21115
+      protocol: TCP
+      targetPort: 21115
+    registryPort:
+      port: 21116
+      targetPort: 21116
+    heartbeatPort:
+      port: 21116
+      targetPort: 21116
+    webPort:
+      port: 21118
+      targetPort: 21118
+      enable: false
+      protocol: TCP
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+  - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  hbbrResource: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  hbbsResource: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  # Additional volumes on the output Deployment definition.
+volume:
+  emptyDir: {}
+
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
