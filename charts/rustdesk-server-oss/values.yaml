@@ -24,7 +24,8 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: Cluster
+  loadBalancerIP: null
   hbbr:
     replayPort:
       port: 21117
