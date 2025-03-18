@@ -35,7 +35,7 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  name: hbbs-web-port
+                  name: web-port
     - host: {{ . | quote }}
       http:
         paths:
@@ -45,6 +45,6 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  name: hbbr-client-port
+                  name: client-port
     {{- end }}
 {{- end }}

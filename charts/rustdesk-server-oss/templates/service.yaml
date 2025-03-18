@@ -11,25 +11,25 @@ spec:
   loadBalancerIP: {{ . }}
   {{- end }}
   ports:
-    - name: "hbbr-relay-port"
+    - name: "relay-port"
       targetPort: {{ .Values.service.hbbr.replayPort.targetPort }}
       port: {{ .Values.service.hbbr.replayPort.port }}
       protocol: TCP
     {{ if .Values.service.enableWebClientSupport }}
-    - name: "hbbr-client-port"
+    - name: "client-port"
       targetPort: {{.Values.service.hbbr.clientPort.targetPort }}
       port: {{ .Values.service.hbbr.clientPort.port }}
       protocol: TCP
     {{ end }}
-    - name: "hbbs-nat-port"
+    - name: "nat-port"
       port: {{ .Values.service.hbbs.natPort.port }}
       protocol: TCP
       targetPort: 21115
-    - name: "hbbs-registry-port"
+    - name: "registry-port"
       port: {{ .Values.service.hbbs.registryPort.port }}
       targetPort: 21116
       protocol: TCP
-    - name: "hbbs-heartbeat-port"
+    - name: "heartbeat-port"
       port: {{ .Values.service.hbbs.heartbeatPort.port }}
       protocol: UDP
       targetPort: 21116
@@ -37,7 +37,7 @@ spec:
     - port: {{ .Values.service.hbbs.webPort.port }}
       targetPort: 21118
       protocol: TCP
-      name: "hbbs-web-port"
+      name: "web-port"
     {{end}}
   selector:
     {{- include "rustdesk-server-oss.selectorLabels" . | nindent 4 }}
