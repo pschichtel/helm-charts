@@ -38,7 +38,7 @@ spec:
             - name: "relay-port"
               containerPort: {{ .Values.service.hbbr.replayPort.targetPort }}
               protocol: TCP
-            {{ if .Values.service.hbbr.clientPort.enable }}
+            {{ if .Values.service.enableWebClientSupport }}
             - name: "client-port"
               containerPort: {{ .Values.service.hbbr.clientPort.targetPort }}
               protocol: TCP
@@ -78,7 +78,7 @@ spec:
             - name: "heartbeat-port"
               containerPort: {{ .Values.service.hbbs.heartbeatPort.targetPort }}
               protocol: UDP
-            {{ if .Values.service.hbbs.webPort.enable }}
+            {{ if .Values.service.enableWebClientSupport }}
             - name: "web-port"
               containerPort: {{ .Values.service.hbbs.webPort.targetPort }}
               protocol: TCP

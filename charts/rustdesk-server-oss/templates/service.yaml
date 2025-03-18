@@ -15,7 +15,7 @@ spec:
       targetPort: {{ .Values.service.hbbr.replayPort.targetPort }}
       port: {{ .Values.service.hbbr.replayPort.port }}
       protocol: TCP
-    {{ if .Values.service.hbbr.clientPort.enable }}
+    {{ if .Values.service.enableWebClientSupport }}
     - name: "hbbr-client-port"
       targetPort: {{.Values.service.hbbr.clientPort.targetPort }}
       port: {{ .Values.service.hbbr.clientPort.port }}
@@ -33,7 +33,7 @@ spec:
       port: {{ .Values.service.hbbs.heartbeatPort.port }}
       protocol: UDP
       targetPort: 21116
-    {{ if .Values.service.hbbs.webPort.enable }}
+    {{ if .Values.service.enableWebClientSupport }}
     - port: {{ .Values.service.hbbs.webPort.port }}
       targetPort: 21118
       protocol: TCP

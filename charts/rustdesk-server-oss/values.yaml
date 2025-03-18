@@ -26,12 +26,12 @@ service:
   type: ClusterIP
   externalTrafficPolicy: Cluster
   loadBalancerIP: null
+  enableWebClientSupport: false
   hbbr:
     replayPort:
       port: 21117
       targetPort: 21117
     clientPort:
-      enable: false
       port: 21119
       targetPort: 21119
   hbbs:
@@ -47,7 +47,6 @@ service:
     webPort:
       port: 21118
       targetPort: 21118
-      enable: false
 
 ingress:
   enabled: false

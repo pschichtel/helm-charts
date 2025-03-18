@@ -1,4 +1,4 @@
-{{- if and .Values.ingress.enabled .Values.service.hbbs.webPort.enable -}}
+{{- if and .Values.ingress.enabled .Values.service.enableWebClientSupport -}}
 {{- $fullName := include "rustdesk-server-oss.fullname" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -29,12 +29,22 @@ spec:
     - host: {{ . | quote }}
       http:
         paths:
-          - path: /
+          - path: /ws/id
             pathType: Prefix
             backend:
               service:
                 name: {{ $fullName }}
                 port:
                   name: hbbs-web-port
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - path: /ws/relay
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  name: hbbr-client-port
     {{- end }}
 {{- end }}
