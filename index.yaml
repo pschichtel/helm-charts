@@ -1788,6 +1788,16 @@ entries:
   rustdesk-server-oss:
   - apiVersion: v2
     appVersion: 1.1.14
+    created: "2025-03-18T19:06:58.82863967Z"
+    description: A Helm chart for rustdesk-server-oss
+    digest: 7b6352a601535f2f5fdbe1b2766352d4c978eb6eeba269ee1e30c8ae51c53732
+    name: rustdesk-server-oss
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/rustdesk-server-oss-0.2.2/rustdesk-server-oss-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
+    appVersion: 1.1.14
     created: "2025-03-18T18:59:09.044900522Z"
     description: A Helm chart for rustdesk-server-oss
     digest: 18a83c1d421da8d88c94fd6a9faf8200d6aef04e62c59b527908211ca1258b07
@@ -2808,4 +2818,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-18T18:59:09.045353455Z"
+generated: "2025-03-18T19:06:58.829256569Z"
