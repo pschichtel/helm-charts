@@ -3,4 +3,5 @@ name: webdav
 description: A Helm chart to deploy a simple nginx-based webdav server
 type: application
 version: 0.1.0
+# renovate: image=ghcr.io/pschichtel/nginx-webdav
 appVersion: "1.22.1-bookworm"

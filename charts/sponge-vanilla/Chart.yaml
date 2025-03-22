@@ -3,4 +3,5 @@ name: sponge-vanilla
 description: A Helm chart for Sponge Vanilla
 type: application
 version: 0.1.2
+# renovate: image=ghcr.io/cubeengine/sponge
 appVersion: "1.20.2-11.0.0-RC1375"

@@ -3,4 +3,5 @@ name: rustdesk-server-oss
 description: A Helm chart for rustdesk-server-oss
 type: application
 version: 0.2.2
+# renovate: image=docker.io/rustdesk/rustdesk-server
 appVersion: '1.1.14'

@@ -3,4 +3,5 @@ name: znc
 description: A Helm chart for the ZNC IRC bouncer
 type: application
 version: 0.2.0
+# renovate: image=docker.io/library/znc
 appVersion: "1.9.1"

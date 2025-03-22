@@ -1,5 +1,5 @@
 image:
-  repository: coturn/coturn
+  repository: docker.io/coturn/coturn
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

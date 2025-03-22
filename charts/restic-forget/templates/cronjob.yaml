@@ -17,8 +17,8 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: forget
-            image: {{ print "ghcr.io/restic/restic:" ($.Values.restic.version | default $.Chart.AppVersion) | quote }}
-            imagePullPolicy: IfNotPresent
+            image: {{ print $.Values.image.repository ":" ($.Values.image.tag | default $.Chart.AppVersion) | quote }}
+            imagePullPolicy: {{ $.Values.image.imagePullPolicy }}
             command: [ /usr/local/bin/forget.sh ]
             args:
             {{- range $entry := ($repo.policy | default $.Values.restic.forget.policy) }}

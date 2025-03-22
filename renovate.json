@@ -1,3 +1,12 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customManagers": [
+    {
+      "fileMatch": ["(^|/)Chart\\.yaml$"],
+      "matchStrings": [
+        "#\\s?renovate: image=(?<depName>.*?)\\s?appVersion:\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
 }

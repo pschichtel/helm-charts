@@ -3,4 +3,5 @@ name: s3-backup
 description: A helm chart to deploy s3-backup jobs.
 type: application
 version: 0.6.3
+# renovate: image=ghcr.io/pschichtel/s3-backup
 appVersion: 0.3.3

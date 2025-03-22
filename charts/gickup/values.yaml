@@ -1,5 +1,5 @@
 image:
-  repo: buddyspencer/gickup
+  repo: docker.io/buddyspencer/gickup
   tag: null
   pullPolicy: IfNotPresent
 

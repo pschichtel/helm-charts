@@ -3,4 +3,5 @@ name: restic-forget
 description: A helm chart to deploy restic jobs for backup cleaning.
 type: application
 version: 0.4.3
+# renovate: image=ghcr.io/restic/restic
 appVersion: 0.17.3

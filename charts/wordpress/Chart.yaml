@@ -3,4 +3,5 @@ name: wordpress
 description: A Helm chart for WordPress
 type: application
 version: 0.7.1
+# renovate: image=docker.io/library/wordpress
 appVersion: "6.6.1"
