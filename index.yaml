@@ -557,6 +557,17 @@ entries:
     version: 0.1.0
   gickup:
   - apiVersion: v2
+    appVersion: 0.10.36
+    created: "2025-03-22T17:11:39.456880782Z"
+    description: A helm chart to deploy gickup.
+    digest: ba7cbf6feb656431351d7d4335bb705945dce5f5d5486791238ec15550d01171
+    home: https://github.com/cooperspencer/gickup
+    name: gickup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.3/gickup-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
     appVersion: 0.10.28
     created: "2024-03-04T00:44:34.708341248Z"
     description: A helm chart to deploy gickup.
@@ -579,6 +590,29 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.1/gickup-0.0.1.tgz
     version: 0.0.1
   graylog:
+  - apiVersion: v2
+    appVersion: 6.1.8-1
+    created: "2025-03-22T17:11:39.631780302Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: 85114505ef995f7cf228ca0d3a8d975e429a470ecbdda6f55cdedf29cb49bcdb
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.2.0/graylog-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     appVersion: 5.2.4-1
     created: "2024-02-22T00:06:58.335852112Z"
@@ -1295,6 +1329,16 @@ entries:
     version: 0.1.0
   mediawiki:
   - apiVersion: v2
+    appVersion: "1.43"
+    created: "2025-03-22T17:11:39.813074738Z"
+    description: A Helm chart for MediaWiki
+    digest: af8ca261f723572f1a0949b83996f57e68c6a5687694d298653d00ee4ae1326c
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.2.0/mediawiki-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: "1.41"
     created: "2024-06-15T17:24:32.243552666Z"
     description: A Helm chart for MediaWiki
@@ -1316,6 +1360,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/mindustry-0.1.0/mindustry-0.1.0.tgz
     version: 0.1.0
   nextcloud-notify_push:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-03-22T17:11:39.971640529Z"
+    description: A Helm chart for nextcloud's push_notify server
+    digest: c152407709aa015072e9a3b889d8b9bd4e097167369fb6557720bade09b2400d
+    name: nextcloud-notify_push
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/nextcloud-notify_push-0.2.0/nextcloud-notify_push-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     appVersion: 0.6.12
     created: "2024-05-30T13:43:07.916549032Z"
@@ -1427,6 +1481,17 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/nextcloud-notify_push-0.1.0/nextcloud-notify_push-0.1.0.tgz
     version: 0.1.0
   powerdns:
+  - apiVersion: v2
+    appVersion: 4.8.5
+    created: "2025-03-22T17:11:40.148605457Z"
+    description: A Helm chart to deploy PowerDNS to Kubernetes
+    digest: 87d4cc6aeb7cb7937d8737ebb9d2663c13e4144e53737cda9f0fc20f36abbd66
+    home: https://www.powerdns.com/
+    name: powerdns
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/powerdns-0.8.1/powerdns-0.8.1.tgz
+    version: 0.8.1
   - apiVersion: v2
     appVersion: 4.8.4
     created: "2024-12-22T01:20:13.33826019Z"
@@ -2059,6 +2124,17 @@ entries:
     version: 0.1.0
   satisfactory:
   - apiVersion: v2
+    appVersion: v1.9.5
+    created: "2025-03-22T17:11:40.309774169Z"
+    description: A Helm chart for deploying a Satisfactory dedicated game server to
+      Kubernetes.
+    digest: 06604f66bc775d82d26161e91069db6f200b751ba0fe9826423adaef33525510
+    name: satisfactory
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/satisfactory-0.3.1/satisfactory-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     appVersion: v1.9.1
     created: "2024-12-21T13:56:38.884042376Z"
     description: A Helm chart for deploying a Satisfactory dedicated game server to
@@ -2528,6 +2604,16 @@ entries:
     version: 0.1.0
   wordpress:
   - apiVersion: v2
+    appVersion: 6.7.2
+    created: "2025-03-22T17:11:40.489264288Z"
+    description: A Helm chart for WordPress
+    digest: 98a5718756bcb9195c6d08817cf39fcdb6255d51e737ccb46bdf7889111df933
+    name: wordpress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.8.0/wordpress-0.8.0.tgz
+    version: 0.8.0
+  - apiVersion: v2
     appVersion: 6.6.1
     created: "2024-09-05T23:31:39.103183298Z"
     description: A Helm chart for WordPress
@@ -2828,4 +2914,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-22T16:53:11.07628209Z"
+generated: "2025-03-22T17:11:40.489728778Z"
