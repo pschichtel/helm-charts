@@ -5,4 +5,4 @@ home: https://www.powerdns.com/
 type: application
 version: 0.8.0
 # renovate: image=docker.io/powerdns/pdns-auth-48
-appVersion: "4.8.4"
+appVersion: "4.8.5"
