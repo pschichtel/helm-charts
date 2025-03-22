@@ -3,6 +3,6 @@ name: gickup
 description: A helm chart to deploy gickup.
 home: https://github.com/cooperspencer/gickup
 type: application
-version: 0.0.2
+version: 0.0.3
 # renovate: image=docker.io/buddyspencer/gickup
 appVersion: 0.10.36
