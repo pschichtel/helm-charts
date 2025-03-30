@@ -1731,6 +1731,16 @@ entries:
     version: 0.1.0
   restic-forget:
   - apiVersion: v2
+    appVersion: 0.18.0
+    created: "2025-03-30T20:50:24.588930075Z"
+    description: A helm chart to deploy restic jobs for backup cleaning.
+    digest: 24f2a36693017a15209c8d364f0320ede2e39c20c77ff7b35ee3fcf41a1a3484
+    name: restic-forget
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/restic-forget-0.5.0/restic-forget-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     appVersion: 0.17.3
     created: "2024-11-10T23:01:49.382001808Z"
     description: A helm chart to deploy restic jobs for backup cleaning.
@@ -1952,6 +1962,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/rustdesk-server-oss-0.1.0/rustdesk-server-oss-0.1.0.tgz
     version: 0.1.0
   s3-backup:
+  - apiVersion: v2
+    appVersion: 0.4.0
+    created: "2025-03-30T20:50:24.67594758Z"
+    description: A helm chart to deploy s3-backup jobs.
+    digest: ca3bfb328bd6ca60d1aa418f86d963b821c6062eb0c1d95cff37794c31f6ec6c
+    name: s3-backup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/s3-backup-0.7.0/s3-backup-0.7.0.tgz
+    version: 0.7.0
   - apiVersion: v2
     appVersion: 0.3.3
     created: "2024-11-10T23:20:44.691530895Z"
@@ -2944,4 +2964,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-24T21:36:26.085035856Z"
+generated: "2025-03-30T20:50:24.676478952Z"
