@@ -89,6 +89,14 @@ spec:
                               resourceTypes:
                                 additionalProperties:
                                   properties:
+                                    groupType:
+                                      type: "string"
+                                    scopeAliases:
+                                      additionalProperties:
+                                        items:
+                                          type: "string"
+                                        type: "array"
+                                      type: "object"
                                     scopes:
                                       items:
                                         type: "string"
@@ -440,6 +448,14 @@ spec:
                                 resourceTypes:
                                   additionalProperties:
                                     properties:
+                                      groupType:
+                                        type: "string"
+                                      scopeAliases:
+                                        additionalProperties:
+                                          items:
+                                            type: "string"
+                                          type: "array"
+                                        type: "object"
                                       scopes:
                                         items:
                                           type: "string"
@@ -989,6 +1005,14 @@ spec:
                                 resourceTypes:
                                   additionalProperties:
                                     properties:
+                                      groupType:
+                                        type: "string"
+                                      scopeAliases:
+                                        additionalProperties:
+                                          items:
+                                            type: "string"
+                                          type: "array"
+                                        type: "object"
                                       scopes:
                                         items:
                                           type: "string"
@@ -1680,6 +1704,8 @@ spec:
                                 type: "string"
                               digits:
                                 type: "integer"
+                              federationLink:
+                                type: "string"
                               hashIterations:
                                 type: "integer"
                               hashedSaltedValue:
@@ -2318,6 +2344,14 @@ spec:
                                 resourceTypes:
                                   additionalProperties:
                                     properties:
+                                      groupType:
+                                        type: "string"
+                                      scopeAliases:
+                                        additionalProperties:
+                                          items:
+                                            type: "string"
+                                          type: "array"
+                                        type: "object"
                                       scopes:
                                         items:
                                           type: "string"
@@ -2778,6 +2812,8 @@ spec:
                                       type: "string"
                                     digits:
                                       type: "integer"
+                                    federationLink:
+                                      type: "string"
                                     hashIterations:
                                       type: "integer"
                                     hashedSaltedValue:
@@ -3311,6 +3347,8 @@ spec:
                                 type: "string"
                               digits:
                                 type: "integer"
+                              federationLink:
+                                type: "string"
                               hashIterations:
                                 type: "integer"
                               hashedSaltedValue:
@@ -3517,6 +3555,8 @@ spec:
                     items:
                       properties:
                         name:
+                          type: "string"
+                        request:
                           type: "string"
                       type: "object"
                     type: "array"
