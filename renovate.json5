@@ -7,6 +7,26 @@
         "#\\s?renovate: image=(?<depName>.*?)\\s?appVersion:\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)"
       ],
       "datasourceTemplate": "docker"
-    }
-  ]
+    },
+    {
+      "fileMatch": [
+          "^charts/keycloak(-operator(-crds)?)?/Chart\\.yaml$",
+      ],
+      "matchStrings": [
+        "appVersion:\\s*(?<currentValue>\\S+)\\s",
+      ],
+      "depNameTemplate": "keycloak/keycloak",
+      "datasourceTemplate": "github-releases"
+    },
+  ],
+  // "packageRules": [
+  //   {
+  //     "matchPackageNames": ["keycloak/keycloak"],
+  //     "postUpgradeTasks": {
+  //       "commands": [
+  //         "cd charts/keycloak-operator-crds && ./update.sh",
+  //       ]
+  //     }
+  //   },
+  // ],
 }
