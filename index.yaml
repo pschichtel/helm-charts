@@ -1421,6 +1421,16 @@ entries:
   mediawiki:
   - apiVersion: v2
     appVersion: "1.43"
+    created: "2025-04-18T22:12:57.39986088Z"
+    description: A Helm chart for MediaWiki
+    digest: 70a98177c9e40624853d4bc5748136b3476a082143ea30378de60c68244a7d41
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.2.1/mediawiki-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: "1.43"
     created: "2025-03-22T17:11:39.813074738Z"
     description: A Helm chart for MediaWiki
     digest: af8ca261f723572f1a0949b83996f57e68c6a5687694d298653d00ee4ae1326c
@@ -2705,6 +2715,16 @@ entries:
     version: 0.1.0
   wordpress:
   - apiVersion: v2
+    appVersion: 6.8.0
+    created: "2025-04-18T22:12:57.494723477Z"
+    description: A Helm chart for WordPress
+    digest: a0e4c42ce1e624c7e62f8c0edde940c4121390bac05ef3da6879466c5c948624
+    name: wordpress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.9.0/wordpress-0.9.0.tgz
+    version: 0.9.0
+  - apiVersion: v2
     appVersion: 6.7.2
     created: "2025-03-22T17:11:40.489264288Z"
     description: A Helm chart for WordPress
@@ -3015,4 +3035,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-13T23:21:17.796862779Z"
+generated: "2025-04-18T22:12:57.495281848Z"
