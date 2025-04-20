@@ -46,6 +46,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/cert-manager-webhook-cloudns-1.0.0/cert-manager-webhook-cloudns-1.0.0.tgz
     version: 1.0.0
+  cosi:
+  - apiVersion: v2
+    appVersion: 0.2.1
+    created: "2025-04-20T00:27:33.296414921Z"
+    description: A Helm chart for COSI
+    digest: b24d5560780e078e4dfab2a3ecdd46f2f8afc515490c93ba0ed901447e015b19
+    name: cosi
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/cosi-0.1.0/cosi-0.1.0.tgz
+    version: 0.1.0
   coturn:
   - apiVersion: v2
     appVersion: 4.6.3-r3
@@ -3035,4 +3046,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-18T22:12:57.495281848Z"
+generated: "2025-04-20T00:27:33.781188005Z"
