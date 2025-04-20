@@ -3,6 +3,7 @@ name: keycloak
 description: A Helm chart for Kubernetes
 type: application
 version: 0.3.0
+# renovate: github-releases=keycloak/keycloak
 appVersion: 26.2.0
 
 dependencies:
