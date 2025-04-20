@@ -9,13 +9,10 @@
       "datasourceTemplate": "docker"
     },
     {
-      "fileMatch": [
-          "^charts/keycloak(-operator(-crds)?)?/Chart\\.yaml$",
-      ],
+      "fileMatch": ["(^|/)Chart\\.yaml$"],
       "matchStrings": [
-        "appVersion:\\s*(?<currentValue>\\S+)\\s",
+        "#\\s?renovate: github-releases=(?<depName>.*?)\\s?appVersion:\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)"
       ],
-      "depNameTemplate": "keycloak/keycloak",
       "datasourceTemplate": "github-releases"
     },
   ],
