@@ -5,10 +5,10 @@ metadata:
   annotations:
     app.quarkus.io/quarkus-version: 3.20.0
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-    app.quarkus.io/build-timestamp: 2025-04-11 - 12:54:54 +0000
+    app.quarkus.io/build-timestamp: 2025-04-23 - 12:23:04 +0000
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloak-operator
 {{- if .Values.openshift.enabled }}
 ---
@@ -30,7 +30,7 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloakrealmimportcontroller-cluster-role
 rules:
   - apiGroups:
@@ -76,7 +76,7 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloakcontroller-cluster-role
 rules:
   - apiGroups:
@@ -257,7 +257,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloakrealmimportcontroller-role-binding
 roleRef:
   kind: Role
@@ -272,7 +272,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloakcontroller-role-binding
 roleRef:
   kind: Role
@@ -287,7 +287,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloak-operator-view
 roleRef:
   kind: Role
@@ -303,10 +303,10 @@ metadata:
   annotations:
     app.quarkus.io/quarkus-version: 3.20.0
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-    app.quarkus.io/build-timestamp: 2025-04-11 - 12:54:54 +0000
+    app.quarkus.io/build-timestamp: 2025-04-23 - 12:23:04 +0000
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloak-operator
 spec:
   ports:
@@ -324,10 +324,10 @@ metadata:
   annotations:
     app.quarkus.io/quarkus-version: 3.20.0
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-    app.quarkus.io/build-timestamp: 2025-04-11 - 12:54:54 +0000
+    app.quarkus.io/build-timestamp: 2025-04-23 - 12:23:04 +0000
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: 26.2.0
+    app.kubernetes.io/version: 26.2.1
   name: keycloak-operator
 spec:
   replicas: 1
@@ -339,10 +339,10 @@ spec:
       annotations:
         app.quarkus.io/quarkus-version: 3.20.0
         app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
-        app.quarkus.io/build-timestamp: 2025-04-11 - 12:54:54 +0000
+        app.quarkus.io/build-timestamp: 2025-04-23 - 12:23:04 +0000
       labels:
         app.kubernetes.io/name: keycloak-operator
-        app.kubernetes.io/version: 26.2.0
+        app.kubernetes.io/version: 26.2.1
     spec:
       containers:
         - env:
@@ -351,7 +351,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: RELATED_IMAGE_KEYCLOAK
-              value: quay.io/keycloak/keycloak:26.2.0
+              value: quay.io/keycloak/keycloak:26.2.1
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           livenessProbe:
