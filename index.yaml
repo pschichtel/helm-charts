@@ -1289,6 +1289,16 @@ entries:
     version: 0.1.0
   keycloak-operator-crds:
   - apiVersion: v2
+    appVersion: 26.2.1
+    created: "2025-04-24T23:36:21.295023609Z"
+    description: A Helm chart for Kubernetes
+    digest: f610a4d537e72c12aceea34a9582e17c97e320c9389b68a7c5b56664c9132ee0
+    name: keycloak-operator-crds
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-crds-1.2.1/keycloak-operator-crds-1.2.1.tgz
+    version: 1.2.1
+  - apiVersion: v2
     appVersion: 26.2.0
     created: "2025-04-13T23:05:35.797556224Z"
     description: A Helm chart for Kubernetes
@@ -1430,6 +1440,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/keycloak-webhook-router-0.1.0/keycloak-webhook-router-0.1.0.tgz
     version: 0.1.0
   mediawiki:
+  - apiVersion: v2
+    appVersion: "1.43"
+    created: "2025-04-24T23:36:21.396282989Z"
+    description: A Helm chart for MediaWiki
+    digest: f6c64e72bc9703ce980445b637d6d7fd80ae1e2207e17f5e974405c629e0f640
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.2.2/mediawiki-0.2.2.tgz
+    version: 0.2.2
   - apiVersion: v2
     appVersion: "1.43"
     created: "2025-04-18T22:12:57.39986088Z"
@@ -3046,4 +3066,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-20T00:27:33.781188005Z"
+generated: "2025-04-24T23:36:21.396743693Z"
