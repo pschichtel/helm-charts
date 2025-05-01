@@ -613,6 +613,29 @@ entries:
     version: 0.0.1
   graylog:
   - apiVersion: v2
+    appVersion: 6.2.1-1
+    created: "2025-05-01T16:13:43.482714176Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: 56dc590ec55fad38e633ddc4eefd5e62850f46ae566975572959667af5c5acb3
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.3.0/graylog-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 6.1.8-1
     created: "2025-03-22T17:11:39.631780302Z"
     description: Graylog is the centralized log management solution built to open
@@ -1318,6 +1341,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-0.1.0/keycloak-operator-0.1.0.tgz
     version: 0.1.0
   keycloak-operator-crds:
+  - apiVersion: v2
+    appVersion: 26.2.2
+    created: "2025-05-01T16:13:44.023377293Z"
+    description: A Helm chart for Kubernetes
+    digest: 5d037d82e137ec3e5010aaec4a1711904895400ea1061e3aa3bc17926f0680e2
+    name: keycloak-operator-crds
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-crds-1.2.2/keycloak-operator-crds-1.2.2.tgz
+    version: 1.2.2
   - apiVersion: v2
     appVersion: 26.2.1
     created: "2025-04-24T23:36:21.295023609Z"
@@ -3106,4 +3139,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-25T23:26:53.721149571Z"
+generated: "2025-05-01T16:13:44.023941483Z"
