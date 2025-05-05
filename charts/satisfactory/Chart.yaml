@@ -4,4 +4,4 @@ description: A Helm chart for deploying a Satisfactory dedicated game server to 
 type: application
 version: 0.3.1
 # renovate: image=wolveix/satisfactory-server
-appVersion: "v1.9.7"
+appVersion: "v1.9.8"
