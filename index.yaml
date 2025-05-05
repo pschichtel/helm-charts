@@ -1372,6 +1372,16 @@ entries:
     version: 0.1.0
   keycloak-operator-crds:
   - apiVersion: v2
+    appVersion: 26.2.3
+    created: "2025-05-05T23:24:30.409062425Z"
+    description: A Helm chart for Kubernetes
+    digest: 77312ee079f20142ddfbd5c7c20ff083f0871ae8d1dbd2695755dfca39eb849a
+    name: keycloak-operator-crds
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-crds-1.2.3/keycloak-operator-crds-1.2.3.tgz
+    version: 1.2.3
+  - apiVersion: v2
     appVersion: 26.2.2
     created: "2025-05-01T16:13:44.023377293Z"
     description: A Helm chart for Kubernetes
@@ -2359,6 +2369,17 @@ entries:
     version: 0.1.0
   satisfactory:
   - apiVersion: v2
+    appVersion: v1.9.8
+    created: "2025-05-05T23:24:30.535665106Z"
+    description: A Helm chart for deploying a Satisfactory dedicated game server to
+      Kubernetes.
+    digest: 29c7e55730e30b9fdc760cd82d442450118d08391f93478b64350964b5c1409b
+    name: satisfactory
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/satisfactory-0.3.2/satisfactory-0.3.2.tgz
+    version: 0.3.2
+  - apiVersion: v2
     appVersion: v1.9.5
     created: "2025-03-22T17:11:40.309774169Z"
     description: A Helm chart for deploying a Satisfactory dedicated game server to
@@ -2839,6 +2860,16 @@ entries:
     version: 0.1.0
   wordpress:
   - apiVersion: v2
+    appVersion: 6.8.1
+    created: "2025-05-05T23:24:30.627005608Z"
+    description: A Helm chart for WordPress
+    digest: afa56effc7fb45c20966efe5d2817f0c387d7114783c047ae136dc32bab65397
+    name: wordpress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.9.2/wordpress-0.9.2.tgz
+    version: 0.9.2
+  - apiVersion: v2
     appVersion: 6.8.0
     created: "2025-04-25T23:26:53.720665438Z"
     description: A Helm chart for WordPress
@@ -3169,4 +3200,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-01T19:08:39.835960561Z"
+generated: "2025-05-05T23:24:30.62766673Z"
