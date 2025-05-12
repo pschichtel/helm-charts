@@ -7,7 +7,7 @@ metadata:
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloak-operator
 {{- if .Values.openshift.enabled }}
 ---
@@ -29,7 +29,7 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloakrealmimportcontroller-cluster-role
 rules:
   - apiGroups:
@@ -75,7 +75,7 @@ kind: Role
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloakcontroller-cluster-role
 rules:
   - apiGroups:
@@ -256,7 +256,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloakrealmimportcontroller-role-binding
 roleRef:
   kind: Role
@@ -271,7 +271,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloakcontroller-role-binding
 roleRef:
   kind: Role
@@ -286,7 +286,7 @@ kind: RoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloak-operator-view
 roleRef:
   kind: Role
@@ -304,7 +304,7 @@ metadata:
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloak-operator
 spec:
   ports:
@@ -324,7 +324,7 @@ metadata:
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
-    app.kubernetes.io/version: {{ .Release.AppVersion }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloak-operator
 spec:
   replicas: 1
@@ -337,7 +337,7 @@ spec:
         app.quarkus.io/quarkus-version: 3.20.0
         app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
       labels:
-        app.kubernetes.io/version: {{ .Release.AppVersion }}
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
         app.kubernetes.io/name: keycloak-operator
     spec:
       containers:
