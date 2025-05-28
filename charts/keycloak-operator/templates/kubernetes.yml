@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    app.quarkus.io/quarkus-version: 3.20.0
+    app.quarkus.io/quarkus-version: 3.20.1
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
@@ -300,7 +300,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    app.quarkus.io/quarkus-version: 3.20.0
+    app.quarkus.io/quarkus-version: 3.20.1
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
@@ -320,7 +320,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.quarkus.io/quarkus-version: 3.20.0
+    app.quarkus.io/quarkus-version: 3.20.1
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
@@ -334,11 +334,11 @@ spec:
   template:
     metadata:
       annotations:
-        app.quarkus.io/quarkus-version: 3.20.0
+        app.quarkus.io/quarkus-version: 3.20.1
         app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
       labels:
-        app.kubernetes.io/version: {{ .Chart.AppVersion }}
         app.kubernetes.io/name: keycloak-operator
+        app.kubernetes.io/version: {{ .Chart.AppVersion }}
     spec:
       containers:
         - env:
