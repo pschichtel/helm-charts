@@ -623,6 +623,29 @@ entries:
     version: 0.0.1
   graylog:
   - apiVersion: v2
+    appVersion: 6.2.4-1
+    created: "2025-06-28T15:39:21.608136822Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: 7ba56445f153f1f9992a5e0bf52cfbae8723c1fb432e3e5be036b53f029b3691
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.3.2/graylog-0.3.2.tgz
+    version: 0.3.2
+  - apiVersion: v2
     appVersion: 6.2.3-1
     created: "2025-06-04T23:59:56.685532879Z"
     description: Graylog is the centralized log management solution built to open
@@ -1716,6 +1739,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/keycloak-webhook-router-0.1.0/keycloak-webhook-router-0.1.0.tgz
     version: 0.1.0
   mediawiki:
+  - apiVersion: v2
+    appVersion: "1.43"
+    created: "2025-06-28T15:39:21.699490666Z"
+    description: A Helm chart for MediaWiki
+    digest: ddce646178717c8cfce426fa604b247bfc02192fb04cf77b416b343df24ac579
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.2.3/mediawiki-0.2.3.tgz
+    version: 0.2.3
   - apiVersion: v2
     appVersion: "1.43"
     created: "2025-04-24T23:36:21.396282989Z"
@@ -3075,6 +3108,16 @@ entries:
   wordpress:
   - apiVersion: v2
     appVersion: 6.8.1
+    created: "2025-06-28T15:39:21.811051485Z"
+    description: A Helm chart for WordPress
+    digest: 54474dd5558d01d94333ebefa2dec09f20ff06d1ca97a507bdc5273b934bad74
+    name: wordpress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.9.3/wordpress-0.9.3.tgz
+    version: 0.9.3
+  - apiVersion: v2
+    appVersion: 6.8.1
     created: "2025-05-05T23:24:30.627005608Z"
     description: A Helm chart for WordPress
     digest: afa56effc7fb45c20966efe5d2817f0c387d7114783c047ae136dc32bab65397
@@ -3424,4 +3467,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-10T23:52:21.018427732Z"
+generated: "2025-06-28T15:39:21.811633034Z"
