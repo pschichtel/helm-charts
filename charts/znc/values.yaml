@@ -32,6 +32,7 @@ service:
   ports:
     web: 8080
     plain: 6667
+  annotations: {}
 
 ingress:
   enabled: false
