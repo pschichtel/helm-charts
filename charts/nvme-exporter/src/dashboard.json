@@ -102,6 +102,7 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
+          "editorMode": "code",
           "expr": "nvme_smart_log_percent_used",
           "format": "time_series",
           "instant": true,
@@ -184,7 +185,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_ctrl_cc{device=\"$device\",cc=\"en\"}",
+          "editorMode": "code",
+          "expr": "nvme_ctrl_cc{instance=\"$node\",device=\"$device\",cc=\"en\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -247,10 +249,12 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_percent_used{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_percent_used{instance=\"$node\",device=\"$device\"}",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{device}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -312,7 +316,7 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "nvme_smart_log_temperature{device=\"$device\"} - 273.15",
+          "expr": "nvme_smart_log_temperature{instance=\"$node\",device=\"$device\"} - 273.15",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -394,7 +398,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_critical_warning{device=\"$device\",critical_warning=\"nvm_subsystem_reliability\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_critical_warning{instance=\"$node\",device=\"$device\",critical_warning=\"nvm_subsystem_reliability\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -475,7 +480,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_critical_warning{device=\"$device\",critical_warning=\"volatile_backup_failed\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_critical_warning{instance=\"$node\",device=\"$device\",critical_warning=\"volatile_backup_failed\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -555,7 +561,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_critical_warning{device=\"$device\",critical_warning=\"avail_spare\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_critical_warning{instance=\"$node\",device=\"$device\",critical_warning=\"avail_spare\"}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -619,7 +626,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_num_error_log_entries{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_num_error_log_entries{instance=\"$node\",device=\"$device\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -700,7 +708,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_ctrl_csts{device=\"$device\",csts=\"rdy\"}",
+          "editorMode": "code",
+          "expr": "nvme_ctrl_csts{instance=\"$node\",device=\"$device\",csts=\"rdy\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -763,14 +772,16 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_avail_spare{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "100 - nvme_smart_log_avail_spare{instance=\"$node\",device=\"$device\"}",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{device}}",
+          "range": true,
           "refId": "A"
         }
       ],
-      "title": "Available Spare",
+      "title": "Used Spare",
       "type": "gauge"
     },
     {
@@ -826,10 +837,12 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_spare_thresh{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_spare_thresh{instance=\"$node\",device=\"$device\"}",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{device}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -907,7 +920,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_critical_warning{device=\"$device\",critical_warning=\"read_only\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_critical_warning{instance=\"$node\",device=\"$device\",critical_warning=\"read_only\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -988,7 +1002,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_critical_warning{device=\"$device\",critical_warning=\"temp_threshold\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_critical_warning{instance=\"$node\",device=\"$device\",critical_warning=\"temp_threshold\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -1069,7 +1084,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_critical_warning{device=\"$device\",critical_warning=\"persistent_memory_read_only\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_critical_warning{instance=\"$node\",device=\"$device\",critical_warning=\"persistent_memory_read_only\"}",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -1132,7 +1148,8 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_media_errors{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_media_errors{instance=\"$node\",device=\"$device\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -1229,18 +1246,22 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_power_cycles{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_power_cycles{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "Safe",
+          "range": true,
           "refId": "A"
         },
         {
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_unsafe_shutdowns{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_unsafe_shutdowns{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "Unsafe",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1334,18 +1355,22 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_warning_temp_time{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_warning_temp_time{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "warning",
+          "range": true,
           "refId": "A"
         },
         {
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_critical_comp_time{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_critical_comp_time{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "critical",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1439,9 +1464,11 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_power_on_hours{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_power_on_hours{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "{{device}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1535,18 +1562,22 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_data_units_read{device=\"$device\"} * 512 * 1024 / 1024 / 1024 / 1024",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_data_units_read{instance=\"$node\",device=\"$device\"} * 512 * 1024 / 1024 / 1024 / 1024",
           "interval": "",
           "legendFormat": "Read",
+          "range": true,
           "refId": "A"
         },
         {
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_data_units_written{device=\"$device\"} * 512 * 1024 / 1024 / 1024 / 1024",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_data_units_written{instance=\"$node\",device=\"$device\"} * 512 * 1024 / 1024 / 1024 / 1024",
           "interval": "",
           "legendFormat": "Write",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1640,18 +1671,22 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_host_read_commands{device=\"$device\"} ",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_host_read_commands{instance=\"$node\",device=\"$device\"} ",
           "interval": "",
           "legendFormat": "Read",
+          "range": true,
           "refId": "A"
         },
         {
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_host_write_commands{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_host_write_commands{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "Write",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1745,9 +1780,11 @@
           "datasource": {
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "nvme_smart_log_controller_busy_time{device=\"$device\"}",
+          "editorMode": "code",
+          "expr": "nvme_smart_log_controller_busy_time{instance=\"$node\",device=\"$device\"}",
           "interval": "",
           "legendFormat": "{{device}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1762,19 +1799,36 @@
   "templating": {
     "list": [
       {
+        "current": {
+          "text": "server",
+          "value": "server"
+        },
+        "definition": "label_values(nvme_ctrl_cc,instance)",
+        "name": "node",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(nvme_ctrl_cc,instance)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
         "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(nvme_smart_log_temperature,device)",
+        "definition": "label_values(nvme_smart_log_temperature{instance=\"$node\"},device)",
         "includeAll": false,
         "label": "device",
         "name": "device",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(nvme_smart_log_temperature,device)",
+          "query": "label_values(nvme_smart_log_temperature{instance=\"$node\"},device)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -1803,5 +1857,5 @@
   "timezone": "",
   "title": "NVMe Exporter",
   "uid": "WwP1Px4Mz",
-  "version": 1
+  "version": 2
 }
