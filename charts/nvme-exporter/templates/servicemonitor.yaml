@@ -1,0 +1,17 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "nvme-exporter.fullname" . }}
+spec:
+  endpoints:
+  - port: http
+    scheme: http
+    interval: "{{ .Values.intervalSeconds }}s"
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "nvme-exporter.selectorLabels" . | nindent 6 }}
+{{- end }}

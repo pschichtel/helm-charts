@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nvme-exporter
+description: A Helm chart for th nvme-exporter
+type: application
+version: 0.1.0
+appVersion: "latest"
