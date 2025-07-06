@@ -2,6 +2,6 @@ apiVersion: v2
 name: mindustry
 description: A Helm chart for deploying a Mindustry dedicated game server to Kubernetes.
 type: application
-version: 0.1.0
+version: 0.1.1
 # renovate: image=docker.io/pschichtel/mindustry-server
 appVersion: "v145.1"
