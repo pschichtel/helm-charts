@@ -1865,6 +1865,16 @@ entries:
   mindustry:
   - apiVersion: v2
     appVersion: v145.1
+    created: "2025-07-06T19:51:29.733453075Z"
+    description: A Helm chart for deploying a Mindustry dedicated game server to Kubernetes.
+    digest: 7fa9c8295a483a1ae173464a97456f994c2c9d53ed76172343f59a8ad8bb4d11
+    name: mindustry
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mindustry-0.1.1/mindustry-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: v145.1
     created: "2023-07-08T14:10:13.265898502Z"
     description: A Helm chart for deploying a Mindustry dedicated game server to Kubernetes.
     digest: 6fa8f802786e7441c51f54d2d6f54cc67c788721bbfbbd8f203b482298e737d7
@@ -3621,4 +3631,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-06T19:17:59.297442078Z"
+generated: "2025-07-06T19:51:29.73397728Z"
