@@ -107,7 +107,7 @@
           "format": "time_series",
           "instant": true,
           "interval": "",
-          "legendFormat": "{{devno}}",
+          "legendFormat": "$node, {{devno}}",
           "refId": "A"
         }
       ],
@@ -1793,7 +1793,7 @@
     }
   ],
   "preload": false,
-  "refresh": "10s",
+  "refresh": "30s",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
@@ -1838,7 +1838,7 @@
     ]
   },
   "time": {
-    "from": "now-1m",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {
