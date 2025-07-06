@@ -2007,6 +2007,16 @@ entries:
   nvme-exporter:
   - apiVersion: v2
     appVersion: latest
+    created: "2025-07-06T02:31:08.018721752Z"
+    description: A Helm chart for th nvme-exporter
+    digest: 36393bc148ecac82c6b0410e941a49d73b54647782c3bfb0742c3ff0e99832c9
+    name: nvme-exporter
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/nvme-exporter-0.1.2/nvme-exporter-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: latest
     created: "2025-07-06T02:20:16.41048821Z"
     description: A Helm chart for th nvme-exporter
     digest: 178735180309b0c120099398c7195617b2c33e227c89b7f8829c5776d3ea0e15
@@ -3561,4 +3571,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-06T02:20:16.41108905Z"
+generated: "2025-07-06T02:31:08.019415788Z"
