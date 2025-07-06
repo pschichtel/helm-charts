@@ -27,6 +27,7 @@ service:
   externalTrafficPolicy: Cluster
   loadBalancerIP: null
   enableWebClientSupport: false
+  annotations: {}
   hbbr:
     replayPort:
       port: 21117
