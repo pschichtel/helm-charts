@@ -2004,6 +2004,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/nextcloud-notify_push-0.1.0/nextcloud-notify_push-0.1.0.tgz
     version: 0.1.0
+  nvme-exporter:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2025-07-06T02:19:07.237056635Z"
+    description: A Helm chart for th nvme-exporter
+    digest: a8af565a9c4b4316c9d53c61849d33296fd1508132459a78109d87c8822dd2bf
+    name: nvme-exporter
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/nvme-exporter-0.1.0/nvme-exporter-0.1.0.tgz
+    version: 0.1.0
   powerdns:
   - apiVersion: v2
     appVersion: 4.8.5
@@ -3540,4 +3551,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-03T23:37:23.360027746Z"
+generated: "2025-07-06T02:19:07.23765317Z"
