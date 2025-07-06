@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "nvme-exporter.fullname" . }}
+  labels:
+    grafana_dashboard: '1'
+data:
+{{ (.Files.Glob "src/*").AsConfig | indent 2 }}
