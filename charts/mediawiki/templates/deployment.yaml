@@ -72,10 +72,12 @@ spec:
               subPath: 'php-fpm.ini'
               mountPath: /usr/local/etc/php-fpm.d/z-www.conf
               readOnly: true
+            {{- if not .Values.mediawiki.installMode }}
             - name: secret
               subPath: 'LocalSettings.php'
               mountPath: /var/www/html/LocalSettings.php
               readOnly: true
+            {{- end }}
             {{- if .Values.php.opcache.enabled }}
             - name: opcache
               mountPath: /opcache
