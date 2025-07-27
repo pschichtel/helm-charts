@@ -174,16 +174,6 @@ exporter:
     enabled: false
 
 mediawiki:
-  siteName: MediaWiki
-  metaNamespace: null
-
-  database:
-    type: mysql
-    server: null
-    name: mediawiki
-    username: mediawiki
-    password: mediawiki
-
   localSettings:
     template: false
     content: null
