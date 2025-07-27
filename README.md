@@ -39,3 +39,8 @@ The charts are of various quality. I generally try to:
 Not all of the charts will check all those boxes. Some are old enough, that `helm create`'s output was different. Some started out as a fork, which itself didn't adhere to these rules. What ever the reaons might be, don't expect perfect consistency. I intentionally don't use a complex template library similar to what e.g. bitnami does, to keep things simpler and to be able to more easily adjust to the specific use-case.
 
 I generally apply the boy scout rule (leave the site cleaner than you found it) and I would prefer PR authors to do the same.
+
+Requests for new Charts
+-----------------------
+
+I won't accept requests for new charts, unless *I* have a use for them or the request is accompanied with some form of sponsoring.
