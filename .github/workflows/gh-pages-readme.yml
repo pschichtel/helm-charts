@@ -1,0 +1,38 @@
+name: Copy README to gh-pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - README.md
+
+jobs:
+  copy-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0  # Fetch all history for all branches
+      
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      
+      - name: Checkout gh-pages branch
+        run: |
+          git checkout gh-pages
+      
+      - name: Copy README from main
+        run: |
+          git checkout main -- README.md
+      
+      - name: Commit and push changes
+        run: |
+          git add README.md
+          git commit -m "Update README.md from main branch" || exit 0
+          git push origin gh-pages
