@@ -92,6 +92,8 @@ tolerations: []
 
 affinity: {}
 
+extraVolumes: []
+
 persistence:
   enabled: false
   pvc:
@@ -181,3 +183,4 @@ mediawiki:
   localSettings:
     template: false
     content: null
+  extraVolumeMounts: []

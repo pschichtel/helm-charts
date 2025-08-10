@@ -82,6 +82,9 @@ spec:
             - name: opcache
               mountPath: /opcache
             {{- end }}
+            {{- with .Values.mediawiki.extraVolumeMounts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
         - name: nginx
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -176,3 +179,6 @@ spec:
             {{- end }}
             sizeLimit: {{ .Values.php.opcache.size | quote }}
         {{- end -}}
+        {{- with .Values.extraVolumes }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
