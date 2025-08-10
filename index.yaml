@@ -1894,6 +1894,16 @@ entries:
   mediawiki:
   - apiVersion: v2
     appVersion: "1.44"
+    created: "2025-08-10T23:59:05.772176561Z"
+    description: A Helm chart for MediaWiki
+    digest: 2c89d23b6f1ff423d116acc613898150d2c376434ac994ff7750b0a9e32cec78
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.3.3/mediawiki-0.3.3.tgz
+    version: 0.3.3
+  - apiVersion: v2
+    appVersion: "1.44"
     created: "2025-07-27T17:26:56.075895122Z"
     description: A Helm chart for MediaWiki
     digest: 7a4e8ce22e4fe416330957a3e9478d4dc5067616d4fe4b7d1738f45d3435a6cb
@@ -3771,4 +3781,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-08-10T23:09:50.393403616Z"
+generated: "2025-08-10T23:59:05.772673484Z"
