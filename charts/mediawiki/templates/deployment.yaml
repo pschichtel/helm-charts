@@ -61,8 +61,11 @@ spec:
             {{- toYaml .Values.mediawikiResources | nindent 12 }}
           volumeMounts:
             {{- if .Values.persistence.enabled }}
-            - name: images
+            - name: storage
               mountPath: /var/www/html/images
+              {{- with .Values.mediawiki.imagesSubPath }}
+              subPath: {{ . | quote }}
+              {{- end }}
             {{- end }}
             - name: configmap
               subPath: 'php.ini'
@@ -159,7 +162,7 @@ spec:
         - name: application
           emptyDir: {}
         {{- if .Values.persistence.enabled }}
-        - name: images
+        - name: storage
           persistentVolumeClaim:
             claimName: {{ print (include "mediawiki.fullname" .) "-pvc" | quote }}
         {{- end }}

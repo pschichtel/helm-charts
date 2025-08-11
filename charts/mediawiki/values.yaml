@@ -180,6 +180,7 @@ mediawiki:
   # Only use this, if you want to use the configuration wizzard in the browser!
   # Download the LocalSettings.php in the end and finish the configuration here using it.
   installMode: false
+  imagesSubPath: null
   localSettings:
     template: false
     content: null
