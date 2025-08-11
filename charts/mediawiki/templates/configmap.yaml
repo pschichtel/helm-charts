@@ -59,6 +59,8 @@ data:
             text/x-component;
         gzip_disable  "MSIE [1-6]\.(?!.*SV1)";
 
+        client_max_body_size 0;
+
         location / {
             index  index.html index.htm index.php;
             try_files $uri $uri/ /index.php?$args;
@@ -113,8 +115,6 @@ data:
             fastcgi_split_path_info   ^(.+\.php)((?:\?|/).*)?$;
             fastcgi_request_buffering off;
 
-            client_max_body_size 0;
-
             try_files $fastcgi_script_name =404;
 
             include /php-location/*.conf;
@@ -122,13 +122,6 @@ data:
 
         location ~ /\.ht {
             deny  all;
-        }
-
-        location ~ /wp-content/(?<path>.+)\.(?<ext>jpe?g|png|gif)$ {
-            add_header Vary Accept;
-            add_header Cache-Control "private" always;
-            expires 365d;
-            try_files $load_avif $load_webp $uri =404;
         }
 
         include /default-server/*.conf;
