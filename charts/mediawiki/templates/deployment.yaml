@@ -99,12 +99,12 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /
+              path: /api.php
               port: http
             timeoutSeconds: {{ .Values.httpProbeTimeout }}
           readinessProbe:
             httpGet:
-              path: /
+              path: /api.php
               port: http
             timeoutSeconds: {{ .Values.httpProbeTimeout }}
           resources:
@@ -114,7 +114,7 @@ spec:
               mountPath: /app
               readOnly: true
             {{- if .Values.persistence.enabled }}
-            - name: images
+            - name: storage
               mountPath: /app/images
               readOnly: true
             {{- end }}

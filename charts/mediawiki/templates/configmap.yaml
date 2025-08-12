@@ -6,22 +6,27 @@ metadata:
     {{- include "mediawiki.selectorLabels" . | nindent 4 }}
 data:
   nginx.conf: |-
-    {{- /*
-        This is to support the uploads-webpc plugin
-    */}}
-    map $http_accept $load_avif {
-        ~image/avif "/wp-content/uploads-webpc/$path.$ext.avif";
-    }
-    map $http_accept $load_webp {
-        ~image/webp "/wp-content/uploads-webpc/$path.$ext.webp";
-    }
-
-    {{- /* for more robust HTTPS detection in fcgi applications */}}
+    # For more robust HTTPS detection in fcgi applications
     map $http_x_forwarded_proto $fastcgi_https {
         default '';
         https 'on';
     }
-
+    
+    # Set browser caching intervals for specific file types
+    map $uri $expires {
+    # Text, CSS, JS
+    ~*\.(txt|xml|js|css)$ 1y;
+    
+    # Media
+    ~*\.(flv|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4|m4v|ogg|webm|aac|eot|ttf|otf|woff|woff2|svg)$ 1y;
+    
+    # Pictures
+    ~*\.(jpg|jpeg|png|gif|ico|swf|webp)$ 1y;
+    
+    # Default value for all others is off
+    default off;
+    }
+    
     server {
         listen       80 default;
         server_name  _;
@@ -64,6 +69,8 @@ data:
         location / {
             index  index.html index.htm index.php;
             try_files $uri $uri/ /index.php?$args;
+            
+            expires $expires;
         }
 
         location = /favicon.ico {
@@ -75,24 +82,6 @@ data:
             allow all;
             log_not_found off;
             access_log off;
-        }
-
-        # Set browser cachig for JavaScript, CSS and text files
-        location ~* \.(txt|xml|js|css)$ {
-            expires 1y;
-            log_not_found off;
-        }
-
-        # Set browser cachig for all media files
-        location ~* \.(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4|m4v|ogg|webm|aac|eot|ttf|otf|woff|woff2|svg)$ {
-            expires 1y;
-            log_not_found off;
-        }
-
-        # Set browser cachig for all image files
-        location ~* \.(jpg|jpeg|png|gif|ico|swf|webp)$ {
-            expires 1y;
-            log_not_found off;
         }
 
         #error_page  404              /404.html;
