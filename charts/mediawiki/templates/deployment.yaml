@@ -116,6 +116,9 @@ spec:
             {{- if .Values.persistence.enabled }}
             - name: storage
               mountPath: /app/images
+              {{- with .Values.mediawiki.imagesSubPath }}
+              subPath: {{ . | quote }}
+              {{- end }}
               readOnly: true
             {{- end }}
             - name: configmap
