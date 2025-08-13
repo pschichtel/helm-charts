@@ -11,22 +11,22 @@ data:
         default '';
         https 'on';
     }
-    
+
     # Set browser caching intervals for specific file types
     map $uri $expires {
-    # Text, CSS, JS
-    ~*\.(txt|xml|js|css)$ 1y;
-    
-    # Media
-    ~*\.(flv|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4|m4v|ogg|webm|aac|eot|ttf|otf|woff|woff2|svg)$ 1y;
-    
-    # Pictures
-    ~*\.(jpg|jpeg|png|gif|ico|swf|webp)$ 1y;
-    
-    # Default value for all others is off
-    default off;
+        # Text, CSS, JS
+        ~*\.(txt|xml|js|css)$ 1y;
+
+        # Media
+        ~*\.(flv|pdf|avi|mov|ppt|doc|mp3|wmv|wav|mp4|m4v|ogg|webm|aac|eot|ttf|otf|woff|woff2|svg)$ 1y;
+
+        # Pictures
+        ~*\.(jpg|jpeg|png|gif|ico|swf|webp)$ 1y;
+
+        # Default value for all others is off
+        default off;
     }
-    
+
     server {
         listen       80 default;
         server_name  _;
@@ -97,7 +97,7 @@ data:
             fastcgi_pass            127.0.0.1:9000;
             fastcgi_param           PATH_INFO          $fastcgi_path_info;
             fastcgi_param           SCRIPT_FILENAME    /var/www/html$fastcgi_script_name;
-            
+
             fastcgi_connect_timeout   3m;
             fastcgi_read_timeout      3m;
             fastcgi_send_timeout      3m;
