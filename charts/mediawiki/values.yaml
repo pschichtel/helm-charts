@@ -185,3 +185,4 @@ mediawiki:
     template: false
     content: null
   extraVolumeMounts: []
+  probesEnabled: true

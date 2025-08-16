@@ -97,6 +97,7 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- if .Values.mediawiki.probesEnabled }}
           livenessProbe:
             httpGet:
               path: /api.php
@@ -107,6 +108,7 @@ spec:
               path: /api.php
               port: http
             timeoutSeconds: {{ .Values.httpProbeTimeout }}
+          {{- end }}
           resources:
             {{- toYaml .Values.nginxResources | nindent 12 }}
           volumeMounts:
