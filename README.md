@@ -50,4 +50,4 @@ Requests for new Charts
 
 I won't accept requests for new charts, unless *I* have a use for them or the request is accompanied with some form of sponsoring.
 
-Also no additional users will receive commit access to this repositories, please fork and create PRs.
+Also no additional users will receive commit access to this repository, please fork and create PRs.
