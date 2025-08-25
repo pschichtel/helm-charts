@@ -5,7 +5,7 @@ Helm Charts
 
 This is a collection of Helm Charts that I have built from scratch or forked from other repositories.
 
-The primary focus of all of these charts is cover my personal use-cases, however anyone is free to use them. **Pull requests, issues and discussions** are always welcome!
+The primary focus of all of these charts is to cover my personal use-cases, however anyone is free to use them. **Pull requests, issues and discussions** are always welcome!
 
 **All charts that exist on the `master` branch should work and can be considered maintained, even if they have not seen any changes recently.**
 If a chart has unreleased modifications that you want, please just ask for a release or open a PR to bump the version.
@@ -17,7 +17,7 @@ Find the project at https://github.com/pschichtel/helm-charts.
 Documentation
 -------------
 
-You might have noticed the lack of documentation. This is not accident or pure lazyness.
+You might have noticed the lack of documentation. This is not accidental or pure lazyness.
 
 Most charts I use on a daily basis, personally or professionally, have misleading or wrong documentation, which has cost me a lot time over the years. I usually go straight to the templates, skipping any documentation that might exist, if anything doesn't behave as expected. I'd encourage anyone to do the same.
 
