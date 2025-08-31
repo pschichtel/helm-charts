@@ -4,4 +4,4 @@ description: A Helm chart for nextcloud's push_notify server
 type: application
 version: 0.3.1
 # renovate: image=docker.io/icewind1991/notify_push
-appVersion: "1.1.1"
+appVersion: "1.2.0"
