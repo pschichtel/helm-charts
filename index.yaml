@@ -596,6 +596,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/external-service-monitor-0.1.0/external-service-monitor-0.1.0.tgz
     version: 0.1.0
+  factorio:
+  - apiVersion: v2
+    appVersion: 2.0.66
+    created: "2025-09-21T15:09:47.498561901Z"
+    description: A Helm chart for Factorio
+    digest: 09a65d264c568015958a1dac11976415f025863e22d26c0db2bc39040b71d067
+    name: factorio
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/factorio-0.1.0/factorio-0.1.0.tgz
+    version: 0.1.0
   gickup:
   - apiVersion: v2
     appVersion: 0.10.38
@@ -3931,4 +3942,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-14T02:09:40.342441007Z"
+generated: "2025-09-21T15:09:47.666858926Z"
