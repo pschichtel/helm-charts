@@ -1,0 +1,17 @@
+{{- if not .Values.persistentVolumeClaim.name }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "factorio.fullname" . }}
+  labels:
+    {{- include "factorio.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.persistentVolumeClaim.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+{{- end }}

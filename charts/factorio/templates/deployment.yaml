@@ -1,0 +1,197 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "factorio.fullname" . }}
+  labels:
+    {{- include "factorio.labels" . | nindent 4 }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "factorio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: {{ ((include (print $.Template.BasePath "/configmap.yaml") $) | fromYaml).data | toYaml | sha256sum }}
+        {{- if .Values.secret.create }}
+        checksum/secret: {{ ((include (print $.Template.BasePath "/secret.yaml") $) | fromYaml).data | toYaml | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "factorio.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      {{- end }}
+      {{- $image := print .Values.image.repository ":" (.Values.image.tag | default (print .Chart.AppVersion "-rootless")) }}
+      initContainers:
+        - name: {{ .Chart.Name }}-init
+          image: {{ $image | quote }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command: ['bash']
+          args: ['-c', 'mkdir -p /factorio/config']
+          volumeMounts:
+          - name: data
+            mountPath: /factorio
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: false
+          {{- end }}
+          image: {{ $image | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: game
+              containerPort: {{ .Values.service.game.port }}
+              protocol: UDP
+            - name: rcon
+              containerPort: {{ .Values.service.rcon.port }}
+              protocol: TCP
+          env:
+          - name: PORT
+            value: {{ .Values.service.game.port | quote }}
+          - name: RCON_PORT
+            value: {{ .Values.service.rcon.port | quote }}
+          - name: GENERATE_NEW_SAVE
+            value: {{ .Values.factorio.generateNewSave | quote }}
+          - name: LOAD_LATEST_SAVE
+            value: {{ .Values.factorio.loadLatestSave | quote }}
+          {{- with .Values.factorio.preset }}
+          - name: PRESET
+            value: {{ . | quote }}
+          {{- end }}
+          - name: SAVE_NAME
+            value: {{ .Values.factorio.saveName | quote }}
+          {{- if .Values.factorio.mods.updateOnStart }}
+          - name: UPDATE_MODS_ON_START
+            value: 'true'
+          - name: USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.factorio.mods.apiToken.secretName | default (include "factorio.fullname" . ) }}
+                key: {{ .Values.factorio.mods.apiToken.key }}
+                optional: false
+          - name: TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.factorio.mods.apiToken.secretName | default (include "factorio.fullname" . ) }}
+                key: {{ .Values.factorio.mods.apiToken.key }}
+                optional: false
+          {{- end }}
+          - name: DLC_SPACE_AGE
+            value: {{ .Values.factorio.spaceAge | quote }}
+          livenessProbe:
+            tcpSocket:
+              port: rcon
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          # data must be mounted first, the following mounts are supposed to layer on top of it
+          - name: data
+            mountPath: /factorio
+          {{- with .Values.factorio.settings }}
+          - name: config
+            mountPath: /factorio/config/server-settings.json
+            subPath: settings.json
+            readOnly: true
+          {{- end }}
+          {{- with .Values.factorio.whitelist }}
+          - name: config
+            mountPath: /factorio/config/server-whitelist.json
+            subPath: whitelist.json
+            readOnly: true
+          {{- end }}
+          {{- with .Values.factorio.banlist }}
+          - name: config
+            mountPath: /factorio/config/server-banlist.json
+            subPath: banlist.json
+            readOnly: true
+          {{- end }}
+          {{- with .Values.factorio.adminlist }}
+          - name: config
+            mountPath: /factorio/config/server-adminlist.json
+            subPath: adminlist.json
+            readOnly: true
+          {{- end }}
+          {{- with .Values.factorio.map }}
+          - name: config
+            mountPath: /factorio/config/map-settings.json
+            subPath: map-settings.json
+            readOnly: true
+          {{- end }}
+          {{- with .Values.factorio.mapGen }}
+          - name: config
+            mountPath: /factorio/config/map-gen-settings.json
+            subPath: map-gen-settings.json
+            readOnly: true
+          {{- end }}
+          {{- if .Values.factorio.rconPassword.enabled }}
+          - name: rcon-password
+            mountPath: /factorio/config/rconpw
+            subPath: {{ .Values.factorio.rconPassword.key | quote }}
+            readOnly: true
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistentVolumeClaim.name | default (include "factorio.fullname" . ) }}
+          readOnly: false
+      - name: config
+        configMap:
+          name: {{ include "factorio.fullname" . }}
+          defaultMode: 0644
+          optional: false
+      {{- if .Values.factorio.rconPassword.enabled }}
+      - name: rcon-password
+        secret:
+          secretName: {{ .Values.factorio.rconPassword.secretName | default (include "factorio.fullname" . ) }}
+          defaultMode: 0644
+          optional: false
+      {{- end }}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

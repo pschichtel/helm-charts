@@ -1,0 +1,102 @@
+# Default values for factorio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: docker.io/factoriotools/factorio
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+deploymentAnnotations: {}
+
+podAnnotations: {}
+podLabels: {}
+
+service:
+  game:
+    type: ClusterIP
+    port: 34197
+    annotations: {}
+  rcon:
+    enabled: false
+    type: ClusterIP
+    port: 27015
+    annotations: {}
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+secret:
+  create: false
+  rconPassword: null
+  factorioUsername: null
+  factorioToken: null
+
+persistentVolumeClaim:
+  name: null
+  storageClassName: null
+  capacity: 5Gi
+
+factorio:
+  settings: {}
+  whitelist: []
+  banlist: []
+  adminlist: []
+  map: {}
+  mapGen: {}
+  generateNewSave: false
+  loadLatestSave: true
+  saveName: _autosave1
+  # https://github.com/factoriotools/factorio-docker/?tab=readme-ov-file#preset-values
+  preset: null
+  rconPassword:
+    enabled: true
+    secretName: null
+    key: rconPassword
+  # https://github.com/factoriotools/factorio-docker/?tab=readme-ov-file#mods
+  mods:
+    updateOnStart: false
+    username:
+      secretName: null
+      key: factorioUsername
+    apiToken:
+      secretName: null
+      key: factorioToken
+  spaceAge: true

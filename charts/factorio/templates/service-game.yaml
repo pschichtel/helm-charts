@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "factorio.fullname" . }}-game
+  labels:
+    {{- include "factorio.labels" . | nindent 4 }}
+  {{- with .Values.service.game.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.game.type }}
+  ports:
+    - port: {{ .Values.service.game.port }}
+      targetPort: game
+      protocol: UDP
+      name: game
+  selector:
+    {{- include "factorio.selectorLabels" . | nindent 4 }}
