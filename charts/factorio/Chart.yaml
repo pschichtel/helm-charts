@@ -4,4 +4,4 @@ description: A Helm chart for Factorio
 type: application
 version: 0.1.0
 # renovate: image=docker.io/factoriotools/factorio
-appVersion: "2.0.66"
+appVersion: "2.0.67"
