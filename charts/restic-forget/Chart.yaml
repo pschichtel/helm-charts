@@ -2,6 +2,6 @@ apiVersion: v2
 name: restic-forget
 description: A helm chart to deploy restic jobs for backup cleaning.
 type: application
-version: 0.5.0
+version: 0.5.1
 # renovate: image=ghcr.io/restic/restic
 appVersion: 0.18.1
