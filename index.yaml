@@ -598,6 +598,16 @@ entries:
     version: 0.1.0
   factorio:
   - apiVersion: v2
+    appVersion: 2.0.67
+    created: "2025-09-22T23:25:15.822713471Z"
+    description: A Helm chart for Factorio
+    digest: 887557a466f89e19a72818c765ce6d89cc317ce6aa554f9108c520879d988981
+    name: factorio
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/factorio-0.1.1/factorio-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 2.0.66
     created: "2025-09-21T15:09:47.498561901Z"
     description: A Helm chart for Factorio
@@ -3942,4 +3952,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-21T15:09:47.666858926Z"
+generated: "2025-09-22T23:25:16.024697683Z"
