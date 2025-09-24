@@ -2839,6 +2839,16 @@ entries:
     version: 0.1.0
   s3-backup:
   - apiVersion: v2
+    appVersion: 0.5.2
+    created: "2025-09-24T08:16:07.760904098Z"
+    description: A helm chart to deploy s3-backup jobs.
+    digest: 6cd2209dfb950c33888c0cef098a2efadf739976e66c2bd946061ee7dbac0db5
+    name: s3-backup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/s3-backup-0.8.2/s3-backup-0.8.2.tgz
+    version: 0.8.2
+  - apiVersion: v2
     appVersion: 0.5.1
     created: "2025-09-22T23:38:51.26507455Z"
     description: A helm chart to deploy s3-backup jobs.
@@ -3972,4 +3982,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-22T23:38:51.265604136Z"
+generated: "2025-09-24T08:16:07.761870233Z"
