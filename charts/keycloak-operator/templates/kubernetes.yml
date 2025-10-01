@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    app.quarkus.io/quarkus-version: 3.20.3
+    app.quarkus.io/quarkus-version: 3.27.0
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
@@ -14,8 +14,16 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  labels:
+    app.kubernetes.io/name: keycloak-operator
   name: keycloak-operator-clusterrole
 rules:
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
   - apiGroups:
       - config.openshift.io
     resources:
@@ -105,6 +113,30 @@ rules:
       - update
       - watch
   - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - servicemonitors
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
       - apps
     resources:
       - statefulsets
@@ -138,18 +170,6 @@ rules:
       - get
       - list
       - watch
-  - apiGroups:
-      - networking.k8s.io
-    resources:
-      - networkpolicies
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
 {{- if .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -171,6 +191,8 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  labels:
+    app.kubernetes.io/name: keycloak-operator
   name: keycloak-operator-role
 rules:
   - apiGroups:
@@ -213,6 +235,12 @@ rules:
     verbs:
       - list
   - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+  - apiGroups:
       - batch
     resources:
       - jobs
@@ -236,6 +264,17 @@ rules:
       - delete
       - patch
       - update
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - servicemonitors
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -300,7 +339,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    app.quarkus.io/quarkus-version: 3.20.3
+    app.quarkus.io/quarkus-version: 3.27.0
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
@@ -320,7 +359,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.quarkus.io/quarkus-version: 3.20.3
+    app.quarkus.io/quarkus-version: 3.27.0
     app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
   labels:
     app.kubernetes.io/name: keycloak-operator
@@ -334,11 +373,11 @@ spec:
   template:
     metadata:
       annotations:
-        app.quarkus.io/quarkus-version: 3.20.3
+        app.quarkus.io/quarkus-version: 3.27.0
         app.quarkus.io/vcs-uri: https://github.com/keycloak/keycloak.git
       labels:
-        app.kubernetes.io/name: keycloak-operator
         app.kubernetes.io/version: {{ .Chart.AppVersion }}
+        app.kubernetes.io/name: keycloak-operator
     spec:
       containers:
         - env:
