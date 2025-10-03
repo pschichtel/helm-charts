@@ -25,7 +25,11 @@ spec:
           {{- end }}
           restartPolicy: Never
           serviceAccountName: {{ include "keycloak-backup.serviceAccountName" . }}
+          {{- if .Values.backup.postActions }}
+          initContainers:
+          {{- else }}
           containers:
+          {{- end }}
           - name: deployment-helper
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -67,6 +71,9 @@ spec:
             {{- with .Values.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- with .Values.backup.postActions }}
+          containers: {{- tpl (. | toYaml) $ | nindent 10 }}
+          {{- end }}
           volumes:
           - name: script
             configMap:
@@ -78,7 +85,7 @@ spec:
           - name: tmp
             emptyDir: {}
           {{- with .Values.volumes }}
-            {{- toYaml . | nindent 12 }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
           {{- with .Values.nodeSelector }}
           nodeSelector:

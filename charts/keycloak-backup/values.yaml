@@ -69,3 +69,4 @@ backup:
   targetKeycloak: null
   users: realm_file
   usersPerFile: null
+  postActions: []
