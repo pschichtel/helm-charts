@@ -1,0 +1,94 @@
+{{- $volumeMountPath := "/storage" -}}
+{{- $scriptPath := "/script" -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "keycloak-backup.fullname" . }}
+  labels:
+    {{- include "keycloak-backup.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 4
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            {{- include "keycloak-backup.labels" . | nindent 12 }}
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+          restartPolicy: Never
+          serviceAccountName: {{ include "keycloak-backup.serviceAccountName" . }}
+          containers:
+          - name: deployment-helper
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command:
+            - {{ print $scriptPath "/backup.sh" | quote }}
+            env:
+            - name: SCRIPT_PATH
+              value: {{ $scriptPath | quote }}
+            - name: KEYCLOAK
+              value: {{ $.Values.backup.targetKeycloak | required ".backup.targetKeycloak is required!" | quote }}
+            - name: VOLUME
+              value: {{ $volumeMountPath | quote }}
+            - name: BACKUP_POD_NAME
+              value: {{ include "keycloak-backup.backupPodName" . }}
+            - name: BACKUP_PVC_NAME
+              value: {{ include "keycloak-backup.fullname" . }}
+            {{- with .Values.backup.users }}
+            - name: KC_USERS
+              value: {{ . }}
+            {{- end }}
+            {{- with .Values.backup.usersPerFile }}
+            - name: KC_USERS_PER_FILE
+              value: {{ . }}
+            {{- end }}
+            {{- with .Values.resources }}
+            resources:
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+            volumeMounts:
+            - name: script
+              mountPath: /script
+              readOnly: true
+            - name: storage
+              mountPath: {{ $volumeMountPath | quote }}
+              readOnly: false
+            - name: tmp
+              mountPath: /tmp
+              readOnly: false
+            {{- with .Values.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumes:
+          - name: script
+            configMap:
+              name: {{ include "keycloak-backup.fullname" . }}-script
+              defaultMode: 0755
+          - name: storage
+            persistentVolumeClaim:
+              claimName: {{ include "keycloak-backup.fullname" . }}
+          - name: tmp
+            emptyDir: {}
+          {{- with .Values.volumes }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
