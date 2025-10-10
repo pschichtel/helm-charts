@@ -4,6 +4,13 @@ metadata:
   name: {{ include "coturn.fullname" . }}
   labels:
     {{- include "coturn.labels" . | nindent 4 }}
+    {{- with .Values.deploymentLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: 1
   strategy: {{ .Values.strategy | toYaml | nindent 4 }}
