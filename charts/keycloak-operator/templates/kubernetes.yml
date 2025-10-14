@@ -178,7 +178,7 @@ metadata:
     app.kubernetes.io/name: keycloak-operator
   name: keycloak-operator-{{ .Release.Namespace }}-clusterrole-binding
 roleRef:
-  kind: Role
+  kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
   name: keycloak-operator-{{ .Release.Namespace }}-clusterrole
 subjects:
