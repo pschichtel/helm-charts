@@ -9,7 +9,6 @@ metadata:
     app.kubernetes.io/name: keycloak-operator
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
   name: keycloak-operator
-{{- if .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -24,6 +23,7 @@ rules:
       - customresourcedefinitions
     verbs:
       - get
+{{- if .Values.openshift.enabled }}
   - apiGroups:
       - config.openshift.io
     resources:
@@ -170,7 +170,6 @@ rules:
       - get
       - list
       - watch
-{{- if .Values.openshift.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -186,7 +185,6 @@ subjects:
   - kind: ServiceAccount
     name: keycloak-operator
     namespace: keycloak
-{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
