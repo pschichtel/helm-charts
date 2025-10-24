@@ -1983,6 +1983,16 @@ entries:
     version: 0.1.0
   keycloak-operator-crds:
   - apiVersion: v2
+    appVersion: 26.4.2
+    created: "2025-10-24T22:28:35.535591015Z"
+    description: A Helm chart for Kubernetes
+    digest: e254c7673ebd8c1055498052406104c0ebde8abd825fc5f36d4f536eeff8ef56
+    name: keycloak-operator-crds
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-operator-crds-1.4.2/keycloak-operator-crds-1.4.2.tgz
+    version: 1.4.2
+  - apiVersion: v2
     appVersion: 26.4.1
     created: "2025-10-16T13:40:36.448755142Z"
     description: A Helm chart for Kubernetes
@@ -4243,4 +4253,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-16T13:56:06.22469448Z"
+generated: "2025-10-24T22:28:35.536166161Z"
