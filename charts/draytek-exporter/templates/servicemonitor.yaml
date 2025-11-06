@@ -1,0 +1,16 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "draytek-exporter.fullname" . }}
+spec:
+  endpoints:
+  - port: prometheus
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "draytek-exporter.selectorLabels" . | nindent 6 }}
+{{- end }}

@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "draytek-exporter.fullname" . }}
+  labels:
+    {{- include "draytek-exporter.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "draytek-exporter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        checksum/secret: {{ ((include (print $.Template.BasePath "/secret.yaml") $) | fromYaml).data | toYaml | sha256sum }}
+      labels:
+        {{- include "draytek-exporter.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            readOnlyRootFilesystem: true
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- with .Values.exporter.username }}
+            - name: DRAYTEK_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  {{- if and .value (not .name) }}
+                  name: {{ include "draytek-exporter.fullname" $ }}
+                  key: username
+                  {{- else }}
+                  name: {{ .name }}
+                  key: {{ .key }}
+                  {{- end }}
+            {{- end }}
+            {{- with .Values.exporter.password }}
+            - name: DRAYTEK_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if and .value (not .name) }}
+                  name: {{ include "draytek-exporter.fullname" $ }}
+                  key: password
+                  {{- else }}
+                  name: {{ .name }}
+                  key: {{ .key }}
+                  {{- end }}
+            {{- end }}
+          args:
+          - '--web.listen-address=:{{ .Values.service.port }}'
+          {{- with .Values.exporter.target }}
+          - '--target={{ . }}'
+          {{- end }}
+          {{- if .Values.exporter.username }}
+          - --username=$(DRAYTEK_USERNAME)
+          {{- end }}
+          - --password-env=DRAYTEK_PASSWORD
+          - --log.level={{ .Values.exporter.logLevel }}
+          ports:
+            - name: prometheus
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
