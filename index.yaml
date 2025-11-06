@@ -471,6 +471,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/docspell-0.0.1/docspell-0.0.1.tgz
     version: 0.0.1
+  draytek-exporter:
+  - apiVersion: v2
+    appVersion: main
+    created: "2025-11-06T00:29:50.48278291Z"
+    description: A Helm chart for the draytek-exporter
+    digest: 3a45056466fcfe6c151cf77bcf8935c86f440c94c7ed5ce1998f84aa84bfc3c9
+    name: draytek-exporter
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/draytek-exporter-0.1.0/draytek-exporter-0.1.0.tgz
+    version: 0.1.0
   external-service-ingress:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -4283,4 +4294,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-24T22:32:07.955860688Z"
+generated: "2025-11-06T00:29:50.76747594Z"
