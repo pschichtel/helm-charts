@@ -3913,6 +3913,16 @@ entries:
   web-app:
   - apiVersion: v2
     appVersion: latest
+    created: "2025-11-10T02:03:48.355383286Z"
+    description: A Helm chart to deploy a very simple stateless web app.
+    digest: e023a01b82d1bd422c208d53d17bb17cbdeedf8e534b4978ba83bb43cd2cdb6e
+    name: web-app
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/web-app-0.3.1/web-app-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
+    appVersion: latest
     created: "2025-11-10T00:20:46.407492586Z"
     description: A Helm chart to deploy a very simple stateless web app.
     digest: 4f1969ba2b7e7fdd7220d498ce52f977395bf090027612cbcd3616e4b58cfefa
@@ -4344,4 +4354,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-10T00:20:46.408023003Z"
+generated: "2025-11-10T02:03:48.35594392Z"
