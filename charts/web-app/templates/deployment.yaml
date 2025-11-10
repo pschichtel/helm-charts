@@ -65,7 +65,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- end }}
-      {{- if or .Values.configs .volumes }}
+      {{- if or .Values.configs .Values.volumes }}
       volumes:
       {{- if .Values.configs }}
         - name: {{ include "web-app.fullname" . }}
