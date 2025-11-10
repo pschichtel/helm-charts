@@ -49,6 +49,8 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+initContainers: []
+
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: foo
@@ -69,3 +71,5 @@ tolerations: []
 affinity: {}
 
 configs: {}
+
+extraObjects: []

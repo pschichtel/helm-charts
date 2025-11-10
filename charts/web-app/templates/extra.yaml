@@ -1,0 +1,12 @@
+{{- range $obj := .Values.extraObjects }}
+{{- $content := $obj.content }}
+{{- if not (eq (kindOf $content) "string") }}
+{{- $content = toYaml $content }}
+{{- end }}
+{{- if ne $obj.template false }}
+{{- $content = tpl $content $ }}
+{{- end -}}
+---
+{{ $content }}
+{{ ""}}
+{{- end }}
