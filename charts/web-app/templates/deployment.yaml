@@ -39,18 +39,23 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository | required "the image repository is required!" }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.env }}
+          env: {{ . | toYaml | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- with .Values.probes.path }}
           livenessProbe:
             httpGet:
-              path: /
+              path: {{ . | quote }}
               port: http
           readinessProbe:
             httpGet:
-              path: /
+              path: {{ . | quote }}
               port: http
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- if or .Values.configs .volumes }}
