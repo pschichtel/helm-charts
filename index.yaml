@@ -473,6 +473,16 @@ entries:
     version: 0.0.1
   draytek-exporter:
   - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2025-11-23T22:51:32.507014184Z"
+    description: A Helm chart for the draytek-exporter
+    digest: f764dc366297677cff2d6a771493e25c730c234a5b14582473e12b86999d691e
+    name: draytek-exporter
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/draytek-exporter-0.2.0/draytek-exporter-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: main
     created: "2025-11-06T00:29:50.48278291Z"
     description: A Helm chart for the draytek-exporter
@@ -4424,4 +4434,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-23T12:57:10.642307706Z"
+generated: "2025-11-23T22:51:32.507902482Z"
