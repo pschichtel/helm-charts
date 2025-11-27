@@ -49,3 +49,6 @@ serviceMonitor:
   enabled: false
   path: /auth/metrics
   additionalEndpoints: []
+
+update:
+  strategy: Auto

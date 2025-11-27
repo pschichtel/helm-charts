@@ -6,6 +6,7 @@ metadata:
     {{- include "keycloak.labels" . | nindent 4 }}
 spec:
   instances: {{ .Values.replicaCount }}
+  update: {{ .Values.update | toYaml | nindent 4 }}
   {{- with .Values.bootstrapAdmin }}
   bootstrapAdmin: {{- . | toYaml | nindent 4 }}
   {{- end }}
