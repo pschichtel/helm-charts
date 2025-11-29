@@ -11,7 +11,11 @@ spec:
       {{- include "pev2.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- $podAnnotations := deepCopy .Values.podAnnotations }}
+      {{- if .Values.secret.create }}
+      {{- $podAnnotations = set $podAnnotations "checksum/secret" ((include (print $.Template.BasePath "/secret.yaml") $ | fromYaml).data | toYaml | sha256sum) }}
+      {{- end }}
+      {{- with $podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
