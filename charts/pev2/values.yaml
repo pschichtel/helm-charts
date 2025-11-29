@@ -73,16 +73,20 @@ pev2:
     host:
       value: null
       secretName: null
+      secretKey: null
     port:
       value: null
       secretName: null
+      secretKey: null
     name:
-      value: pev2
+      value: null
       secretName: null
+      secretKey: null
     username:
       value: null
       secretName: null
+      secretKey: null
     password:
       value: null
       secretName: null
-      secretKey: 
+      secretKey: null
