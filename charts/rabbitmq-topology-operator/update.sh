@@ -45,6 +45,7 @@ do
 	yq -i '.spec.template.spec.tolerations                              = "with8:{{ .Values.toleratios }}"' "$f"
 	yq -i '.spec.template.spec.affinity                                 = "with8:{{ .Values.affinity }}"' "$f"
 	yq -i '.spec.template.metadata.annotations                          = "with8:{{ .Values.podAnnotations }}"' "$f"
+	yq -i '.spec.template.spec.volumes[0].secret.secretName             = strenv(RESOURCE_FULLNAME) + "-webhook-cert"' "$f"
 	# remove unneeded quoting
 	sed -i -r "s/'\\{\\{(.+)}}'/{{\\1}}/g" "$f"
 	# introduce with blocks
