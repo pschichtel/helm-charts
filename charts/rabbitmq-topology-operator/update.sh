@@ -4,7 +4,8 @@ set -euo pipefail
 
 version="$(yq .appVersion Chart.yaml)"
 
-cd templates
+mkdir -p templates/generated
+cd templates/generated
 find -mindepth 1 -delete
 
 file='kubernetes.yml'
@@ -14,25 +15,27 @@ yq -s '(.kind | downcase) + "_" + .metadata.name + ".yml"' "$file"
 rm -v "$file"
 rm -v namespace_*.yml
 
+export RESOURCE_NAME='{{ include "rabbitmq-topology-operator.name" $ }}'
+export RESOURCE_FULLNAME='{{ include "rabbitmq-topology-operator.fullname" $ }}'
 for f in *.yml
 do
     kind="$(yq '.kind | downcase' "$f")"
     echo "Processing kind: $kind"
     yq -i 'del(.metadata.namespace)' "$f"
-    yq -i '.metadata.name |= sub("^messaging-topology(-(operator|manager))?", "{{ .Release.Name }}")' "$f"
-    yq -i '.metadata.labels["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
+    yq -i '.metadata.name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME))' "$f"
+    yq -i '.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     if [ "$kind" = 'clusterrolebinding' ] || [ "$kind" = "rolebinding" ]
     then
-	    yq -i '.roleRef.name |= sub("^messaging-topology(-(operator|manager))?", "{{ .Release.Name }}") | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^messaging-topology(-(operator|manager))?", "{{ .Release.Name }}")))' "$f"
+	    yq -i '.roleRef.name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME)) | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME))))' "$f"
     fi
     if [ "$kind" = 'deployment' ]
     then
-        yq -i '.spec.selector.matchLabels["app.kubernetes.io/name"]         = "{{ .Chart.Name }}"' "$f"
+        yq -i '.spec.selector.matchLabels["app.kubernetes.io/name"]         = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.selector.matchLabels["app.kubernetes.io/instance"]     = "{{ .Release.Name }}"' "$f"
-        yq -i '.spec.template.metadata.labels["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
+        yq -i '.spec.template.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.template.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
-	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^messaging-topology-(operator|manager)", "{{ .Release.Name }}")' "$f"
+	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^messaging-topology-(operator|manager)", strenv(RESOURCE_FULLNAME))' "$f"
 	yq -i '.spec.template.spec.containers[0].image                      = "{{ print .Values.image.registry \"/\" .Values.image.repository \":\" (.Values.image.tag | default .Chart.AppVersion) }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullPolicy            = "{{ .Values.image.pullPolicy }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullSecrets           = "with12:{{ .Values.image.imagePullSecrets }}"' "$f"
@@ -49,23 +52,23 @@ do
     fi
     if [ "$kind" = 'issuer' ]
     then
-        yq -i '.metadata.name = "{{ .Release.Name }}-issuer"' "$f"
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
     fi
     if [ "$kind" = 'certificate' ]
     then
-        yq -i '.spec.secretName = "{{ .Release.Name }}-webhook-cert" | .metadata.name = .spec.secretName' "$f"
+        yq -i '.spec.secretName = strenv(RESOURCE_FULLNAME) + "-webhook-cert" | .metadata.name = .spec.secretName' "$f"
         yq -i '.spec.issuerRef.name = "{{ .Release.Name }}-issuer"' "$f"
-	yq -i '.spec.dnsNames |= map(sub("^webhook-service\.rabbitmq-system\.svc", "{{ .Release.Name }}-webhook.{{ .Release.Namespace }}.svc"))' "$f"
+	yq -i '.spec.dnsNames |= map(sub("^webhook-service\.rabbitmq-system\.svc", strenv(RESOURCE_FULLNAME) + "-webhook.{{ .Release.Namespace }}.svc"))' "$f"
     fi
     if [ "$kind" = 'service' ]
     then
-        yq -i '.metadata.name = "{{ .Release.Name }}-webhook"' "$f"
-        yq -i '.spec.selector["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-webhook"' "$f"
+        yq -i '.spec.selector["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     fi
     if [ "$kind" = 'validatingwebhookconfiguration' ]
     then
-        yq -i '.webhooks |= map(.clientConfig.service.name = "{{ .Release.Name }}-webhook" | .clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
+        yq -i '.webhooks |= map(.clientConfig.service.name = strenv(RESOURCE_FULLNAME) + "-webhook" | .clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
     fi
 done
 

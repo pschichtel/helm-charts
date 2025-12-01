@@ -1,0 +1,109 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
+    app.kubernetes.io/part-of: rabbitmq
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+  name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-role'
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - persistentvolumeclaims
+      - secrets
+      - serviceaccounts
+      - services
+    verbs:
+      - create
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - get
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/exec
+    verbs:
+      - create
+  - apiGroups:
+      - apps
+    resources:
+      - statefulsets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters
+    verbs:
+      - create
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - rabbitmq.com
+    resources:
+      - rabbitmqclusters/status
+    verbs:
+      - get
+      - update
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - rolebindings
+      - roles
+    verbs:
+      - create
+      - get
+      - list
+      - update
+      - watch

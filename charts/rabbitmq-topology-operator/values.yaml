@@ -7,6 +7,8 @@ image:
   tag: ""
 
 imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
 
 podAnnotations: {}
 podLabels: {}

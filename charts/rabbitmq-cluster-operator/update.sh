@@ -4,7 +4,8 @@ set -euo pipefail
 
 version="$(yq .appVersion Chart.yaml)"
 
-cd templates
+mkdir -p templates/generated
+cd templates/generated
 find -mindepth 1 -delete
 
 file='kubernetes.yml'
@@ -14,25 +15,27 @@ yq -s '(.kind | downcase) + "_" + .metadata.name + ".yml"' "$file"
 rm -v "$file"
 rm -v namespace_*.yml
 
+export RESOURCE_NAME='{{ include "rabbitmq-cluster-operator.name" $ }}'
+export RESOURCE_FULLNAME='{{ include "rabbitmq-cluster-operator.fullname" $ }}'
 for f in *.yml
 do
     kind="$(yq '.kind | downcase' "$f")"
     echo "Processing kind: $kind"
     yq -i 'del(.metadata.namespace)' "$f"
-    yq -i '.metadata.name |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}")' "$f"
-    yq -i '.metadata.labels["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
+    yq -i '.metadata.name |= sub("^rabbitmq-cluster(-operator)?", strenv(RESOURCE_FULLNAME))' "$f"
+    yq -i '.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     if [ "$kind" = 'clusterrolebinding' ] || [ "$kind" = "rolebinding" ]
     then
-        yq -i '.roleRef.name |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}") | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}")))' "$f"
+        yq -i '.roleRef.name |= sub("^rabbitmq-cluster(-operator)?", strenv(RESOURCE_FULLNAME)) | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^rabbitmq-cluster(-operator)?", strenv(RESOURCE_FULLNAME))))' "$f"
     fi
     if [ "$kind" = 'deployment' ]
     then
-        yq -i '.spec.selector.matchLabels["app.kubernetes.io/name"]         = "{{ .Chart.Name }}"' "$f"
+        yq -i '.spec.selector.matchLabels["app.kubernetes.io/name"]         = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.selector.matchLabels["app.kubernetes.io/instance"]     = "{{ .Release.Name }}"' "$f"
-        yq -i '.spec.template.metadata.labels["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
+	yq -i '.spec.template.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.template.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
-	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}")' "$f"
+	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^rabbitmq-cluster(-operator)?", strenv(RESOURCE_FULLNAME))' "$f"
 	yq -i '.spec.template.spec.containers[0].image                      = "{{ print .Values.image.registry \"/\" .Values.image.repository \":\" (.Values.image.tag | default .Chart.AppVersion) }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullPolicy            = "{{ .Values.image.pullPolicy }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullSecrets           = "with12:{{ .Values.image.imagePullSecrets }}"' "$f"

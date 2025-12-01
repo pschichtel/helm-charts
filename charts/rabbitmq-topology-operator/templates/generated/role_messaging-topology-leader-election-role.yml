@@ -1,0 +1,41 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
+    app.kubernetes.io/part-of: rabbitmq
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-leader-election-role'
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete

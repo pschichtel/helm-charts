@@ -1,0 +1,10 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-issuer'
+  labels:
+    app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+spec:
+  selfSigned: {}
