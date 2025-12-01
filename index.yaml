@@ -3076,6 +3076,16 @@ entries:
   rabbitmq-cluster-operator:
   - apiVersion: v2
     appVersion: 2.17.2
+    created: "2025-12-01T18:16:01.059630552Z"
+    description: A Helm chart for rabbitmq's cluster operator
+    digest: abceaf4bd3a2f8bc696b73992405536f0a1a748cf5ef954d846b6adb165d8d0b
+    name: rabbitmq-cluster-operator
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/rabbitmq-cluster-operator-0.1.1/rabbitmq-cluster-operator-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 2.17.2
     created: "2025-12-01T17:21:58.60226277Z"
     description: A Helm chart for rabbitmq's cluster operator
     digest: 00ab3f980440d1005fc8fde49f0984712a9c90875afd77548a3e4bf45d5295ce
@@ -3084,6 +3094,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/rabbitmq-cluster-operator-0.1.0/rabbitmq-cluster-operator-0.1.0.tgz
     version: 0.1.0
+  rabbitmq-topology-operator:
+  - apiVersion: v2
+    appVersion: 1.18.1
+    created: "2025-12-01T18:16:01.245317918Z"
+    description: A Helm chart for rabbitmq's topology operator
+    digest: 9432c8a55dab5a0bd38df72e0da15e9ada80af9c1ca4f0726a89b9848916b4e8
+    name: rabbitmq-topology-operator
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/rabbitmq-topology-operator-0.1.1/rabbitmq-topology-operator-0.1.1.tgz
+    version: 0.1.1
   restic-forget:
   - apiVersion: v2
     appVersion: 0.18.1
@@ -4561,4 +4582,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-01T17:21:58.602863474Z"
+generated: "2025-12-01T18:16:01.245828904Z"
