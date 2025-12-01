@@ -12,5 +12,5 @@ spec:
     - '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook.{{ .Release.Namespace }}.svc.cluster.local'
   issuerRef:
     kind: Issuer
-    name: '{{ .Release.Name }}-issuer'
+    name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-issuer'
   secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'

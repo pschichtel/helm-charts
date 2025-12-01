@@ -27,7 +27,7 @@ do
     yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     if [ "$kind" = 'clusterrolebinding' ] || [ "$kind" = "rolebinding" ]
     then
-	    yq -i '.roleRef.name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME)) | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME))))' "$f"
+        yq -i '.roleRef.name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME)) | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME))))' "$f"
     fi
     if [ "$kind" = 'deployment' ]
     then
@@ -57,8 +57,8 @@ do
     if [ "$kind" = 'certificate' ]
     then
         yq -i '.spec.secretName = strenv(RESOURCE_FULLNAME) + "-webhook-cert" | .metadata.name = .spec.secretName' "$f"
-        yq -i '.spec.issuerRef.name = "{{ .Release.Name }}-issuer"' "$f"
-	yq -i '.spec.dnsNames |= map(sub("^webhook-service\.rabbitmq-system\.svc", strenv(RESOURCE_FULLNAME) + "-webhook.{{ .Release.Namespace }}.svc"))' "$f"
+        yq -i '.spec.issuerRef.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
+        yq -i '.spec.dnsNames |= map(sub("^webhook-service\.rabbitmq-system\.svc", strenv(RESOURCE_FULLNAME) + "-webhook.{{ .Release.Namespace }}.svc"))' "$f"
     fi
     if [ "$kind" = 'service' ]
     then
