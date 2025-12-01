@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/rabbitmq/cluster-operator
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+
+podAnnotations: {}
+podLabels: {}
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 500Mi
+  requests:
+    cpu: 200m
+    memory: 500Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
