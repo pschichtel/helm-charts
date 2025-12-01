@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
   name: {{ include "rabbitmq-cluster-operator.fullname" $ }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "rabbitmq-cluster-operator.name" $ }}
@@ -63,4 +63,3 @@ spec:
       {{- with .Values.affinity  }}
       affinity: {{- toYaml . | nindent 8 }}
       {{- end }}
-  replicaCount: {{ .Values.replicaCount }}

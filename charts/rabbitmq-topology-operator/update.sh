@@ -40,7 +40,7 @@ do
 	yq -i '.spec.template.spec.containers[0].imagePullPolicy            = "{{ .Values.image.pullPolicy }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullSecrets           = "with12:{{ .Values.image.imagePullSecrets }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].resources                  = "{{- .Values.resources | toYaml | nindent 12 }}"' "$f"
-	yq -i '.spec.replicaCount                                           = "{{ .Values.replicaCount }}"' "$f"
+	yq -i '.spec.replicas                                               = "{{ .Values.replicaCount }}"' "$f"
 	yq -i '.spec.template.spec.nodeSelector                             = "with8:{{ .Values.nodeSelector }}"' "$f"
 	yq -i '.spec.template.spec.tolerations                              = "with8:{{ .Values.toleratios }}"' "$f"
 	yq -i '.spec.template.spec.affinity                                 = "with8:{{ .Values.affinity }}"' "$f"
