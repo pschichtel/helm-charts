@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/part-of: rabbitmq
     servicebinding.io/controller: "true"
     app.kubernetes.io/instance: '{{ .Release.Name }}'
-  name: rabbitmq-cluster-service-binding-role
+  name: '{{ .Release.Name }}-service-binding-role'
 rules:
   - apiGroups:
       - rabbitmq.com

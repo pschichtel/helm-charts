@@ -1,7 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/rabbitmq/cluster-operator
+  registry: ghcr.io
+  repository: rabbitmq/cluster-operator
   pullPolicy: IfNotPresent
   tag: ""
 

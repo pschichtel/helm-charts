@@ -33,13 +33,13 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          image: {{ print .Values.image.repository ":" .Values.image.tag }}
+          image: {{ print .Values.image.registry "/" .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) }}
           name: operator
           ports:
             - containerPort: 9782
               name: metrics
               protocol: TCP
-          resources: {{- .Values.resources | nindent 12 }}
+          resources: {{- .Values.resources | toYaml | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -49,7 +49,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with - .Values.image.imagePullSecrets  }}
+          {{- with .Values.image.imagePullSecrets  }}
           imagePullSecrets: {{- toYaml . | nindent 12 }}
           {{- end }}
       serviceAccountName: {{ .Release.Name }}

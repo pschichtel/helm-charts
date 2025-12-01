@@ -7,12 +7,12 @@ metadata:
     app.kubernetes.io/name: '{{ .Chart.Name }}'
     app.kubernetes.io/part-of: rabbitmq
     app.kubernetes.io/instance: '{{ .Release.Name }}'
-  name: rabbitmq-cluster-leader-election-rolebinding
+  name: '{{ .Release.Name }}-leader-election-rolebinding'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: rabbitmq-cluster-leader-election-role
+  name: '{{ .Release.Name }}-leader-election-role'
 subjects:
   - kind: ServiceAccount
-    name: rabbitmq-cluster-operator
-    namespace: rabbitmq-system
+    name: '{{ .Release.Name }}'
+    namespace: '{{ .Release.Namespace }}'

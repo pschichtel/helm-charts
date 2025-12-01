@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: '{{ .Chart.Name }}'
     app.kubernetes.io/part-of: rabbitmq
     app.kubernetes.io/instance: '{{ .Release.Name }}'
-  name: rabbitmq-cluster-leader-election-role
+  name: '{{ .Release.Name }}-leader-election-role'
 rules:
   - apiGroups:
       - coordination.k8s.io
