@@ -2,6 +2,6 @@ apiVersion: v2
 name: rabbitmq-cluster-operator
 description: A Helm chart for rabbitmq's cluster operator
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "2.17.2"
 

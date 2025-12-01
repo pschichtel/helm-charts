@@ -9,7 +9,7 @@ find -mindepth 1 -delete
 
 file='kubernetes.yml'
 
-curl -sLf -o "$file" "https://github.com/rabbitmq/cluster-operator/releases/download/v${version}/cluster-operator-ghcr-io.yml"
+curl -sLf -o "$file" "https://github.com/rabbitmq/messaging-topology-operator/releases/download/v${version}/messaging-topology-operator-with-certmanager.yaml"
 yq -s '(.kind | downcase) + "_" + .metadata.name + ".yml"' "$file"
 rm -v "$file"
 rm -v namespace_*.yml
@@ -19,12 +19,12 @@ do
     kind="$(yq '.kind | downcase' "$f")"
     echo "Processing kind: $kind"
     yq -i 'del(.metadata.namespace)' "$f"
-    yq -i '.metadata.name |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}")' "$f"
+    yq -i '.metadata.name |= sub("^messaging-topology(-(operator|manager))?", "{{ .Release.Name }}")' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     if [ "$kind" = 'clusterrolebinding' ] || [ "$kind" = "rolebinding" ]
     then
-        yq -i '.roleRef.name |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}") | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}")))' "$f"
+	    yq -i '.roleRef.name |= sub("^messaging-topology(-(operator|manager))?", "{{ .Release.Name }}") | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^messaging-topology(-(operator|manager))?", "{{ .Release.Name }}")))' "$f"
     fi
     if [ "$kind" = 'deployment' ]
     then
@@ -32,8 +32,8 @@ do
         yq -i '.spec.selector.matchLabels["app.kubernetes.io/instance"]     = "{{ .Release.Name }}"' "$f"
         yq -i '.spec.template.metadata.labels["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
         yq -i '.spec.template.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
-	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^rabbitmq-cluster(-operator)?", "{{ .Release.Name }}")' "$f"
-	yq -i '.spec.template.spec.containers[0].image                      = "{{ print .Values.image.repository \":\" .Values.image.tag }}"' "$f"
+	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^messaging-topology-(operator|manager)", "{{ .Release.Name }}")' "$f"
+	yq -i '.spec.template.spec.containers[0].image                      = "{{ print .Values.image.registry \":\" .Values.image.repository \":\" .Values.image.tag }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullPolicy            = "{{ .Values.image.pullPolicy }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].imagePullSecrets           = "with12:{{- .Values.image.imagePullSecrets }}"' "$f"
 	yq -i '.spec.template.spec.containers[0].resources                  = "{{- .Values.resources | nindent 12 }}"' "$f"
@@ -46,6 +46,26 @@ do
 	sed -i -r "s/'\\{\\{(.+)}}'/{{\\1}}/g" "$f"
 	# introduce with blocks
 	sed -i -r -r "s/(\\s+)([^:]+):\s+with([0-9]+):\\{\\{\\s*(.+?)}}/\\1{{- with \\4 }}\\n\\1\\2: {{- toYaml . | nindent \\3 }}\\n\\1{{- end }}/g" "$f"
+    fi
+    if [ "$kind" = 'issuer' ]
+    then
+        yq -i '.metadata.name = "{{ .Release.Name }}-issuer"' "$f"
+    fi
+    if [ "$kind" = 'certificate' ]
+    then
+        yq -i '.spec.secretName = "{{ .Release.Name }}-webhook-cert" | .metadata.name = .spec.secretName' "$f"
+        yq -i '.spec.issuerRef.name = "{{ .Release.Name }}-issuer"' "$f"
+	yq -i '.spec.dnsNames |= map(sub("^webhook-service\.rabbitmq-system\.svc", "{{ .Release.Name }}-webhook.{{ .Release.Namespace }}.svc"))' "$f"
+    fi
+    if [ "$kind" = 'service' ]
+    then
+        yq -i '.metadata.name = "{{ .Release.Name }}-webhook"' "$f"
+        yq -i '.spec.selector["app.kubernetes.io/name"]     = "{{ .Chart.Name }}"' "$f"
+        yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
+    fi
+    if [ "$kind" = 'validatingwebhookconfiguration' ]
+    then
+        yq -i '.webhooks |= map(.clientConfig.service.name = "{{ .Release.Name }}-webhook" | .clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
     fi
 done
 

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: rabbitmq-topology-operator
+description: A Helm chart for rabbitmq's topology operator
+type: application
+version: 0.1.1
+appVersion: "1.18.1"
+
