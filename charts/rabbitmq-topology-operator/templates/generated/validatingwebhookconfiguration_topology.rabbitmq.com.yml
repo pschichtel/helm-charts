@@ -3,7 +3,7 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
   annotations:
-    cert-manager.io/inject-ca-from: '{{ print .Release.Namespace }}/{{ include "rabbitmq-topology-operator.fullname" $ }}-issuer'
+    cert-manager.io/inject-ca-from: '{{ print .Release.Namespace }}/{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'
   name: topology.rabbitmq.com
   labels:
     app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'

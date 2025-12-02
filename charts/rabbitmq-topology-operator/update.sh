@@ -70,7 +70,7 @@ do
     fi
     if [ "$kind" = 'validatingwebhookconfiguration' ]
     then
-        yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ print .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
+        yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ print .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-webhook-cert"' "$f"
         yq -i '.webhooks |= map(.clientConfig.service.name = strenv(RESOURCE_FULLNAME) + "-webhook" | .clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
     fi
 done
