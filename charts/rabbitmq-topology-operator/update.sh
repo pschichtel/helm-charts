@@ -10,6 +10,7 @@ find -mindepth 1 -delete
 
 file='kubernetes.yml'
 
+echo "Updating to $version"
 curl -sLf -o "$file" "https://github.com/rabbitmq/messaging-topology-operator/releases/download/v${version}/messaging-topology-operator-with-certmanager.yaml"
 yq -s '(.kind | downcase) + "_" + .metadata.name + ".yml"' "$file"
 rm -v "$file"

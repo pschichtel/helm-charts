@@ -10,6 +10,7 @@ find -mindepth 1 -delete
 
 file='kubernetes.yml'
 
+echo "Updating to $version"
 curl -sLf -o "$file" "https://github.com/rabbitmq/cluster-operator/releases/download/v${version}/cluster-operator-ghcr-io.yml"
 yq -s '(.kind | downcase) + "_" + .metadata.name + ".yml"' "$file"
 rm -v "$file"
