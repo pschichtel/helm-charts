@@ -4,4 +4,4 @@ description: A Helm chart for WordPress
 type: application
 version: 0.9.3
 # renovate: image=docker.io/library/wordpress
-appVersion: "6.8.3"
+appVersion: "6.9.0"
