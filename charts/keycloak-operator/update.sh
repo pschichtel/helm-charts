@@ -1,21 +1,73 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 version="$(yq .appVersion Chart.yaml)"
 
-cd templates
-rm -v *
+mkdir -p templates/generated
+cd templates/generated
+find -mindepth 1 -delete
 
 file='kubernetes.yml'
 
-remove_noise() {
-    yq -i "del(${1:-}.metadata.labels[\"app.kubernetes.io/managed-by\"]) | del(${1:-}.metadata.annotations[\"app.quarkus.io/build-timestamp\"])" "$file"
-}
-
+echo "Updating to $version"
 curl -sLf -o "$file" "https://raw.githubusercontent.com/keycloak/keycloak-k8s-resources/${version}/kubernetes/kubernetes.yml"
-remove_noise
-remove_noise ".spec.template"
-sed -i -r 's/ClusterRole(Binding)?/Role\1/g' "$file"
-sed -i -r "s/$version/{{ .Chart.AppVersion }}/g" "$file"
-sed -i -r 's/image:.+/image: {{ print .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}/g' "$file"
-sed -i -r 's/imagePullPolicy:.+/imagePullPolicy: {{ .Values.image.pullPolicy }}/g' "$file"
-sed -i -r 's/namespace: keycloak/namespace: {{ .Release.Namespace }}/g' "$file"
+yq -s '(.kind | downcase) + "_" + .metadata.name + ".yml"' "$file"
+rm -v "$file"
+rm -v namespace_*.yml
+
+export RESOURCE_NAME='{{ include "keycloak-operator.name" $ }}'
+export RESOURCE_FULLNAME='{{ include "keycloak-operator.fullname" $ }}'
+for f in *.yml
+do
+    kind="$(yq '.kind | downcase' "$f")"
+    echo "Processing kind: $kind"
+    yq -i 'del(.metadata.namespace)' "$f"
+    yq -i 'del(.metadata.labels["app.kubernetes.io/managed-by"])' "$f"
+    yq -i 'del(.metadata.annotations["app.quarkus.io/build-timestamp"])' "$f"
+
+    yq -i '.metadata.name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME))' "$f"
+    yq -i '.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
+    yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
+
+    if [ "$kind" = 'clusterrolebinding' ] || [ "$kind" = "rolebinding" ]
+    then
+        yq -i '.roleRef.name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME)) | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub("^messaging-topology(-(operator|manager))?", strenv(RESOURCE_FULLNAME))))' "$f"
+    fi
+    if [ "$kind" = 'deployment' ]
+    then
+        yq -i 'del(.spec.template.metadata.labels["app.kubernetes.io/managed-by"])' "$f"
+        yq -i 'del(.spec.template.metadata.annotations["app.quarkus.io/build-timestamp"])' "$f"
+
+        yq -i '.spec.selector.matchLabels["app.kubernetes.io/name"]         = strenv(RESOURCE_NAME)' "$f"
+        yq -i '.spec.selector.matchLabels["app.kubernetes.io/instance"]     = "{{ .Release.Name }}"' "$f"
+        yq -i '.spec.template.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
+        yq -i '.spec.template.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
+	yq -i '.spec.template.spec.serviceAccountName                      |= sub("^messaging-topology-(operator|manager)", strenv(RESOURCE_FULLNAME))' "$f"
+	yq -i '.spec.template.spec.containers[0].image                      = "{{ print .Values.image.registry \"/\" .Values.image.repository \":\" (.Values.image.tag | default .Chart.AppVersion) }}"' "$f"
+	yq -i '.spec.template.spec.containers[0].imagePullPolicy            = "{{ .Values.image.pullPolicy }}"' "$f"
+	yq -i '.spec.template.spec.containers[0].imagePullSecrets           = "with12:{{ .Values.image.imagePullSecrets }}"' "$f"
+	yq -i '.spec.template.spec.containers[0].resources                  = "{{- .Values.resources | toYaml | nindent 12 }}"' "$f"
+	yq -i '.spec.replicas                                               = "{{ .Values.replicaCount }}"' "$f"
+	yq -i '.spec.template.spec.nodeSelector                             = "with8:{{ .Values.nodeSelector }}"' "$f"
+	yq -i '.spec.template.spec.tolerations                              = "with8:{{ .Values.toleratios }}"' "$f"
+	yq -i '.spec.template.spec.affinity                                 = "with8:{{ .Values.affinity }}"' "$f"
+	yq -i '.spec.template.metadata.annotations                          = "with8:{{ .Values.podAnnotations }}"' "$f"
+	yq -i '.spec.template.spec.volumes[0].secret.secretName             = strenv(RESOURCE_FULLNAME) + "-webhook-cert"' "$f"
+	# remove unneeded quoting
+	sed -i -r "s/'\\{\\{(.+)}}'/{{\\1}}/g" "$f"
+	# introduce with blocks
+	sed -i -r -r "s/(\\s+)([^:]+):\s+with([0-9]+):\\{\\{\\s*(.+?)}}/\\1{{- with \\4 }}\\n\\1\\2: {{- toYaml . | nindent \\3 }}\\n\\1{{- end }}/g" "$f"
+    fi
+    if [ "$kind" = 'issuer' ]
+    then
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
+    fi
+    if [ "$kind" = 'service' ]
+    then
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-webhook"' "$f"
+        yq -i '.spec.selector["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
+        yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
+    fi
+done
+
