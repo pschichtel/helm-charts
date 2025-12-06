@@ -1,0 +1,18 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: '{{ include "keycloak-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+    app.kubernetes.io/version: '{{ .Chart.AppVersion }}'
+  name: '{{ include "keycloak-operator.fullname" $ }}-clusterrole-binding'
+  annotations: {}
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: '{{ include "keycloak-operator.fullname" $ }}-clusterrole'
+subjects:
+  - kind: ServiceAccount
+    name: '{{ include "keycloak-operator.fullname" $ }}'
+    namespace: '{{ .Release.Namespace }}'

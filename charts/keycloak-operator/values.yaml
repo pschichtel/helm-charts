@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: quay.io/keycloak/keycloak-operator
+  registry: quay.io
+  repository: keycloak/keycloak-operator
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
 crds:
@@ -16,22 +16,16 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
-
-resources: {}
-# We usually recommend not to specify default resources and to leave this as a conscious
-# choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. If you do want to specify resources, uncomment the following
-# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-# limits:
-#   cpu: 100m
-#   memory: 128Mi
-# requests:
-#   cpu: 100m
-#   memory: 128Mi
+resources:
+  limits:
+    cpu: 700m
+    memory: 450Mi
+  requests:
+    cpu: 300m
+    memory: 450Mi
 
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
-
