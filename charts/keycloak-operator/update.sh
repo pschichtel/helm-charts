@@ -32,6 +32,7 @@ do
     yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/version"] = "{{ .Chart.AppVersion }}"' "$f"
 
+    yq -i '.metadata.labels |= (to_entries | sort_by(.key) | from_entries)' "$f"
     yq -i '.metadata.annotations |= (. // {} | to_entries | map(select(.key | test("app\\.quarkus\\.io/.+") | not)) | from_entries)' "$f"
     yq -i '.metadata |= (to_entries | map(select(.value != null and .value != [] and .value != {})) | from_entries)' "$f"
 
@@ -61,6 +62,7 @@ do
         yq -i '.spec.template.spec.affinity                                 = "with8:{{ .Values.affinity }}"' "$f"
         yq -i '.spec.template.metadata.annotations                          = "with8:{{ .Values.podAnnotations }}"' "$f"
         yq -i '.spec.template.spec.volumes[0].secret.secretName             = strenv(RESOURCE_FULLNAME) + "-webhook-cert"' "$f"
+        yq -i '.spec.template.metadata.labels                              |= (to_entries | sort_by(.key) | from_entries)' "$f"
         # remove unneeded quoting
         sed -i -r "s/'\\{\\{(.+)}}'/{{\\1}}/g" "$f"
         # introduce with blocks
