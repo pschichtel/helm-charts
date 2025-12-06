@@ -946,6 +946,21 @@ entries:
     version: 0.1.0
   keycloak:
   - apiVersion: v2
+    appVersion: 26.4.7
+    created: "2025-12-06T17:26:58.649469039Z"
+    dependencies:
+    - condition: keycloak-operator.enabled
+      name: keycloak-operator
+      repository: https://schich.tel/helm-charts
+      version: 0.5.10
+    description: A Helm chart for Kubernetes
+    digest: 546718195e09c25c7c6519be0fbdf6a2cdec9a905ee0e4dd0af3a93c373d46c4
+    name: keycloak
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-0.5.11/keycloak-0.5.11.tgz
+    version: 0.5.11
+  - apiVersion: v2
     appVersion: 26.4.6
     created: "2025-11-27T23:00:45.615869303Z"
     dependencies:
@@ -4737,4 +4752,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-06T17:25:11.700891833Z"
+generated: "2025-12-06T17:26:58.783462872Z"
