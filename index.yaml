@@ -1548,6 +1548,16 @@ entries:
   keycloak-backup:
   - apiVersion: v2
     appVersion: unknown
+    created: "2025-12-07T21:26:59.432102564Z"
+    description: A Helm chart to setup backups of a keycloak using its export feature.
+    digest: 36fe4368c4a80ea9bb744649be8fd2a70c402efc88658486a9c1f68ba694b144
+    name: keycloak-backup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/keycloak-backup-0.2.2/keycloak-backup-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
+    appVersion: unknown
     created: "2025-12-07T20:52:24.275967695Z"
     description: A Helm chart to setup backups of a keycloak using its export feature.
     digest: 84538dcad599310cec0154b3b3060b48bf1dfee6c0080afe2e00728523ceaa23
@@ -4823,4 +4833,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-07T20:52:24.276550079Z"
+generated: "2025-12-07T21:26:59.432701973Z"
