@@ -51,7 +51,7 @@ spec:
     {{- end }}
   {{- end -}}
   {{- $additionalOptions := deepCopy .Values.additionalOptions  }}
-  {{- if .Values.serviceMonitor.enabled }}
+  {{- if and .Values.serviceMonitor.enabled (eq .Values.serviceMonitor.mode "operator") }}
   {{- $additionalOptions = set $additionalOptions "metrics-enabled" (dict "value" "true") }}
   {{- end }}
   {{- with $additionalOptions }}

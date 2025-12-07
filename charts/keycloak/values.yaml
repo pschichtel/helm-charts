@@ -47,6 +47,8 @@ additionalOptions: {}
 
 serviceMonitor:
   enabled: false
+  # either "operator" or "chart"
+  mode: chart
   path: /auth/metrics
   additionalEndpoints: []
 
