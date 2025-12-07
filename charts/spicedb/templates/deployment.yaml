@@ -7,6 +7,9 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   progressDeadlineSeconds: 600
+  {{- with .Values.deploymentStrategy }}
+  strategy: {{- . | toYaml | nindent 4 }}
+  {{- end -}}
   selector:
     matchLabels:
       {{- include "spicedb.selectorLabels" . | nindent 6 }}

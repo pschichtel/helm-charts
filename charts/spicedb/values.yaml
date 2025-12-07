@@ -21,6 +21,8 @@ rbac:
 podAnnotations: {}
 podLabels: {}
 
+deploymentStrategy: {}
+
 service:
   type: ClusterIP
 
