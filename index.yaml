@@ -3853,6 +3853,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/satisfactory-0.3.0/satisfactory-0.3.0.tgz
     version: 0.3.0
+  spicedb:
+  - apiVersion: v2
+    appVersion: 1.47.1
+    created: "2025-12-07T16:08:27.758087592Z"
+    description: A Helm chart for Authzed's SpiceDB
+    digest: 020493a011d407cfa329f98f809b61e59b521c7fd7fda8b5973ccf0fe6d6889b
+    name: spicedb
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/spicedb-0.1.0/spicedb-0.1.0.tgz
+    version: 0.1.0
   sponge-vanilla:
   - apiVersion: v2
     appVersion: 1.20.2-11.0.0-RC1375
@@ -4752,4 +4763,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-06T17:26:58.783462872Z"
+generated: "2025-12-07T16:08:27.758773387Z"
