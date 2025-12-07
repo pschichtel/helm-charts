@@ -135,6 +135,9 @@ spec:
                 key: {{ .secretKey | required ".spicedb.grpcPresharedKey.value or .secretName is required!" | quote }}
                 {{- end }}
                 {{- end }}
+          {{- with .Values.extraEnv }}
+          {{- . | toYaml | nindent 10 }}
+          {{- end }}
           livenessProbe:
             exec:
               command: ["grpc_health_probe", "-v", "-addr=localhost:{{ $grpcPort }}"]
