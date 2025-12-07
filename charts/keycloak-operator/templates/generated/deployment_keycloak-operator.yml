@@ -88,6 +88,3 @@ spec:
       {{- with .Values.affinity  }}
       affinity: {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - secret:
-            secretName: '{{ include "keycloak-operator.fullname" $ }}-webhook-cert'
