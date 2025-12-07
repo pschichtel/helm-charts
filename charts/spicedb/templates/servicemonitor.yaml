@@ -1,0 +1,16 @@
+{{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "spicedb.fullname" . }}
+spec:
+  endpoints:
+  - port: prometheus
+    scheme: http
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "spicedb.selectorLabels" . | nindent 6 }}
+{{- end }}

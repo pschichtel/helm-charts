@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "spicedb.fullname" . }}
+  labels:
+    {{- include "spicedb.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  progressDeadlineSeconds: 600
+  selector:
+    matchLabels:
+      {{- include "spicedb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- $annotations := deepCopy .Values.podAnnotations -}}
+      {{- if or .Values.spicedb.datastore.connectionUri.value .Values.spicedb.grpcPresharedKey.value }}
+      {{- $annotations = set $annotations "checksum/secret" ((include (print $.Template.BasePath "/secret.yaml") $ | fromYaml).data | toYaml | sha256sum) }}
+      {{- end }}
+      {{- with $annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "spicedb.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.spicedb.dispatchClusterEnabled }}
+      serviceAccountName: {{ include "spicedb.serviceAccountName" . }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+      dnsPolicy: "ClusterFirst"
+      terminationGracePeriodSeconds: 30
+      restartPolicy: "Always"
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          image: {{ print .Values.image.registry "/" .Values.image.repository ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["spicedb", "serve"]
+          {{- $grpcPort := 50051 }}
+          {{- $terminationLogPath := "/dev/termination-log" }}
+          ports:
+          - containerPort: {{ $grpcPort }}
+            name: grpc
+            protocol: TCP
+          {{- if .Values.spicedb.httpEnabled }}
+          - containerPort: 8443
+            name: http
+            protocol: TCP
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+          - containerPort: 9090
+            name: metrics
+            protocol: TCP
+          {{- end }}
+          {{- if .Values.spicedb.dispatchClusterEnabled }}
+          - containerPort: 50053
+            name: dispatch
+            protocol: TCP
+          {{- end }}
+          env:
+          - name: SPICEDB_POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: SPICEDB_LOG_LEVEL
+            value: {{ .Values.spicedb.logLevel | quote }}
+          - name: SPICEDB_LOG_FORMAT
+            value: {{ .Values.spicedb.logFormat | quote }}
+          - name: SPICEDB_SKIP_RELEASE_CHECK
+            value: 'true'
+          - name: SPICEDB_DISPATCH_CLUSTER_ENABLED
+            value: "{{ .Values.spicedb.dispatchClusterEnabled }}"
+          {{- if .Values.spicedb.dispatchClusterEnabled }}
+          - name: SPICEDB_DISPATCH_UPSTREAM_ADDR
+            value: {{ print "kubernetes:///" (include "spicedb.fullname" .) "." .Release.Namespace ":dispatch" | quote }}
+          {{- end }}
+          - name: SPICEDB_HTTP_ENABLED
+            value: "{{ .Values.spicedb.httpEnabled }}"
+          {{- with .Values.spicedb.shutdownGracePeriod }}
+          - name: SPICEDB_GRPC_SHUTDOWN_GRACE_PERIOD
+            value: {{ . | quote }}
+          {{- end }}
+          - name: SPICEDB_TERMINATION_LOG_PATH
+            value: {{ $terminationLogPath | quote }}
+          {{- if .Values.spicedb.datastore.engine }}
+          - name: SPICEDB_DATASTORE_ENGINE
+            value: {{ .Values.spicedb.datastore.engine | quote }}
+          - name: SPICEDB_DATASTORE_CONN_URI
+            valueFrom:
+              secretKeyRef:
+                {{- with .Values.spicedb.datastore.connectionUri }}
+                {{- if .value }}
+                name: {{ include "spicedb.fullname" $ }}
+                key: datastore_connection_uri
+                {{- else }}
+                name: {{ .secretName | required ".spicedb.datastore.connectionUri.value or .secretName is required!" }}
+                key: {{ .secretKey | required ".spicedb.datastore.connectionUri.value or .secretKey is required!" | quote }}
+                {{- end }}
+                {{- end }}
+          {{- if .Values.spicedb.datastore.readReplica.enabled }}
+          - name: SPICEDB_DATASTORE_READ_REPLICA_CONN_URI
+            valueFrom:
+              secretKeyRef:
+                {{- with .Values.spicedb.datastore.readReplica.connectionUri }}
+                {{- if .value }}
+                name: {{ include "spicedb.fullname" $ }}
+                key: datastore_read_replica_connection_uri
+                {{- else }}
+                name: {{ .secretName | required ".spicedb.datastore.readReplica.connectionUri.value or .secretName is required!" }}
+                key: {{ .secretKey | required ".spicedb.datastore.readReplica.connectionUri.value or .secretKey is required!" | quote }}
+                {{- end }}
+                {{- end }}
+          {{- end }}
+          {{- end }}
+          - name: SPICEDB_GRPC_PRESHARED_KEY
+            valueFrom:
+              secretKeyRef:
+                {{- with .Values.spicedb.grpcPresharedKey }}
+                {{- if .value }}
+                name: {{ include "spicedb.fullname" $ }}
+                key: grpc_preshared_key
+                {{- else }}
+                name: {{ .secretName | required ".spicedb.grpcPresharedKey.value or .secretName is required!" }}
+                key: {{ .secretKey | required ".spicedb.grpcPresharedKey.value or .secretName is required!" | quote }}
+                {{- end }}
+                {{- end }}
+          livenessProbe:
+            exec:
+              command: ["grpc_health_probe", "-v", "-addr=localhost:{{ $grpcPort }}"]
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command: ["grpc_health_probe", "-v", "-addr=localhost:{{ $grpcPort }}"]
+            failureThreshold: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          terminationMessagePath: {{ $terminationLogPath | quote }}
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+      volumes:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
