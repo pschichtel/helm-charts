@@ -94,7 +94,16 @@ def strategic_merge($b; $o):
               claimName: $pvc
             }
           }
-        ]
+        ],
+        affinity: {
+          podAffinity: {
+            requiredDuringSchedulingIgnoredDuringExecution: [
+              {
+                labelSelector: $labels
+              }
+            ]
+          }
+        }
       }
     } as $base
   | ($spec.unsupported?.podTemplate // {}) as $patch

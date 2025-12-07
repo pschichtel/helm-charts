@@ -68,6 +68,9 @@ spec:
             - name: tmp
               mountPath: /tmp
               readOnly: false
+            - name: metadata
+              mountPath: /metadata
+              readOnly: true
             {{- with .Values.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -84,6 +87,12 @@ spec:
               claimName: {{ include "keycloak-backup.fullname" . }}
           - name: tmp
             emptyDir: {}
+          - name: metadata
+            downwardAPI:
+              items:
+                - path: "labels"
+                  fieldRef:
+                    fieldPath: metadata.labels
           {{- with .Values.volumes }}
           {{- toYaml . | nindent 10 }}
           {{- end }}

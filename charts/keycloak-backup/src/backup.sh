@@ -13,8 +13,9 @@ volume="${VOLUME?no volume configured!}"
 
 
 keycloak_object="$(kubectl -n "$namespace" get -o json "$keycloak")"
+labels="$(jq -Rs 'trim | split("\n") | map(split("=")[0] as $key | .[($key | length)+1:] | fromjson as $value | {key: $key, value: $value}) | from_entries' < '/metadata/labels')"
 jq_transformer="$script_path/transform.jq"
-overrides="$(jq -rMc --arg name "$pod" --arg pvc "$pvc" --arg volumeAt "$volume" -f "$jq_transformer" <<< "$keycloak_object")"
+overrides="$(jq -rMc --arg name "$pod" --arg pvc "$pvc" --arg volumeAt "$volume" --argjson labels "$labels" -f "$jq_transformer" <<< "$keycloak_object")"
 optimized="$(jq -rMc '.spec.startOptimized // true' <<< "$keycloak_object")"
 
 export_cmd=(export --dir "$volume" --users realm_file)
