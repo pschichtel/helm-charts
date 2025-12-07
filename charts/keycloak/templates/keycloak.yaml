@@ -50,7 +50,11 @@ spec:
     tolerations: {{ . | toYaml | nindent 6 }}
     {{- end }}
   {{- end -}}
-  {{- with .Values.additionalOptions }}
+  {{- $additionalOptions := deepCopy .Values.additionalOptions  }}
+  {{- if .Values.serviceMonitor.enabled }}
+  {{- $additionalOptions = set $additionalOptions "metrics-enabled" (dict "value" "true") }}
+  {{- end }}
+  {{- with $additionalOptions }}
   additionalOptions:
   {{- range $name, $option := . }}
   - name: {{ $name | quote }}
