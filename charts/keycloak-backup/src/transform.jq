@@ -99,6 +99,7 @@ def strategic_merge($b; $o):
           podAffinity: {
             requiredDuringSchedulingIgnoredDuringExecution: [
               {
+                topologyKey: kubernetes.io/hostname
                 labelSelector: $labels
               }
             ]
