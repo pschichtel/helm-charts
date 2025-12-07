@@ -95,15 +95,8 @@ def strategic_merge($b; $o):
             }
           }
         ],
-        affinity: {
-          podAffinity: {
-            requiredDuringSchedulingIgnoredDuringExecution: [
-              {
-                topologyKey: "kubernetes.io/hostname",
-                labelSelector: $labels
-              }
-            ]
-          }
+        nodeSelector: {
+          "kubernetes.io/hostname": $node
         }
       }
     } as $base

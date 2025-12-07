@@ -10,12 +10,12 @@ keycloak="keycloaks.k8s.keycloak.org/${KEYCLOAK?no keycloak configured!}"
 pod="${BACKUP_POD_NAME?no pod name configured}"
 pvc="${BACKUP_PVC_NAME?no pvc name configured}"
 volume="${VOLUME?no volume configured!}"
+node_name="${NODE_NAME?no NODE_NAME configured!}"
 
 
 keycloak_object="$(kubectl -n "$namespace" get -o json "$keycloak")"
-labels="$(jq -Rs 'trim | split("\n") | map(split("=")[0] as $key | .[($key | length)+1:] | fromjson as $value | {key: $key, value: $value}) | from_entries' < '/metadata/labels')"
 jq_transformer="$script_path/transform.jq"
-overrides="$(jq -rMc --arg name "$pod" --arg pvc "$pvc" --arg volumeAt "$volume" --argjson labels "$labels" -f "$jq_transformer" <<< "$keycloak_object")"
+overrides="$(jq -rMc --arg name "$pod" --arg pvc "$pvc" --arg volumeAt "$volume" --arg node "$node_name" -f "$jq_transformer" <<< "$keycloak_object")"
 optimized="$(jq -rMc '.spec.startOptimized // true' <<< "$keycloak_object")"
 
 export_cmd=(export --dir "$volume" --users realm_file)
