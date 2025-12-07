@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euo pipefail
+
+echo "Preparing backup..."
 
 script_path="${SCRIPT_PATH?no script path configured!}"
 namespace="$(cat "/var/run/secrets/kubernetes.io/serviceaccount/namespace")"
@@ -31,6 +33,13 @@ then
   export_cmd+=(--users-per-file "$KC_USERS_PER_FILE")
 fi
 
+echo "Overrides:"
+jq <<< "$overrides"
+echo "Export command:"
+echo "$ ${export_cmd[*]}"
+echo ""
+
+echo "Starting backup..."
 find "$volume" -mindepth 1 -depth -delete
 kubectl -n "$namespace" delete --ignore-not-found "pod/$pod"
 kubectl -n "$namespace" run \
@@ -44,3 +53,4 @@ kubectl -n "$namespace" run \
   -- \
   "${export_cmd[@]}"
 find "$volume" -mindepth 1
+echo "Backup complete!"

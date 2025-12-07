@@ -30,7 +30,7 @@ spec:
           {{- else }}
           containers:
           {{- end }}
-          - name: deployment-helper
+          - name: backup
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             command:
