@@ -103,7 +103,7 @@ env:
       name: {{ include "spicedb.fullname" $ }}
       key: datastore_connection_uri
       {{- else }}
-      name: {{ .secretName | required ".spicedb.datastore.connectionUri.value or .secretName is required!" }}
+      name: {{ tpl (.secretName | required ".spicedb.datastore.connectionUri.value or .secretName is required!") $ }}
       key: {{ .secretKey | required ".spicedb.datastore.connectionUri.value or .secretKey is required!" | quote }}
       {{- end }}
       {{- end }}
@@ -116,7 +116,7 @@ env:
       name: {{ include "spicedb.fullname" $ }}
       key: datastore_read_replica_connection_uri
       {{- else }}
-      name: {{ .secretName | required ".spicedb.datastore.readReplica.connectionUri.value or .secretName is required!" }}
+      name: {{ tpl (.secretName | required ".spicedb.datastore.readReplica.connectionUri.value or .secretName is required!") $ }}
       key: {{ .secretKey | required ".spicedb.datastore.readReplica.connectionUri.value or .secretKey is required!" | quote }}
       {{- end }}
       {{- end }}
@@ -130,7 +130,7 @@ env:
       name: {{ include "spicedb.fullname" $ }}
       key: grpc_preshared_key
       {{- else }}
-      name: {{ .secretName | required ".spicedb.grpcPresharedKey.value or .secretName is required!" }}
+      name: {{ tpl (.secretName | required ".spicedb.grpcPresharedKey.value or .secretName is required!") $ }}
       key: {{ .secretKey | required ".spicedb.grpcPresharedKey.value or .secretName is required!" | quote }}
       {{- end }}
       {{- end }}
