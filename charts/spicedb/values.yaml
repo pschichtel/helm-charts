@@ -25,6 +25,7 @@ deploymentStrategy: {}
 
 service:
   type: ClusterIP
+  annotations: {}
 
 ingress:
   enabled: false
