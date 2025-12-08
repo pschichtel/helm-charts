@@ -10,17 +10,18 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  {{- $host := tpl (.Values.ingress.host | required ".ingress.host is required!") . }}
   {{- with .Values.ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     - hosts:
-        - {{ .Values.ingress.host | quote }}
+        - {{ $host | quote }}
       secretName: {{ .Values.ingress.tlsSecretName | default (print (include "spicedb.fullname" .) "-tls") }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.host | quote }}
+    - host: {{ $host | quote }}
       http:
         paths:
           - path: /
