@@ -5,4 +5,4 @@ description: A Helm chart for COSI
 type: application
 version: 0.1.0
 # renovate: github-releases=kubernetes-sigs/container-object-storage-interface
-appVersion: "0.2.1"
+appVersion: "0.2.2"
