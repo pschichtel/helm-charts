@@ -10,7 +10,7 @@ nginxImage:
   repository: docker.io/library/nginx
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.29.3"
+  tag: "1.29.4"
 
 mediawikiImage:
   repository: docker.io/library/mediawiki
