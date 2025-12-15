@@ -38,6 +38,8 @@ features:
   - docker
   - authorization
 
+bootstrapAdmin: {}
+
 ingress:
   enabled: false
   extraHosts: []
