@@ -4,4 +4,4 @@ description: A Helm chart for MediaWiki
 type: application
 version: 0.3.8
 # renovate: image=docker.io/library/mediawiki
-appVersion: "1.44"
+appVersion: "1.45"
