@@ -10,10 +10,6 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-
-securityContext: {}
-
 service:
   port: 9103
 
