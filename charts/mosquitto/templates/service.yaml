@@ -18,7 +18,7 @@ spec:
   {{- end }}
   ports:
     - port: {{ .Values.service.ports.mqtt }}
-      targetPort: default
+      targetPort: mqtt
       protocol: TCP
       name: mqtt
     {{- range $name, $port := .Values.service.ports.additional }}
