@@ -494,6 +494,16 @@ entries:
   draytek-exporter:
   - apiVersion: v2
     appVersion: 0.2.0
+    created: "2025-12-29T01:08:59.871326709Z"
+    description: A Helm chart for the draytek-exporter
+    digest: 6cf799ba2c9a471917a5fd282e663a620ce6934691feca5fe88d2f5f895520f7
+    name: draytek-exporter
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/draytek-exporter-0.2.1/draytek-exporter-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 0.2.0
     created: "2025-11-23T22:51:32.507014184Z"
     description: A Helm chart for the draytek-exporter
     digest: f764dc366297677cff2d6a771493e25c730c234a5b14582473e12b86999d691e
@@ -2781,6 +2791,16 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/mindustry-0.1.0/mindustry-0.1.0.tgz
     version: 0.1.0
+  mosquitto:
+  - apiVersion: v1
+    appVersion: 2.0.22
+    created: "2025-12-29T01:09:00.051845176Z"
+    description: Eclipse Mosquitto - An open source MQTT broker
+    digest: 4029720ca998fde61a682f912ae13033462cbe743339f246ed9e4df674f079ad
+    name: mosquitto
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mosquitto-0.3.0/mosquitto-0.3.0.tgz
+    version: 0.3.0
   nextcloud-notify_push:
   - apiVersion: v2
     appVersion: 1.2.1
@@ -4963,4 +4983,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-28T00:22:58.813432874Z"
+generated: "2025-12-29T01:09:00.052500023Z"
