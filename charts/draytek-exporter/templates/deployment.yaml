@@ -30,10 +30,10 @@ spec:
       {{- end }}
       securityContext:
         runAsNonRoot: true
-        allowPrivilegeEscalation: false
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
+            allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default (print "v" .Chart.AppVersion) }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
