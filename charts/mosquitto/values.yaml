@@ -15,6 +15,7 @@ podLabels: {}
 
 service:
   type: ClusterIP
+  externalTrafficPolicy: null
   ports:
     mqtt: 1883
     additional:
