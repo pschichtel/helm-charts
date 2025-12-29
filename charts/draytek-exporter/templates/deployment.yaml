@@ -19,7 +19,7 @@ spec:
         {{- end }}
         checksum/secret: {{ ((include (print $.Template.BasePath "/secret.yaml") $) | fromYaml).data | toYaml | sha256sum }}
       labels:
-        {{- include "draytek-exporter.labels" . | nindent 8 }}
+        {{- include "draytek-exporter.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

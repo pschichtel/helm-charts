@@ -17,7 +17,7 @@ spec:
         {{- end }}
         checksum/configmap: {{ ((include (print $.Template.BasePath "/configmap.yaml") $) | fromYaml).data | toYaml | sha256sum }}
       labels:
-        {{- include "mosquitto.labels" . | nindent 8 }}
+        {{- include "mosquitto.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
