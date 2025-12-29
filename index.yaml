@@ -2804,6 +2804,15 @@ entries:
   mosquitto:
   - apiVersion: v1
     appVersion: 2.0.22
+    created: "2025-12-29T01:14:22.226945128Z"
+    description: Eclipse Mosquitto - An open source MQTT broker
+    digest: c111326e37315bab3fb4d9774a4308dd34a464deb3744af0bf03105df421a505
+    name: mosquitto
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mosquitto-0.3.1/mosquitto-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v1
+    appVersion: 2.0.22
     created: "2025-12-29T01:09:00.051845176Z"
     description: Eclipse Mosquitto - An open source MQTT broker
     digest: 4029720ca998fde61a682f912ae13033462cbe743339f246ed9e4df674f079ad
@@ -4993,4 +5002,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2025-12-29T01:12:18.132271681Z"
+generated: "2025-12-29T01:14:22.22789247Z"
