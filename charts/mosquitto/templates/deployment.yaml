@@ -28,10 +28,10 @@ spec:
     {{- end }}
       securityContext:
         runAsNonRoot: true
-        allowPrivilegeEscalation: false
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
+            allowPrivilegeEscalation: false
             runAsUser: 1883
             runAsGroup: 1883
           image: {{ print .Values.image.registry "/" .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) | quote }}
