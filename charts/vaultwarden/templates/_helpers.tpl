@@ -52,12 +52,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "vaultwarden.secretRef" -}}
 {{- if .Ref -}}
+{{- if kindIs "string" .Ref -}}
+- name: {{ .Name | quote }}
+  value: {{ .Ref | quote }}
+{{- else -}}
 {{- if .Ref.key -}}
 - name: {{ .Name | quote }}
   valueFrom:
     secretKeyRef:
       name: {{ .Ref.name | default .Root.Values.vaultwarden.commonSecret | default (include "vaultwarden.fullname" .Root) | quote }}
       key: {{ .Ref.key | quote }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

@@ -82,8 +82,7 @@ spec:
           {{- include "vaultwarden.optionalSetting" (dict "Name" "EXTENDED_LOGGING" "Value" .Values.vaultwarden.settings.extendedLogging) | nindent 10 }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "VAULTWARDEN_DB_USERNAME" "Ref" .Values.vaultwarden.database.username) | nindent 10 }}
           {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "VAULTWARDEN_DB_PASSWORD" "Ref" .Values.vaultwarden.database.password) | nindent 10 }}
-          - name: DATABASE_URL
-            value: {{ .Values.vaultwarden.database.uri | quote }}
+          {{- include "vaultwarden.secretRef" (dict "Root" $ "Name" "DATABASE_URL" "Ref" .Values.vaultwarden.database.uri) | nindent 10 }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
