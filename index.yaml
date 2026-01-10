@@ -765,6 +765,29 @@ entries:
     version: 0.0.1
   graylog:
   - apiVersion: v2
+    appVersion: 7.0.3-1
+    created: "2026-01-10T13:39:17.369065841Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: 931d90d38ea8efe8ac7560927959d093e23f9e49bfd3683c3776cec8fca349ee
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.5.0/graylog-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     appVersion: 6.3.0-1
     created: "2025-07-03T23:35:52.722094959Z"
     description: Graylog is the centralized log management solution built to open
@@ -2908,6 +2931,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/mosquitto-0.3.0/mosquitto-0.3.0.tgz
     version: 0.3.0
   nextcloud-notify_push:
+  - apiVersion: v2
+    appVersion: 1.2.2
+    created: "2026-01-10T13:39:17.519153759Z"
+    description: A Helm chart for nextcloud's push_notify server
+    digest: 4b0c960d36bfc2d9e177e0aa34bb36ee112a6e9cc8034e9fd38e5c0068bda5c5
+    name: nextcloud-notify_push
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/nextcloud-notify_push-0.4.2/nextcloud-notify_push-0.4.2.tgz
+    version: 0.4.2
   - apiVersion: v2
     appVersion: 1.2.1
     created: "2025-11-23T12:57:10.641769609Z"
@@ -5119,4 +5152,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-10T13:34:17.670209479Z"
+generated: "2026-01-10T13:39:17.520213918Z"
