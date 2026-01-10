@@ -2,6 +2,6 @@ apiVersion: v2
 name: vaultwarden
 description: A Helm chart for Kubernetes
 type: application
-version: 0.7.0
+version: 0.7.1
 # renovate: image=ghcr.io/dani-garcia/vaultwarden
-appVersion: "1.35.1"
+appVersion: "1.35.2"
