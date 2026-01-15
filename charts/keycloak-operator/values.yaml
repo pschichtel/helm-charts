@@ -6,6 +6,8 @@ image:
   pullPolicy: IfNotPresent
   tag: ""
 
+keycloakImagePullPolicy: Always
+
 crds:
   enabled: true
 

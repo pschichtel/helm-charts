@@ -56,6 +56,7 @@ do
         yq -i '.spec.template.spec.containers[0].imagePullSecrets           = "with12:{{ .Values.image.imagePullSecrets }}"' "$f"
         yq -i '.spec.template.spec.containers[0].resources                  = "{{- .Values.resources | toYaml | nindent 12 }}"' "$f"
         yq -i '.spec.template.spec.containers[0].env                       |= map(with(select(.name == "RELATED_IMAGE_KEYCLOAK"); .value |= sub(":.+$", ":{{ .Chart.AppVersion }}")) | with(select(.name != "RELATED_IMAGE_KEYCLOAK"); .))' "$f"
+        yq -i '.spec.template.spec.containers[0].env                       += {"name": "KC_OPERATOR_KEYCLOAK_IMAGE_PULL_POLICY", "value": "{{ .Values.keycloakImagePullPolicy | quote }}"}' "$f"
         yq -i '.spec.replicas                                               = "{{ .Values.replicaCount }}"' "$f"
         yq -i '.spec.template.spec.nodeSelector                             = "with8:{{ .Values.nodeSelector }}"' "$f"
         yq -i '.spec.template.spec.tolerations                              = "with8:{{ .Values.toleratios }}"' "$f"
