@@ -23,7 +23,6 @@ spec:
       labels:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/name: {{ include "keycloak-operator.name" $ }}
-        app.kubernetes.io/version: {{ .Chart.AppVersion }}
     spec:
       containers:
         - env:
