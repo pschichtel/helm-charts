@@ -30,6 +30,23 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wordpress-copy
+          securityContext:
+            {{- toYaml .Values.wordpressSecurityContext | nindent 12 }}
+          image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
+          imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
+          command: ['sh']
+          args:
+            - -c
+            - |
+              if ! [ -e /mnt/index.php ]
+              then
+                cp -va /var/www/html/. /mnt
+              fi
+          volumeMounts:
+            - name: data
+              mountPath: /mnt
       containers:
         - name: wordpress
           securityContext:
