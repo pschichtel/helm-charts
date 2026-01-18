@@ -9,7 +9,8 @@ spec:
   policyTypes:
   - Egress
   podSelector:
-    {{- include "wordpress.selectorLabels" . | nindent 4 }}
+    matchLabels:
+      {{- include "wordpress.selectorLabels" . | nindent 6 }}
   {{- with .Values.networkPolicy.egress }}
   egress:
     {{- . | toYaml | nindent 4 }}
