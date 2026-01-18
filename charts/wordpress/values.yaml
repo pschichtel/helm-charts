@@ -113,6 +113,10 @@ nginxVolumeMounts: []
 
 wordpressVolumeMounts: []
 
+networkPolicy:
+  enabled: false
+  egress: null
+
 php:
   ini:
     # Allow uploads
