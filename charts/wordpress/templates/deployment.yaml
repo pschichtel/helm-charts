@@ -32,8 +32,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: wordpress-copy
-          securityContext:
-            {{- toYaml .Values.wordpressSecurityContext | nindent 12 }}
+          {{- include "wordpress.securityContext" . | nindent 10 }}
           image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
           imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
           command: ['sh']
@@ -49,8 +48,7 @@ spec:
               mountPath: /mnt
       containers:
         - name: wordpress
-          securityContext:
-            {{- toYaml .Values.wordpressSecurityContext | nindent 12 }}
+          {{- include "wordpress.securityContext" . | nindent 10 }}
           image: "{{ .Values.wordpressImage.repository }}:{{ .Values.wordpressImage.tag | default (print .Chart.AppVersion "-fpm") }}"
           imagePullPolicy: {{ .Values.wordpressImage.pullPolicy }}
           ports:
@@ -82,8 +80,7 @@ spec:
             {{- . | toYaml | nindent 12 }}
             {{- end }}
         - name: nginx
-          securityContext:
-            {{- toYaml .Values.nginxSecurityContext | nindent 12 }}
+          {{- include "wordpress.securityContext" . | nindent 10 }}
           image: "{{ .Values.nginxImage.repository }}:{{ .Values.nginxImage.tag }}"
           imagePullPolicy: {{ .Values.nginxImage.pullPolicy }}
           ports:

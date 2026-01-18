@@ -29,19 +29,6 @@ podAnnotations: {}
 podSecurityContext: {}
 # fsGroup: 2000
 
-nginxSecurityContext:
-  allowPrivilegeEscalation: false
-  runAsUser: 33
-  runAsGroup: 33
-  runAsNonRoot: true
-wordpressSecurityContext: {}
-# capabilities:
-#   drop:
-#   - ALL
-# readOnlyRootFilesystem: true
-# runAsNonRoot: true
-# runAsUser: 1000
-
 service:
   type: ClusterIP
   port: 8080

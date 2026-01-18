@@ -49,3 +49,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "wordpress.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "wordpress.securityContext" -}}
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsUser: 33
+  runAsGroup: 33
+  runAsNonRoot: true 
+  capabilities:
+    drop:
+      - ALL
+{{- end }}
