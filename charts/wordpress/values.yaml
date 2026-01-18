@@ -160,7 +160,7 @@ php:
 
 probes:
   enabled: true
-  path: '/'
+  path: '/wp-admin/install.php'
   headers: []
   timeout: 2
   period: 20
