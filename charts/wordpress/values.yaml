@@ -104,6 +104,10 @@ networkPolicy:
   enabled: false
   egress: null
 
+tmp:
+  medium: null
+  sizeLimit: null
+
 php:
   ini:
     # Allow uploads
