@@ -3,6 +3,6 @@ name: powerdns
 description: A Helm chart to deploy PowerDNS to Kubernetes
 home: https://www.powerdns.com/
 type: application
-version: 0.8.1
-# renovate: image=docker.io/powerdns/pdns-auth-48
-appVersion: "4.8.5"
+version: 0.9.0
+# renovate: image=docker.io/powerdns/pdns-auth-50
+appVersion: "5.0.2"
