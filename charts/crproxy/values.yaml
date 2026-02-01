@@ -34,3 +34,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# host -> {username, password}
+credentials: {}
+credentialsSecret: null
+
+authenticatedHosts: []

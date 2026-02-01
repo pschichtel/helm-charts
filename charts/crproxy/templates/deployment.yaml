@@ -46,6 +46,13 @@ spec:
           args:
           - --address
           - {{ print "0.0.0.0:" .Values.service.port | quote }}
+          {{- range .Values.authenticatedHosts }}
+          - --user
+          - {{ print "$(AUTH_HOST_" . ")@" . | quote }}
+          {{- end }}
+          envFrom:
+          - secretRef:
+              name: {{ .Values.credentialsSecret | default (include "crproxy.fullname" .) }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
