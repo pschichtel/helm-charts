@@ -46,6 +46,10 @@ spec:
           args:
           - --address
           - {{ print "0.0.0.0:" .Values.service.port | quote }}
+          {{- with .Values.defaultRegistry }}
+          - --default-registry
+          - {{ .Values.defaultRegistry | quote }}
+          {{- end }}
           {{- range .Values.authenticatedHosts }}
           - --user
           - {{ print "$(AUTH_HOST_" . ")@" . | quote }}
