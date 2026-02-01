@@ -378,6 +378,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/coturn-0.1.0/coturn-0.1.0.tgz
     version: 0.1.0
+  crproxy:
+  - apiVersion: v2
+    appVersion: 0.8.0
+    created: "2026-02-01T04:03:50.869921841Z"
+    description: A Helm chart for baocloud's crproxy
+    digest: b40f5747ee5b7393b389a652a5fc57facf97c9810704fc4d54354709148c635f
+    name: crproxy
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/crproxy-0.1.0/crproxy-0.1.0.tgz
+    version: 0.1.0
   docspell:
   - apiVersion: v2
     appVersion: 0.42.0
@@ -5394,4 +5405,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-31T23:20:31.771197061Z"
+generated: "2026-02-01T04:03:50.870562916Z"
