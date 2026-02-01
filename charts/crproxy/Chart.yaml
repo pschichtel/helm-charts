@@ -1,0 +1,6 @@
+apiVersion: v2
+name: crproxy
+description: A Helm chart for baocloud's crproxy
+type: application
+version: 0.1.0
+appVersion: "0.8.0"
