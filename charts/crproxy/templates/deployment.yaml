@@ -48,7 +48,7 @@ spec:
           - {{ print "0.0.0.0:" .Values.service.port | quote }}
           {{- with .Values.defaultRegistry }}
           - --default-registry
-          - {{ .Values.defaultRegistry | quote }}
+          - {{ . | quote }}
           {{- end }}
           {{- range .Values.authenticatedHosts }}
           - --user
