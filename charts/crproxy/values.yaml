@@ -14,6 +14,8 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
+deploymentStrategy: {}
+
 service:
   port: 8080
 
