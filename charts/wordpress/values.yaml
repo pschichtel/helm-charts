@@ -8,7 +8,7 @@ nginxImage:
   repository: docker.io/nginxinc/nginx-unprivileged
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.29.3"
+  tag: "1.29.4"
 
 wordpressImage:
   repository: docker.io/library/wordpress
