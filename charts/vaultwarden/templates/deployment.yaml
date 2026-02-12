@@ -41,6 +41,8 @@ spec:
           env:
           - name: ROCKET_PORT
             value: '8080'
+          - name: IP_HEADER
+            value: {{ .Values.vaultwarden.settings.ipHeader | quote }}
           - name: SIGNUPS_ALLOWED
             value: {{ .Values.vaultwarden.settings.signupsAllowed | quote }}
           {{- if .Values.vaultwarden.settings.signupsAllowed }}

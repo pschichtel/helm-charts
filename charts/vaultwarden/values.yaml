@@ -94,6 +94,7 @@ vaultwarden:
   createSecret: null
   commonSecret: null
   settings:
+    ipHeader: X-Real-IP
     signupsAllowed: false
     # only if `signupsAllowed` is true
     signupsDomainsWhitelist: []
