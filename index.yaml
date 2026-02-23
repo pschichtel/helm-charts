@@ -3475,6 +3475,16 @@ entries:
     version: 0.1.0
   pev2:
   - apiVersion: v2
+    appVersion: 2.20.1
+    created: "2026-02-23T13:47:34.362850104Z"
+    description: A Helm chart for the PEV2 application to analyse PG query plans.
+    digest: a97ec483c3d5904a1e57454df2ba5c44214f37a8b8c6ec0a521789d82458252d
+    name: pev2
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/pev2-0.3.0/pev2-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 2.19.0
     created: "2026-02-20T15:07:37.70078812Z"
     description: A Helm chart for the PEV2 application to analyse PG query plans.
@@ -5616,4 +5626,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-20T17:38:06.090787004Z"
+generated: "2026-02-23T13:47:34.363943938Z"
