@@ -2,6 +2,6 @@ apiVersion: v2
 name: pev2
 description: A Helm chart for the PEV2 application to analyse PG query plans.
 type: application
-version: 0.2.0
+version: 0.3.0
 # renovate: image=docker.io/dalibo/explain.dalibo.com
-appVersion: "2.19.0"
+appVersion: "2.20.1"
