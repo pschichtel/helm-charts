@@ -2,6 +2,6 @@ apiVersion: v2
 name: jdownloader
 description: A Helm chart for JDownloader
 type: application
-version: 0.1.1
+version: 0.1.2
 # renovate: image=docker.io/jlesage/jdownloader-2
 appVersion: "26.02.3"

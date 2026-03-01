@@ -1,7 +1,7 @@
 {{- range $name, $pvc := .Values.storage }}
 {{- if not $pvc.existingPvc }}
 apiVersion: v1
-kind: Persistence
+kind: PersistentVolumeClaim
 metadata:
   name: {{ print (include "jdownloader.fullname" $) "-" $name | quote }}
   labels:
