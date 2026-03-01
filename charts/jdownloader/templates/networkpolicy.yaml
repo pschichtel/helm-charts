@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "jdownloader.fullname" . }}
+  labels:
+    {{- include "jdownloader.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "jdownloader.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    - to: {{- list .Values.networkPolicy.dnsSelector | toYaml | nindent 8 }}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - port: 80
+          protocol: TCP
+        - port: 443
+          protocol: TCP

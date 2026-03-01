@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jdownloader.fullname" . }}
+  labels:
+    {{- include "jdownloader.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "jdownloader.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "jdownloader.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- $repo := print .Values.image.registry "/" .Values.image.repository }}
+          {{- if .Values.image.digest }}
+          image: {{ print $repo "@" .Values.image.digest | quote }}
+          {{- else }}
+          image: {{ print $repo ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: WEB_LISTENING_PORT
+              value: {{ .Values.service.port | quote }}
+            - name: WEB_AUDIO
+              value: '1'
+            - name: DARK_MODE
+              value: '1'
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- range $name, $pvc := .Values.storage }}
+          - name: {{ $name }}
+            mountPath: {{ print "/" $name | quote }}
+            {{- with $pvc.volumeMount.subPath }}
+            subPath: {{ . | quote }}
+            {{- end }}
+          {{- end }}
+            {{- with .Values.volumeMounts }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        {{- range $name, $pvc := .Values.storage }}
+        - name: {{ $name }}
+          persistentVolumeClaim:
+            claimName: {{ $pvc.existingPvc | default (print (include "jdownloader.fullname" $) "-" $name) }}
+        {{- end }}
+        {{- with .Values.volumes }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

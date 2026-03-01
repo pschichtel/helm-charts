@@ -1,0 +1,12 @@
+{{- range $name, $pvc := .Values.storage }}
+{{- if not $pvc.existingPvc }}
+apiVersion: v1
+kind: Persistence
+metadata:
+  name: {{ print (include "jdownloader.fullname" $) "-" $name | quote }}
+  labels:
+    {{- include "jdownloader.labels" $ | nindent 4 }}
+spec:
+  {{- $pvc.pvc | toYaml | nindent 2 }}
+{{- end }}
+{{- end }}
