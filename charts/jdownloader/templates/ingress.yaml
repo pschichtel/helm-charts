@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if and .Values.ingress.enabled .Values.ingress.hosts -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -24,7 +24,8 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    - host: {{ .host | quote }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . | quote }}
       http:
         paths:
           - path: /
@@ -33,5 +34,6 @@ spec:
               service:
                 name: {{ include "jdownloader.fullname" $ }}
                 port:
-                  number: {{ $.Values.service.port }}
+                  name: http
+    {{- end }}
 {{- end }}
