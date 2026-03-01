@@ -1098,6 +1098,17 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.1.0/graylog-0.1.0.tgz
     version: 0.1.0
+  jdownloader:
+  - apiVersion: v2
+    appVersion: 26.02.3
+    created: "2026-03-01T15:04:27.042623121Z"
+    description: A Helm chart for JDownloader
+    digest: e4b2ff66527f53fd53da3c62bb0a1d172969e8556dfcee272887c42829508f89
+    name: jdownloader
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/jdownloader-0.1.0/jdownloader-0.1.0.tgz
+    version: 0.1.0
   keycloak:
   - apiVersion: v2
     appVersion: 26.5.4
@@ -5656,4 +5667,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-28T01:28:39.871927872Z"
+generated: "2026-03-01T15:04:27.043383646Z"
