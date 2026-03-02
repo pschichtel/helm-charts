@@ -71,17 +71,26 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-          {{- range $name, $pvc := .Values.storage }}
-          - name: {{ $name }}
-            mountPath: {{ print "/" $name | quote }}
-            {{- with $pvc.volumeMount.subPath }}
-            subPath: {{ . | quote }}
+            - name: tmp
+              mountPath: /tmp
+              subPath: tmp
+            - name: tmp
+              mountPath: /var/tmp
+              subPath: var-tmp
+            {{- range $name, $pvc := .Values.storage }}
+            - name: {{ $name }}
+              mountPath: {{ print "/" $name | quote }}
+              {{- with $pvc.volumeMount.subPath }}
+              subPath: {{ . | quote }}
+              {{- end }}
             {{- end }}
-          {{- end }}
             {{- with .Values.volumeMounts }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 512Mi
         {{- range $name, $pvc := .Values.storage }}
         - name: {{ $name }}
           persistentVolumeClaim:
