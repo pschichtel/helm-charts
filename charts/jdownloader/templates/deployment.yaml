@@ -25,24 +25,20 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      initContainers:
+        - name: init-docker-instance
+          {{- include "jdownloader.image" . | nindent 10 }}
+          {{- include "jdownloader.securityContext" . | nindent 10 }}
+          command: ['bash']
+          args: ['-c', '/opt/base/bin/uuidgen > /.docker-instance/uuid']
+          volumeMounts:
+            - name: tmp
+              mountPath: /.docker-instance
+              subPath: docker-instance
       containers:
         - name: {{ .Chart.Name }}
-          {{- $repo := print .Values.image.registry "/" .Values.image.repository }}
-          {{- if .Values.image.digest }}
-          image: {{ print $repo "@" .Values.image.digest | quote }}
-          {{- else }}
-          image: {{ print $repo ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
-          {{- end }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            runAsGroup: 1000
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-                - ALL
+          {{- include "jdownloader.image" . | nindent 10 }}
+          {{- include "jdownloader.securityContext" . | nindent 10 }}
           env:
             - name: USER_ID
               value: '1000'

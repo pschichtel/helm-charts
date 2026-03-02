@@ -50,3 +50,25 @@ app.kubernetes.io/name: {{ include "jdownloader.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
+{{- define "jdownloader.image" -}}
+{{- $repo := print .Values.image.registry "/" .Values.image.repository }}
+{{- if .Values.image.digest }}
+image: {{ print $repo "@" .Values.image.digest | quote }}
+{{- else }}
+image: {{ print $repo ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
+{{- end }}
+imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{- end }}
+
+{{- define "jdownloader.securityContext" -}}
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+{{- end }}
+
