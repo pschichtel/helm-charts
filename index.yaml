@@ -1101,6 +1101,16 @@ entries:
   jdownloader:
   - apiVersion: v2
     appVersion: 26.02.3
+    created: "2026-03-02T00:12:49.274777951Z"
+    description: A Helm chart for JDownloader
+    digest: 70053cad036197d5fca9234749905326d720482bdf6d2ad0b50f33840b1000f7
+    name: jdownloader
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/jdownloader-0.1.4/jdownloader-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 26.02.3
     created: "2026-03-02T00:06:09.444125727Z"
     description: A Helm chart for JDownloader
     digest: 0eb5d4fcbb22d40a5cb3afd4a31871a237efc63b81b4938e1037739bd8a58266
@@ -5697,4 +5707,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-02T00:06:09.445109687Z"
+generated: "2026-03-02T00:12:49.275485075Z"
