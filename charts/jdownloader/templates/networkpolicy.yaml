@@ -11,7 +11,9 @@ spec:
   policyTypes:
     - Ingress
     - Egress
-  ingress: []
+  {{- with .Values.networkPolicy.ingress }}
+  ingress: {{ . | toYaml | nindent 4 }}
+  {{- end }}
   egress:
     - to: {{- list .Values.networkPolicy.dnsSelector | toYaml | nindent 8 }}
       ports:

@@ -65,6 +65,7 @@ networkPolicy:
     podSelector:
       matchLabels:
         k8s-app: kube-dns
+  ingress: []
 
 storage:
   config:
