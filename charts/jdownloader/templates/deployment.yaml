@@ -29,7 +29,7 @@ spec:
         - name: init-docker-instance
           {{- include "jdownloader.image" . | nindent 10 }}
           {{- include "jdownloader.securityContext" . | nindent 10 }}
-          command: ['bash']
+          command: ['sh']
           args: ['-c', '/opt/base/bin/uuidgen > /.docker-instance/uuid']
           volumeMounts:
             - name: tmp
