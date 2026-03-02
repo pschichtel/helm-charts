@@ -25,6 +25,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: Always
       initContainers:
         - name: init-docker-instance
           {{- include "jdownloader.image" . | nindent 10 }}
