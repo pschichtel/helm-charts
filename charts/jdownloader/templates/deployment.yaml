@@ -63,9 +63,6 @@ spec:
             - name: tmp
               mountPath: /var/tmp
               subPath: var-tmp
-            - name: tmp
-              mountPath: /.docker-instance
-              subPath: docker-instance
             {{- range $name, $pvc := .Values.storage }}
             - name: {{ $name }}
               mountPath: {{ print "/" $name | quote }}
