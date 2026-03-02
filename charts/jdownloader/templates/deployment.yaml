@@ -25,19 +25,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      securityContext:
-        fsGroup: 1000
-        fsGroupChangePolicy: Always
-      initContainers:
-        - name: init-docker-instance
-          {{- include "jdownloader.image" . | nindent 10 }}
-          {{- include "jdownloader.securityContext" . | nindent 10 }}
-          command: ['sh']
-          args: ['-c', '/opt/base/bin/uuidgen > /.docker-instance/uuid']
-          volumeMounts:
-            - name: tmp
-              mountPath: /.docker-instance
-              subPath: docker-instance
       containers:
         - name: {{ .Chart.Name }}
           {{- include "jdownloader.image" . | nindent 10 }}
