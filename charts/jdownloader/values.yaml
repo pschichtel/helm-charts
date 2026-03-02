@@ -81,12 +81,11 @@ storage:
   output:
     existingPvc: null
     pvc:
-      spec:
-        accessModes:
-          - ReadWriteMany
-        resources:
-          requests:
-            storage: 100Gi
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 100Gi
     volumeMount:
       subPath: null
 
