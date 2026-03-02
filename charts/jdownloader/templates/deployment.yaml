@@ -36,12 +36,18 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
           env:
+            - name: USER_ID
+              value: '1000'
+            - name: GROUP_ID
+              value: '1000'
             - name: WEB_LISTENING_PORT
               value: {{ .Values.service.port | quote }}
             - name: WEB_AUDIO
