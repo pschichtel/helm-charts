@@ -28,7 +28,6 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           {{- include "jdownloader.image" . | nindent 10 }}
-          {{- include "jdownloader.securityContext" . | nindent 10 }}
           env:
             - name: USER_ID
               value: '1000'

@@ -60,15 +60,3 @@ image: {{ print $repo ":" (.Values.image.tag | default (print "v" .Chart.AppVers
 imagePullPolicy: {{ .Values.image.pullPolicy }}
 {{- end }}
 
-{{- define "jdownloader.securityContext" -}}
-securityContext:
-  runAsNonRoot: true
-  runAsUser: 1000
-  runAsGroup: 1000
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: false
-  capabilities:
-    drop:
-      - ALL
-{{- end }}
-
