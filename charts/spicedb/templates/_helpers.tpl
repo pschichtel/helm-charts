@@ -134,6 +134,26 @@ env:
       key: {{ .secretKey | required ".spicedb.grpcPresharedKey.value or .secretName is required!" | quote }}
       {{- end }}
       {{- end }}
+{{- with .Values.spicedb.otel }}
+{{- if .enabled }}
+- name: SPICEDB_OTEL_PROVIDER
+  value: {{ ternary "otlphttp" "otlpgrpc" .useHttp | quote }}
+- name: SPICEDB_OTEL_SERVICE_NAME
+  value: {{ .serviceName | quote }}
+- name: SPICEDB_OTEL_ENDPOINT
+  value: {{ .endpoint | quote }}
+- name: SPICEDB_OTEL_INSECURE
+  value: {{ .insecure | quote }}
+{{- with .sampleRatio }}
+- name: SPICEDB_OTEL_SAMPLE_RATIO
+  value: {{ . | quote }}
+{{- end }}
+{{- with .tracePropagator }}
+- name: SPICEDB_OTEL_TRACE_PROPAGATOR
+  value: {{ . | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- with .Values.extraEnv }}
 {{- . | toYaml | nindent 0 }}
 {{- end }}

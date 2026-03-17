@@ -78,6 +78,14 @@ spicedb:
     value: null
     secretName: null
     secretKey: null
+  otel:
+    enabled: false
+    serviceName: spicedb
+    endpoint: localhost:4317
+    insecure: false
+    useHttp: false
+    sampleRatio: null
+    tracePropagator: null
 
 metrics:
   enabled: true
