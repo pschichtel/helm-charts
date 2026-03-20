@@ -163,3 +163,14 @@ env:
 image: {{ print .Values.image.registry "/" .Values.image.repository ":" (.Values.image.tag | default (print "v" .Chart.AppVersion)) | quote }}
 imagePullPolicy: {{ .Values.image.pullPolicy }}
 {{- end }}
+
+{{- define "spicedb.securityContext" -}}
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+    - ALL
+{{- end }}
+

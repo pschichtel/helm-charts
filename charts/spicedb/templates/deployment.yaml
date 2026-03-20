@@ -36,26 +36,20 @@ spec:
       {{- if .Values.spicedb.dispatchClusterEnabled }}
       serviceAccountName: {{ include "spicedb.serviceAccountName" . }}
       {{- end }}
-      securityContext:
-        runAsNonRoot: true
       dnsPolicy: "ClusterFirst"
       terminationGracePeriodSeconds: 30
       restartPolicy: "Always"
       {{- if .Values.spicedb.datastore.engine }}
       initContainers:
         - name: migrate-db
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+          {{- include "spicedb.securityContext" . | nindent 10 }}
           {{- include "spicedb.containerImage" . | nindent 10 }}
           command: ["spicedb", "datastore", "migrate", "head"]
           {{- include "spicedb.env" . | nindent 10 }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+          {{- include "spicedb.securityContext" . | nindent 10 }}
           {{- include "spicedb.containerImage" . | nindent 10 }}
           command: ["spicedb", "serve"]
           {{- $grpcPort := 50051 }}
