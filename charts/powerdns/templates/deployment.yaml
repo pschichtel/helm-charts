@@ -88,7 +88,7 @@ spec:
           - name: config
             mountPath: /etc/powerdns/templates.d
             readOnly: true
-          {{- if and (eq .Values.powerdns.db.driver "gsqlite3") .Values.powerdns.db.sqlite.persistence.enabled }}
+          {{- if eq .Values.powerdns.db.driver "gsqlite3" }}
           - name: sqlite
             mountPath: {{ .Values.powerdns.db.sqlite.mountPath | quote }}
           {{- end }}
@@ -96,10 +96,14 @@ spec:
       - name: config
         configMap:
           name: {{ template "powerdns.fullname" . }}
-      {{- if and (eq .Values.powerdns.db.driver "gsqlite3") .Values.powerdns.db.sqlite.persistence.enabled }}
+      {{- if eq .Values.powerdns.db.driver "gsqlite3" }}
       - name: sqlite
+        {{- if .Values.powerdns.db.sqlite.persistence.enabled }}
         persistentVolumeClaim:
           claimName: {{ default (print (include "powerdns.fullname" .) "-sqlite") .Values.powerdns.db.sqlite.persistence.existingClaim | quote }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
