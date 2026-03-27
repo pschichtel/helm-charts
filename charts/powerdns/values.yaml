@@ -78,10 +78,31 @@ powerdns:
     port:
       value: 3306
     name: {}
+    # Optional for some drivers (e.g. gsqlite3)
     username: {}
+    # Optional for some drivers (e.g. gsqlite3)
     password: {}
+    sqlite:
+      # When `powerdns.db.driver` is set to `gsqlite3`, PowerDNS uses a local sqlite database file.
+      # The chart will set `gsqlite3-database` to `mountPath/databaseFile`.
+      mountPath: /var/lib/powerdns
+      databaseFile: pdns.sqlite3
+      persistence:
+        # If enabled, a PVC is created (or an existing claim is mounted) and attached to `mountPath`.
+        enabled: false
+        # If set, this claim is mounted instead of creating a new one.
+        existingClaim: ""
+        annotations: {}
+        accessModes:
+          - ReadWriteOnce
+        size: 1Gi
+        # storageClass: "-" disables dynamic provisioning (sets `storageClassName: ""`).
+        storageClass: ""
     configTemplate: |
       launch={{ .Values.powerdns.db.driver }}
+      {{- if eq .Values.powerdns.db.driver "gsqlite3" }}
+      gsqlite3-database={{ printf "%s/%s" .Values.powerdns.db.sqlite.mountPath .Values.powerdns.db.sqlite.databaseFile }}
+      {{- else }}
       {{ .Values.powerdns.db.driver }}-host={{ print "{{ PDNS_DB_HOST }}" }}
       {{ .Values.powerdns.db.driver }}-port={{ print "{{ PDNS_DB_PORT }}" }}
       {{ .Values.powerdns.db.driver }}-dbname={{ print "{{ PDNS_DB_NAME }}" }}
@@ -90,5 +111,6 @@ powerdns:
       {{- end }}
       {{- if .Values.powerdns.db.password }}
       {{ .Values.powerdns.db.driver }}-password={{ print "{{ PDNS_DB_PASSWORD }}" }}
+      {{- end }}
       {{- end }}
   additionalConfig: ''
