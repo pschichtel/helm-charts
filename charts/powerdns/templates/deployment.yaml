@@ -4,8 +4,11 @@ metadata:
   name: {{ template "powerdns.fullname" . }}
   labels:
     {{- include "powerdns.labels" . | nindent 4 }}
+{{- if and (eq .Values.powerdns.db.driver "gsqlite3") (ne (int .Values.replicaCount) 1) }}
+{{- fail "powerdns: when powerdns.db.driver=gsqlite3, replicaCount must be 1 (sqlite cannot be safely shared across replicas). Use other database alternatives for high availability." }}
+{{- end }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ int .Values.replicaCount }}
   selector:
     matchLabels:
       {{- include "powerdns.selectorLabels" . | nindent 6 }}
