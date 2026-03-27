@@ -1,0 +1,24 @@
+{{- if and (eq .Values.powerdns.db.driver "gsqlite3") .Values.powerdns.db.sqlite.persistence.enabled (not .Values.powerdns.db.sqlite.persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "powerdns.fullname" . }}-sqlite
+  labels:
+    {{- include "powerdns.labels" . | nindent 4 }}
+  {{- with .Values.powerdns.db.sqlite.persistence.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+    {{- toYaml .Values.powerdns.db.sqlite.persistence.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.powerdns.db.sqlite.persistence.size | quote }}
+  {{- if eq (.Values.powerdns.db.sqlite.persistence.storageClass | toString) "-" }}
+  storageClassName: ""
+  {{- else if .Values.powerdns.db.sqlite.persistence.storageClass }}
+  storageClassName: {{ .Values.powerdns.db.sqlite.persistence.storageClass | quote }}
+  {{- end }}
+{{- end }}
+
