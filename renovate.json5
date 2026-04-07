@@ -1,29 +1,25 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "customManagers": [
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  customManagers: [
     {
-      "fileMatch": ["(^|/)Chart\\.yaml$"],
-      "matchStrings": [
-        "#\\s?renovate: image=(?<depName>.*?)\\s?appVersion:\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)"
+      customType: 'regex',
+      managerFilePatterns: [
+        '/(^|/)Chart\\.yaml$/',
       ],
-      "datasourceTemplate": "docker"
+      matchStrings: [
+        '#\\s?renovate: image=(?<depName>.*?)\\s?appVersion:\\s?\\"?(?<currentValue>[\\w+\\.\\-]*)',
+      ],
+      datasourceTemplate: 'docker',
     },
     {
-      "fileMatch": ["(^|/)Chart\\.yaml$"],
-      "matchStrings": [
-        "#\\s?renovate: github-releases=(?<depName>.*?)\\s?appVersion:\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)"
+      customType: 'regex',
+      managerFilePatterns: [
+        '/(^|/)Chart\\.yaml$/',
       ],
-      "datasourceTemplate": "github-releases"
+      matchStrings: [
+        '#\\s?renovate: github-releases=(?<depName>.*?)\\s?appVersion:\\s?\\"?(?<currentValue>[\\w+\\.\\-]*)',
+      ],
+      datasourceTemplate: 'github-releases',
     },
   ],
-  // "packageRules": [
-  //   {
-  //     "matchPackageNames": ["keycloak/keycloak"],
-  //     "postUpgradeTasks": {
-  //       "commands": [
-  //         "cd charts/keycloak-operator-crds && ./update.sh",
-  //       ]
-  //     }
-  //   },
-  // ],
 }
