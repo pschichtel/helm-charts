@@ -59,6 +59,16 @@ entries:
     version: 0.1.0
   coturn:
   - apiVersion: v2
+    appVersion: 4.10.0-r0
+    created: "2026-04-14T20:54:50.617023811Z"
+    description: A Helm chart for coturn
+    digest: 392dc3a7f649b190271877d48e567229bff856d44ceecfc7f2563c956f9000d7
+    name: coturn
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/coturn-1.5.0/coturn-1.5.0.tgz
+    version: 1.5.0
+  - apiVersion: v2
     appVersion: 4.9.0-r0
     created: "2026-02-26T23:24:12.769603504Z"
     description: A Helm chart for coturn
@@ -6058,4 +6068,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-13T23:07:01.846093582Z"
+generated: "2026-04-14T20:54:50.617858097Z"
