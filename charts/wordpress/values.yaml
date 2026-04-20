@@ -24,7 +24,9 @@ fullnameOverride: ""
 annotations: {}
 
 # annotations on pods
-podAnnotations: {}
+podAnnotations:
+  fsGroup: 33
+  fsGroupChangePolicy: OnRootMismatch
 
 podSecurityContext: {}
 # fsGroup: 2000
