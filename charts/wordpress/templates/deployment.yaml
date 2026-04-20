@@ -41,7 +41,7 @@ spec:
             - |
               if ! [ -e /mnt/index.php ]
               then
-                cp -va /var/www/html/. /mnt
+                cp -dR /var/www/html/. /mnt
               fi
           volumeMounts:
             - name: data
