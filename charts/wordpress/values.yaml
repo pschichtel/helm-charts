@@ -24,12 +24,11 @@ fullnameOverride: ""
 annotations: {}
 
 # annotations on pods
-podAnnotations:
+podAnnotations: {}
+
+podSecurityContext:
   fsGroup: 33
   fsGroupChangePolicy: OnRootMismatch
-
-podSecurityContext: {}
-# fsGroup: 2000
 
 service:
   type: ClusterIP
