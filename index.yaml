@@ -5659,6 +5659,16 @@ entries:
   wordpress:
   - apiVersion: v2
     appVersion: 6.9.4
+    created: "2026-04-20T22:50:20.209060663Z"
+    description: A Helm chart for WordPress
+    digest: b238a81e6419f4c5fbb8d023d5d666b3c92c403eb30c9e7775881b80a6462633
+    name: wordpress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.10.10/wordpress-0.10.10.tgz
+    version: 0.10.10
+  - apiVersion: v2
+    appVersion: 6.9.4
     created: "2026-04-20T22:34:14.191204008Z"
     description: A Helm chart for WordPress
     digest: 3d214d1194f1bce2fd242409d1eda36f4b99bca902f3945b780875d190385faa
@@ -6128,4 +6138,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-20T22:34:14.192976789Z"
+generated: "2026-04-20T22:50:20.20976055Z"
