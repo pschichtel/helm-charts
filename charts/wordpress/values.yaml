@@ -26,8 +26,9 @@ annotations: {}
 # annotations on pods
 podAnnotations: {}
 
-podSecurityContext: {}
-# fsGroup: 2000
+podSecurityContext:
+  fsGroup: 33
+  fsGroupChangePolicy: OnRootMismatch
 
 service:
   type: ClusterIP
