@@ -45,6 +45,11 @@ ingress:
   extraHosts: []
   tls: []
 
+adminIngress:
+  enabled: false
+  extraHosts: []
+  tls: []
+
 additionalOptions: {}
 
 serviceMonitor:

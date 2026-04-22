@@ -1,25 +1,20 @@
-{{- if .Values.ingress.enabled }}
+{{- if .Values.adminIngress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "keycloak.fullname" . }}
+  name: {{ include "keycloak.fullname" . }}-admin
   labels:
     {{- include "keycloak.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.adminIngress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- with .Values.ingress.className }}
+  {{- with .Values.adminIngress.className }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- $hosts := list (index (regexSplit "/" .Values.hostname -1) 2) }}
-  {{- if not .Values.adminIngress.enabled }}
-  {{- with .Values.adminHostname }}
-  {{- $hosts = append $hosts (index (regexSplit "/" .  -1) 2) }}
-  {{- end }}
-  {{- end }}
-  {{- $hosts = concat $hosts .Values.ingress.extraHosts }}
+  {{- $hosts := list (index (regexSplit "/" (.Values.adminHostname | required "adminHostname must be set!") -1) 2) }}
+  {{- $hosts = concat $hosts .Values.adminIngress.extraHosts }}
   rules:
     {{- range $host := $hosts }}
     - host: {{ $host | quote }}
@@ -33,7 +28,7 @@ spec:
                 port:
                   name: http 
     {{- end }}
-  {{- with .Values.ingress.tls }}
+  {{- with .Values.adminIngress.tls }}
   tls: {{- . | toYaml | nindent 4 }}
   {{- end }}
 {{- end }}
