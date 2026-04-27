@@ -11,6 +11,14 @@ spec:
   bootstrapAdmin: {{- . | toYaml | nindent 4 }}
   {{- end }}
   db: {{- .Values.db | required ".db is required!" | toYaml | nindent 4 -}}
+  {{- with .Values.env }}
+  env:
+  {{- $envList := list }}
+  {{- range $name, $env := . }}
+    {{- $envList = append $envList (set (deepCopy $env) "name" $name) }}
+  {{- end }}
+  {{- $envList | toYaml | nindent 2 }}
+  {{- end }}
   {{- with .Values.image }}
   {{- if .digest }}
   image: {{ print .repository "@" .digest | quote }}
