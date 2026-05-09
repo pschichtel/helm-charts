@@ -3664,6 +3664,16 @@ entries:
     version: 0.3.0
   nextcloud-notify_push:
   - apiVersion: v2
+    appVersion: 1.3.2
+    created: "2026-05-09T14:52:56.665482873Z"
+    description: A Helm chart for nextcloud's push_notify server
+    digest: fd069b8ef3606e12ce9901a871223ffe336b59a4da50fde918c53f84e729ed6b
+    name: nextcloud-notify_push
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/nextcloud-notify_push-0.4.5/nextcloud-notify_push-0.4.5.tgz
+    version: 0.4.5
+  - apiVersion: v2
     appVersion: 1.3.1
     created: "2026-03-14T00:40:41.903910539Z"
     description: A Helm chart for nextcloud's push_notify server
@@ -6198,4 +6208,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-09T14:50:58.391290896Z"
+generated: "2026-05-09T14:52:56.667555348Z"
