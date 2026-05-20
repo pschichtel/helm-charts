@@ -4980,6 +4980,16 @@ entries:
     version: 0.3.0
   spicedb:
   - apiVersion: v2
+    appVersion: 1.53.0
+    created: "2026-05-20T08:08:06.17456649Z"
+    description: A Helm chart for Authzed's SpiceDB
+    digest: 3d0b9937b19f577ea8e39b585cdd6bd820d832fa9a9593df2e1bdbdfae2f4cb6
+    name: spicedb
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/spicedb-0.6.0/spicedb-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
     appVersion: 1.52.0
     created: "2026-05-04T17:07:21.19975502Z"
     description: A Helm chart for Authzed's SpiceDB
@@ -6218,4 +6228,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-09T14:54:05.865518865Z"
+generated: "2026-05-20T08:08:06.177133246Z"
