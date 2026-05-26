@@ -188,3 +188,6 @@ mediawiki:
     content: null
   extraVolumeMounts: []
   probesEnabled: true
+
+nginx:
+  extraVolumeMounts: []

@@ -136,6 +136,9 @@ spec:
               subPath: 'types.conf'
               mountPath: /etc/nginx/conf.d/types.conf
               readOnly: true
+            {{- with .Values.nginx.extraVolumeMounts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
         {{- if .Values.exporter.enabled }}
         - name: exporter
           securityContext:
