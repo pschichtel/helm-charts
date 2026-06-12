@@ -50,7 +50,7 @@ data:
         listen {{ .Values.deployment.port }} default_server;
         listen [::]:{{ .Values.deployment.port }} default_server;
 
-        root /var/www/html;
+        root /var/www/html/public_html;
         server_name _;
 
         index index.php;

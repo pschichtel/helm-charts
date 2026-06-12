@@ -2,7 +2,7 @@ apiVersion: v2
 name: roundcube
 description: Helm Chart for Roundcube
 version: 0.0.1
-appVersion: "1.6.9"
+appVersion: "1.7.1"
 type: application
 
 sources:
