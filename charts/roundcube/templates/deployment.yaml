@@ -43,9 +43,6 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- end }}
-      {{- if or .Values.serviceAccount.create .Values.serviceAccount.name }}
-      serviceAccountName: {{ include "roundcube.serviceAccountName" . }}
-      {{- end }}
       containers:
         - name: roundcubemail
           image: {{ tpl .Values.image . }}
