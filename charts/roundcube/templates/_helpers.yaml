@@ -9,20 +9,6 @@ ssl://
 {{- end -}}
 {{- end -}}
 
-# inspired by https://stackoverflow.com/a/67523275/2400785
-{{- define "roundcube.desKey" -}}
-{{- if .Values.config.desKey }}
-{{- .Values.config.desKey -}}
-{{- else -}}
-{{- $lookupResult := (lookup "v1" "Secret" .Release.Namespace (include "common.names.fullname" . )).data -}}
-{{- if $lookupResult -}}
-{{- (index $lookupResult "desKey" | b64dec) | default (randAlphaNum 64) -}}
-{{- else -}}
-{{- randAlphaNum 64 -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
 {{- define "roundcube.plugins.list" -}}
 {{- $pluginList := list -}}
 {{- range $plugin, $settings := .Values.config.plugins -}}

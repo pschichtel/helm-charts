@@ -77,8 +77,14 @@ spec:
             - name: ROUNDCUBEMAIL_DES_KEY
               valueFrom:
                 secretKeyRef:
+                  {{- $desKey := .Values.config.desKey | required "config.desKey is required!" }}
+                  {{- if kindIs $desKey }}
                   name: {{ include "common.names.fullname" . }}
                   key: desKey
+                  {{- else }}
+                  name: {{ $desKey.name }}
+                  key: {{ $desKey.key }}
+                  {{- end }}
             - name: ROUNDCUBEMAIL_LANGUAGE
               value: "{{ .Values.config.defaultLanguage }}"
             - name: ROUNDCUBEMAIL_PLUGINS
