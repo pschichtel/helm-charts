@@ -84,13 +84,12 @@ spec:
               value: "{{ .Values.config.defaultSkin }}"
             - name: ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE
               value: "{{ .Values.config.uploadMaxFilesize }}"
-            {{- if eq .Values.database.source "external" }}
             - name: ROUNDCUBEMAIL_DB_TYPE
-              value: "{{ .Values.externalDatabase.type }}"
+              value: "{{ .Values.database.type }}"
             - name: ROUNDCUBEMAIL_DB_HOST
-              value: "{{ required "No database host configured" .Values.externalDatabase.host }}"
+              value: "{{ required "No database host configured" .Values.database.host }}"
             - name: ROUNDCUBEMAIL_DB_PORT
-              value: "{{ .Values.externalDatabase.port }}"
+              value: "{{ .Values.database.port }}"
             - name: ROUNDCUBEMAIL_DB_USER
               valueFrom:
                 secretKeyRef:
@@ -102,27 +101,7 @@ spec:
                   name: {{ include "roundcube.fullname" . }}
                   key: dbPassword
             - name: ROUNDCUBEMAIL_DB_NAME
-              value: "{{ .Values.externalDatabase.name }}"
-            {{- else if eq .Values.database.source "zalando-postgres" }}
-            - name: ROUNDCUBEMAIL_DB_TYPE
-              value: pgsql
-            - name: ROUNDCUBEMAIL_DB_HOST
-              value: "{{ include "roundcube.fullname" . }}-db"
-            - name: ROUNDCUBEMAIL_DB_PORT
-              value: "5432"
-            - name: ROUNDCUBEMAIL_DB_USER
-              valueFrom:
-                secretKeyRef:
-                  name: "roundcube-owner-user.{{ include "roundcube.fullname" . }}-db.credentials.postgresql.acid.zalan.do"
-                  key: username
-            - name: ROUNDCUBEMAIL_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: "roundcube-owner-user.{{ include "roundcube.fullname" . }}-db.credentials.postgresql.acid.zalan.do"
-                  key: password
-            - name: ROUNDCUBEMAIL_DB_NAME
-              value: roundcube
-            {{- end }}
+              value: "{{ .Values.database.name }}"
             - name: COMPOSER_ALLOW_SUPERUSER
               value: "1"
             {{- with .Values.deployment.additionalEnv }}
@@ -186,7 +165,6 @@ spec:
         {{- with .Values.deployment.additionalVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-
 
       {{- with .Values.deployment.affinity }}
       affinity: {{- . | toYaml | nindent 8 }}

@@ -89,16 +89,9 @@ config:
     ;pm.max_children=200
     ;pm.status_path=/status
 
-## Configure database creation/usage
-database:
-  ## Which database source should be used
-  ## Supported values:
-  ##   * external:         Do not create a database, but use an existing external database. See `externalDatabase` for further configuration.
-  source: external
-
 ## Configuration for an external database (not deployed within this chart)
 ## When working with a NetworkPolicy, add an egress rule to networkPolicy.egress.additionalRules to allow access to the database.
-externalDatabase:
+database:
   ## Type of the external database. supported: mysql, pgsql, sqlite
   type: pgsql
 
