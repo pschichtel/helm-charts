@@ -2,16 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "roundcube.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.configMap.additionalLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.configMap.additionalLabels "context" $) | nindent 4 }}
-    {{- end }}
-  annotations:
-    {{- if .Values.configMap.additionalAnnotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.configMap.additionalAnnotations "context" $) | nindent 4 }}
-    {{- end }}
+    {{- include "roundcube.labels" . | nindent 4 }}
 data:
   php.ini: |
     {{- .Values.config.customPhpConfig | default "" | nindent 4 }}

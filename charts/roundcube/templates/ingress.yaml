@@ -3,29 +3,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "roundcube.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-    {{- if .Values.ingress.additionalLabels }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.ingress.additionalLabels "context" $) | nindent 4 }}
-    {{- end }}
+    {{- include "roundcube.labels" . | nindent 4 }}
+  {{- with .Values.ingress.additionalAnnotations }}
   annotations:
-    {{- if and .Values.ingress.useTLS .Values.ingress.tls.includeAcmeAnnotation }}
-    kubernetes.io/tls-acme: "true"
-    {{- end }}
-    {{- if .Values.ingress.class }}
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
-    {{- end }}
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
-    nginx.ingress.kubernetes.io/session-cookie-name: "roundcube_sessaffinity"
-    nginx.ingress.kubernetes.io/proxy-body-size: {{ .Values.config.uploadMaxFilesize }}
-    {{ if not (eq .Values.ingress.path "/") }}
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    {{ end }}
-    {{- if .Values.ingress.additionalAnnotations }}
-    {{- include "common.tplvalues.render" ( dict "value" .Values.ingress.additionalAnnotations "context" $) | nindent 4 }}
-    {{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   {{- if .Values.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ingress.ingressClassName }}
@@ -38,7 +22,7 @@ spec:
             pathType: {{ .Values.ingress.pathType }}
             backend:
               service:
-                name: {{ include "common.names.fullname" . }}
+                name: {{ include "roundcube.fullname" . }}
                 port:
                   number: {{ .Values.service.port }}
   {{- if .Values.ingress.useTLS }}
@@ -48,7 +32,7 @@ spec:
       {{- if .Values.ingress.tls.secretName }}
       secretName: {{ .Values.ingress.tls.secretName }}
       {{- else }}
-      secretName: {{ include "common.names.fullname" . }}-tls
+      secretName: {{ include "roundcube.fullname" . }}-tls
       {{- end }}
   {{- end }}
 {{- end -}}

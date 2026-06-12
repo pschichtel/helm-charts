@@ -158,28 +158,10 @@ smtp:
   password: "%p"
 
 
-## Additional configuration for the ConfigMap resource
-configMap:
-  ## Additional labels for the ConfigMap resource
-  additionalLabels: {}
-
-  ## Additional annotations for the ConfigMap resource
-  additionalAnnotations: {}
-
-
-## Additional configuration for the Secret resource
-secret:
-  ## Additional labels for the Secret resource
-  additionalLabels: {}
-
-  ## Additional annotations for the Secret resource
-  additionalAnnotations: {}
-
-
 ## Additional configuration for the Deployment resource
 deployment:
   ## Number of instances of Roundcube to be started
-  replicas: 2
+  replicas: 1
 
   ## Deployment strategy (see https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/deployment-v1/#DeploymentSpec)
   strategy:
@@ -194,14 +176,8 @@ deployment:
     ## You can refer to existing ImagePullSecrets as follows:
     # - name: my-custom-secret
 
-  ## Additional labels for the Deployment resource
-  additionalLabels: {}
-
   ## Additional labels for the Pod resource
   additionalPodLabels: {}
-
-  ## Additional annotations for the Deployment resource
-  additionalAnnotations: {}
 
   ## Additional annotations for the Pod resource
   additionalPodAnnotations: {}
@@ -261,10 +237,6 @@ service:
   ## Service port for HTTP
   port: 80
 
-
-  ## Additional labels for the Service resource
-  additionalLabels: {}
-
   ## Additional annotations for the Service resource
   additionalAnnotations: {}
 
@@ -293,9 +265,6 @@ ingress:
     ## Configure secret name, e.g., to re-use an existing secret
     secretName:
 
-  ## Additional labels for the Ingress resource
-  additionalLabels: {}
-
   ## Additional annotations for the Ingress resource
   additionalAnnotations: {}
 
@@ -307,13 +276,6 @@ pdb:
 
   minAvailable: 1
   maxUnavailable: ""
-
-
-  ## Additional labels for the PodDisruptionBudget resource
-  additionalLabels: {}
-
-  ## Additional annotations for the PodDisruptionBudget resource
-  additionalAnnotations: {}
 
 
 ## NetworkPolicy configuration
