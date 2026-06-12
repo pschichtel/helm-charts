@@ -4661,6 +4661,24 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/restic-forget-0.1.0/restic-forget-0.1.0.tgz
     version: 0.1.0
+  roundcube:
+  - apiVersion: v2
+    appVersion: 1.7.1
+    created: "2026-06-12T20:39:43.805342098Z"
+    description: Helm Chart for Roundcube
+    digest: dbe2f2b4694c15e98e38834172af46444a7514b24e4b4e34b772b193a102254f
+    keywords:
+    - roundcube
+    - roundcubemail
+    - webmail
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail-docker
+    - https://github.com/pschichtel/helm-charts
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/roundcube-0.0.1/roundcube-0.0.1.tgz
+    version: 0.0.1
   rustdesk-server-oss:
   - apiVersion: v2
     appVersion: 1.1.15
@@ -6338,4 +6356,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-11T23:48:12.105291698Z"
+generated: "2026-06-12T20:39:43.806019895Z"
