@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.io/icewind1991/notify_push
+  repository: ghcr.io/nextcloud/notify_push
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
