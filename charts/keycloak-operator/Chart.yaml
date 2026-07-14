@@ -9,5 +9,5 @@ appVersion: 26.7.0
 dependencies:
 - name: keycloak-operator-crds
   repository: https://schich.tel/helm-charts
-  version: 1.7.0
+  version: 1.7.1
   condition: crds.enabled
