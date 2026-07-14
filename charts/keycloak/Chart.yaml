@@ -9,5 +9,5 @@ appVersion: 26.7.0
 dependencies:
 - name: keycloak-operator
   repository: https://schich.tel/helm-charts
-  version: 0.8.1
+  version: 0.8.0
   condition: keycloak-operator.enabled
