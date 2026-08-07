@@ -7,7 +7,7 @@ This is a collection of Helm Charts that I have built from scratch or forked fro
 
 The primary focus of all of these charts is to cover my personal use-cases, however anyone is free to use them. **Pull requests, issues and discussions** are always welcome!
 
-**All charts that exist on the `master` branch should work and can be considered maintained, even if they have not seen any changes recently.**
+**All charts that exist on the `main` branch should work and can be considered maintained, even if they have not seen any changes recently.**
 If a chart has unreleased modifications that you want, please just ask for a release or open a PR to bump the version.
 
 **Pull requests, issues and discussions are welcome!**
