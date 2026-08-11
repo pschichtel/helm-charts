@@ -3,6 +3,6 @@ name: coturn
 description: A Helm chart for coturn
 
 type: application
-version: 1.11.0
+version: 1.11.1
 # renovate: image=ghcr.io/coturn/coturn
-appVersion: "4.17.0-r0"
+appVersion: "4.17.2-r0"
