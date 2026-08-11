@@ -59,6 +59,16 @@ entries:
     version: 0.1.0
   coturn:
   - apiVersion: v2
+    appVersion: 4.17.2-r0
+    created: "2026-08-11T14:24:11.1676329Z"
+    description: A Helm chart for coturn
+    digest: fdfdedab637b2ddc17bb1bd5b77152227d86273eef9863ecd283c212b0c0f03f
+    name: coturn
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/coturn-1.11.1/coturn-1.11.1.tgz
+    version: 1.11.1
+  - apiVersion: v2
     appVersion: 4.17.0-r0
     created: "2026-08-09T15:30:41.611065571Z"
     description: A Helm chart for coturn
@@ -4953,6 +4963,23 @@ entries:
     version: 0.1.0
   roundcube:
   - apiVersion: v2
+    appVersion: 1.7.3
+    created: "2026-08-11T14:24:11.345357087Z"
+    description: Helm Chart for Roundcube
+    digest: 1646aac933e1bdf3fcc3c362911333d8f77ebf50a33bcf4f2aacefe346b6c8aa
+    keywords:
+    - roundcube
+    - roundcubemail
+    - webmail
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail-docker
+    - https://github.com/pschichtel/helm-charts
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/roundcube-0.1.0/roundcube-0.1.0.tgz
+    version: 0.1.0
+  - apiVersion: v2
     appVersion: 1.7.1
     created: "2026-06-12T20:39:43.805342098Z"
     description: Helm Chart for Roundcube
@@ -6686,4 +6713,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-09T15:30:41.61285092Z"
+generated: "2026-08-11T14:24:11.346291136Z"
