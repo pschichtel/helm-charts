@@ -150,7 +150,9 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_NAME" "Key" "postgresDatabase" "Value" .Values.postgresql.auth.database "Root" .) }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_USERNAME" "Key" "postgresUsername" "Value" .Values.postgresql.auth.username "Root" .) }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_PASSWORD" "Key" "postgresPassword" "Value" .Values.postgresql.auth.password "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "A_REDIS_PASSWORD" "Key" "redisPassword" "Value" .Values.redis.password "Optional" (not .Values.redis.auth) "Root" .) }}
+{{- if .Values.redis.auth }}
+{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "A_REDIS_PASSWORD" "Key" "redisPassword" "Value" .Values.redis.password "Root" .) }}
+{{- end }}
 - name: REDIS_URL
 {{- $redisAddr := print (tpl .Values.redis.host .) ":" .Values.redis.port }}
 {{- if .Values.redis.auth }}
