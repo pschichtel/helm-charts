@@ -64,6 +64,14 @@ spec:
         {{- end }}  
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.image }}
+          {{- if .digest }}
+          image: {{ print .registry "/" .repository "@" .digest | quote }}
+          {{- else }}
+          image: {{ print .registry "/" .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
+          {{- end }}
+          imagePullPolicy: {{ ..pullPolicy }}
+          {{- end }}
           command: ['web-entrypoint.sh']
           args: ['bin/rails', 'server', '-p', '3000', '-b', '::']
           envFrom:
@@ -72,8 +80,6 @@ spec:
             {{- include "dawarich.env" . | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -139,6 +145,14 @@ spec:
         {{ include "dawarich.initContainers" . | nindent 10 }}
       containers:
         - name: {{ .Chart.Name }}-sidekiq
+          {{- with .Values.image }}
+          {{- if .digest }}
+          image: {{ print .registry "/" .repository "@" .digest | quote }}
+          {{- else }}
+          image: {{ print .registry "/" .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
+          {{- end }}
+          imagePullPolicy: {{ ..pullPolicy }}
+          {{- end }}
           command: ['sidekiq-entrypoint.sh']
           envFrom:
             {{- include "dawarich.envFrom" . | nindent 12 }}
@@ -146,8 +160,6 @@ spec:
             {{- include "dawarich.env" . | nindent 12 }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
           livenessProbe:
             {{- toYaml .Values.sidekiq.livenessProbe | nindent 12 }}
           readinessProbe:
