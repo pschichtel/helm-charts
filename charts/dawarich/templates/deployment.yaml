@@ -16,7 +16,7 @@ spec:
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
-        config-hash: {{ include (print $.Template.BasePath "/config-map.yaml") . | sha256sum }}
+        config-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         secret-hash: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
       labels:
         {{- include "dawarich.labels" . | nindent 8 }}
@@ -121,7 +121,7 @@ spec:
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
-        config-hash: {{ include (print $.Template.BasePath "/config-map.yaml") . | sha256sum }}
+        config-hash: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         secret-hash: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
       labels:
         {{- include "dawarich.labelsSidekiq" . | nindent 8 }}
