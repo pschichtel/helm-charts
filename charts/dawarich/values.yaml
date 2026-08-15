@@ -1,0 +1,261 @@
+# Default values for dawarich.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: docker.io/freikin/dawarich
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+secret:
+  create: true
+  stringData:
+    keyBase: changeme
+    postgresHost: null
+    postgresPort: null
+    postgresDatabase: dawarich
+    postgresUsername: dawarich
+    postgresPassword: changeme
+    redisPassword: null
+    photonApiKey: null
+    geoapifyApiKey: null
+    oidcClientId: null
+    oidcClientSecret: null
+
+keyBase:
+  key: keyBase
+
+env:
+  minMinutesSpentInCity: "60"
+  timeZone: "Europe/Berlin"
+  backgroundProcessingConcurrency: "10"
+  applicationProtocol: "http"
+  distanceUnit: "km"
+  prometheusExporterEnabled: "false"
+  prometheusExporterHost: "127.0.0.1"
+  prometheusExporterPort: "9394"
+  railsEnv: "production"
+  railsLogToStdout: "true"
+  photonApiHost: ""
+  photonApiUseHttps: ""
+
+# Optional: Specify an existing secret to load all environment variables from
+existingEnvSecret: null
+
+# See https://dawarich.app/docs/tutorials/reverse-geocoding
+# Photon and Geoapify are mutually exclusive
+photonApiKey:
+  key: photonApiKey
+
+geoapifyApiKey:
+  key: geoapifyApiKey
+
+# OIDC (OpenID Connect) authentication configuration
+oidc:
+  enabled: false
+  providerName: "OpenID Connect"
+
+  clientId:
+    key: oidcClientId
+  clientSecret:
+    key: oidcClientSecret
+
+  issuer: ""
+  redirectUri: ""
+
+  autoRegister: false
+  allowEmailPasswordRegistration: true
+
+dawarich:
+  replicaCount: 1
+  hosts:
+    - "dawarich.example.org"
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 500m
+    #   memory: 2Gi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+sidekiq:
+  replicaCount: 1
+
+  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  livenessProbe:
+    exec:
+      command:
+        - "sh"
+        - "-c"
+        - "pgrep -f sidekiq"
+  readinessProbe:
+    exec:
+      command:
+        - "sh"
+        - "-c"
+        - "pgrep -f sidekiq"
+  startupProbe:
+    exec:
+      command:
+        - "sh"
+        - "-c"
+        - "pgrep -f sidekiq"
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 10
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 256Mi
+    # requests:
+    #   cpu: 500m
+    #   memory: 2Gi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+persistence:
+  public:
+    # This volume mounts to /var/app/public
+    enabled: true
+    existingClaim: ""
+    annotations: []
+    accessMode: "ReadWriteOnce"
+    storageClass: ""
+    size: 10Gi
+  watched:
+    # This volume mounts to /var/app/tmp/imports/watched
+    enabled: true
+    existingClaim: ""
+    annotations: []
+    accessMode: "ReadWriteOnce"
+    storageClass: ""
+    size: 10Gi
+  storage:
+    # This volume mounts to /var/app/storage
+    enabled: true
+    existingClaim: ""
+    annotations: []
+    accessMode: "ReadWriteOnce"
+    storageClass: ""
+    size: 5Gi
+
+postgresql:
+  host: '{{ $.Release.Name }}-postgresql'
+  port: 5432
+
+  auth:
+    database:
+      key: postgresDatabase
+    username:
+      key: postgresUsername
+    password:
+      key: postgresPassword
+
+redis:
+  host: '{{ .Release.Name }}-bundled-redis'
+  port: 6379
+  auth: true
+  password:
+    key: redisPassword
+
+bundled-redis:
+  enabled: true
+
+  auth: true
+  existingSecret: '{{ include "dawarich.secretName" . }}'
+  authKey: redisPassword
+  haproxy:
+    enabled: false
+  exporter:
+    enabled: false
+  hardAntiAffinity: false
+
+
+# This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 3000
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Additional volumes on the output Deployment definition.
+extraVolumes: []
+
+# Additional volumeMounts on the output Deployment definition.
+extraVolumeMounts: []
