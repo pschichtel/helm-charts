@@ -532,6 +532,18 @@ entries:
   dawarich:
   - apiVersion: v2
     appVersion: 1.7.5
+    created: "2026-08-15T16:12:59.077881182Z"
+    description: Self-hosted alternative to Google Location History
+    digest: a30dda5ed80d3b8a83af3109e5a6dfcc2e09a4aa04090017c61d7c88ba64f470
+    name: dawarich
+    sources:
+    - https://dawarich.app
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/dawarich-0.1.2/dawarich-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: 1.7.5
     created: "2026-08-15T16:00:07.520913425Z"
     description: Self-hosted alternative to Google Location History
     digest: 228bd67daa23e575f0ab4d444312ff56d6c5b91c21fc4f828b314e3c5c955256
@@ -6738,4 +6750,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-15T16:00:07.521726646Z"
+generated: "2026-08-15T16:12:59.078398271Z"
