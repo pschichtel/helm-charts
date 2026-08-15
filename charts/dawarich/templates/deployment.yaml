@@ -30,38 +30,6 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        {{ include "dawarich.initContainers" . | nindent 8 }}
-        {{- if .Values.postgresql.enabled }}
-        - name: postgis-init
-          image: bitnami/postgresql:latest
-          command:
-            - /bin/sh
-            - -c
-            - |
-              set -e
-              psql -d {{ .Values.postgresql.auth.database }} -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-          env:
-            - name: PGHOST
-              value: {{ include "dawarich.fullname" . }}-postgresql
-            - name: PGUSER
-              value: postgres
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{- if .Values.postgresql.auth.existingSecret }}
-                    {{ .Values.postgresql.auth.existingSecret }}
-                  {{- else }}
-                    {{ $.Release.Name }}-postgresql
-                  {{- end }}
-                  key: {{- if .Values.postgresql.auth.secretKeys.adminPasswordKey }}
-                    {{ .Values.postgresql.auth.secretKeys.adminPasswordKey }}
-                  {{- else }}
-                    postgres-password
-                  {{- end }}
-            - name: DB_USER
-              value: {{ .Values.postgresql.auth.username }}
-        {{- end }}  
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.image }}
@@ -141,8 +109,6 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-        {{ include "dawarich.initContainers" . | nindent 10 }}
       containers:
         - name: {{ .Chart.Name }}-sidekiq
           {{- with .Values.image }}

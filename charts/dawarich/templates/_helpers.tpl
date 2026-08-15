@@ -179,16 +179,6 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 {{- end }}
 
-{{- define "dawarich.initContainers" }}
-- name: wait-for-postgres
-  image: busybox
-  env:
-    {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_HOST" "Key" "postgresHost" "Value" .Values.postgresql.host "Root" .) | nindent 4 }}
-    {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_PORT" "Key" "postgresPort" "Value" .Values.postgresql.port "Root" .) | nindent 4 }}
-  command: ['sh', '-c', 'until nc -z "$DATABASE_HOST" "$DATABASE_PORT"; do echo waiting for postgres; sleep 2; done;']
-{{- end }}
-
-
 {{- define "dawarich.livenessProbe" }}
 httpGet:
   path: /api/v1/health
