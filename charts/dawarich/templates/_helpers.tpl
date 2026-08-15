@@ -226,6 +226,7 @@ failureThreshold: 10
 {{- end }}
 
 {{- define "dawarich.secretValueEnvRef" }}
+{{- if or (not .Optional) .Value }}
 - name: {{ .EnvName | quote }}
   valueFrom:
     secretKeyRef:
@@ -237,6 +238,7 @@ failureThreshold: 10
       key: {{ .Key | quote }}
       {{- end }}
       optional: {{ not (not .Optional) }}
+{{- end }}
 {{- end }}
 
 {{- define "dawarich.secretName" -}}
