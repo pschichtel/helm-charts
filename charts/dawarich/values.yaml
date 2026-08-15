@@ -181,19 +181,6 @@ redis:
   password:
     key: redisPassword
 
-bundled-redis:
-  enabled: true
-
-  auth: true
-  existingSecret: '{{ include "dawarich.secretName" . }}'
-  authKey: redisPassword
-  haproxy:
-    enabled: false
-  exporter:
-    enabled: false
-  hardAntiAffinity: false
-
-
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 # This is to override the chart name.
