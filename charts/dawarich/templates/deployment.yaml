@@ -70,7 +70,7 @@ spec:
           {{- else }}
           image: {{ print .registry "/" .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
           {{- end }}
-          imagePullPolicy: {{ ..pullPolicy }}
+          imagePullPolicy: {{ .pullPolicy }}
           {{- end }}
           command: ['web-entrypoint.sh']
           args: ['bin/rails', 'server', '-p', '3000', '-b', '::']
@@ -151,7 +151,7 @@ spec:
           {{- else }}
           image: {{ print .registry "/" .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
           {{- end }}
-          imagePullPolicy: {{ ..pullPolicy }}
+          imagePullPolicy: {{ .pullPolicy }}
           {{- end }}
           command: ['sidekiq-entrypoint.sh']
           envFrom:
