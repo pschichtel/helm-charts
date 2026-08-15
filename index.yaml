@@ -529,6 +529,19 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/crproxy-0.1.0/crproxy-0.1.0.tgz
     version: 0.1.0
+  dawarich:
+  - apiVersion: v2
+    appVersion: 1.7.5
+    created: "2026-08-15T15:42:28.087211458Z"
+    description: Self-hosted alternative to Google Location History
+    digest: 498229ee02debafca72fd48a8a134914779877615db184082f57b8bbd28c99a1
+    name: dawarich
+    sources:
+    - https://dawarich.app
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/dawarich-0.1.0/dawarich-0.1.0.tgz
+    version: 0.1.0
   docspell:
   - apiVersion: v2
     appVersion: 0.42.0
@@ -6713,4 +6726,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-11T14:24:11.346291136Z"
+generated: "2026-08-15T15:42:28.090080486Z"
