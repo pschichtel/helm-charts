@@ -64,17 +64,6 @@ app.kubernetes.io/name: {{ include "dawarich.fullname" . | printf "%s-sidekiq" }
 app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "dawarich.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "dawarich.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
 {{- define "dawarich.environmentSetup" -}}
 {{- range $key, $value := .environment }}
 {{- if $value }}
