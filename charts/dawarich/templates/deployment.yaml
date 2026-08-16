@@ -28,7 +28,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "dawarich.securityContext" . | nindent 6 }}
+      {{- include "dawarich.podSecurityContext" . | nindent 6 }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.image }}
@@ -105,7 +105,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "dawarich.securityContext" . | nindent 6 }}
+      {{- include "dawarich.podSecurityContext" . | nindent 6 }}
       containers:
         - name: {{ .Chart.Name }}-sidekiq
           {{- with .Values.image }}
