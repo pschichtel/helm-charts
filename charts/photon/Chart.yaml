@@ -3,4 +3,5 @@ name: photon
 description: Unofficial Helm chart for the Komoot/Photon geocoder
 type: application
 version: 0.1.3
+# renovate: image=docker.io/rtuszik/photon-docker
 appVersion: "2.3.1"
