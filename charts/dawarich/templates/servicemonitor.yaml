@@ -7,6 +7,11 @@ spec:
   endpoints:
     - port: prometheus
       scheme: http
+      basicAuth:
+        username:
+          {{- include "dawarich.secretKeyRef" (dict "Key" "metricsUsername" "Value" .Values.metrics.username "Root" .) | nindent 10 }}
+        password:
+          {{- include "dawarich.secretKeyRef" (dict "Key" "metricsPassword" "Value" .Values.metrics.password "Root" .) | nindent 10 }}
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}

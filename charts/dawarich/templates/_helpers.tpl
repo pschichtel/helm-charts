@@ -191,6 +191,8 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
   value: "0.0.0.0"
 - name: PROMETHEUS_EXPORTER_PORT
   value: "{{ include "dawarich.prometheusPort" . }}"
+{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "METRICS_USERNAME" "Key" "metricsUsername" "Value" .Values.metrics.username "Root" .) }}
+{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "METRICS_PASSWORD" "Key" "metricsPassword" "Value" .Values.metrics.password "Root" .) }}
 {{- end }}
 {{- if .Values.photon.enabled }}
 {{- with .Values.photon.host }}
@@ -250,14 +252,20 @@ failureThreshold: 10
 - name: {{ .EnvName | quote }}
   valueFrom:
     secretKeyRef:
-      {{- if kindIs "map" .Value }}
-      name: {{ .Value.name | default (include "dawarich.secretName" .Root) }}
-      key: {{ .Value.key | quote }}
-      {{- else }}
-      name: {{ include "dawarich.secretName" .Root }}
-      key: {{ .Key | quote }}
-      {{- end }}
-      optional: {{ not (not .Optional) }}
+        {{- include "dawarich.secretKeyRef" . | nindent 6 }}
+{{- end }}
+{{- end }}
+
+{{- define "dawarich.secretKeyRef" }}
+{{- if or .Value (not .Optional) -}}
+{{- if kindIs "map" .Value -}}
+name: {{ .Value.name | default (include "dawarich.secretName" .Root) }}
+key: {{ .Value.key | quote }}
+{{- else }}
+name: {{ include "dawarich.secretName" .Root }}
+key: {{ .Key | quote }}
+{{- end }}
+optional: {{ not (not .Optional) }}
 {{- end }}
 {{- end }}
 

@@ -25,6 +25,8 @@ secret:
     photonApiKey: null
     oidcClientId: null
     oidcClientSecret: null
+    metricsUsername: metrics
+    metricsPassword: metrics
 
 keyBase:
   key: keyBase
@@ -209,6 +211,10 @@ ingress:
 
 metrics:
   enabled: false
+  username:
+    key: metricsUsername
+  password:
+    key: metricsPassword
   serviceMonitor:
     enabled: false
 
