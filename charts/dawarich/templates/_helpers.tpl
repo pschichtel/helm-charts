@@ -86,7 +86,8 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
     claimName: {{ default (printf "%s-watched" (include "dawarich.fullname" .)) .Values.persistence.watched.existingClaim }}
 {{- else }}
 - name: watched
-  emptyDir: {}
+  emptyDir:
+    sizeLimit: 256Mi
 {{- end }}
 {{- if .Values.persistence.storage.enabled }}
 - name: storage
@@ -100,7 +101,7 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 
 {{- define "dawarich.commonVolumeMounts" -}}
 - name: tmp
-  mountPath: /tmp
+  mountPath: /var/app/tmp
 {{- if .Values.persistence.public.enabled }}
 - name: public
   mountPath: /var/app/public
