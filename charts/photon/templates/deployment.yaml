@@ -99,12 +99,17 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
+          - name: tmp
+            mountPath: /tmp
           - name: storage
             mountPath: /photon/data
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
+      - name: tmp
+        emptyDir:
+          sizeLimit: 100Mi
       - name: storage
         persistentVolumeClaim:
           claimName: {{ .Values.persistence.existingClaim | default (include "photon.fullname" .) }}
