@@ -3,7 +3,7 @@ name: dawarich
 description: "Self-hosted alternative to Google Location History"
 type: application
 version: 0.1.16
-# renovate: image=ghcr.io/coturn/coturn
+# renovate: image=docker.io/freikin/dawarich
 appVersion: "1.12.2"
 sources:
   - https://dawarich.app
