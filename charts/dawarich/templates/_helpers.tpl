@@ -245,12 +245,12 @@ securityContext:
 {{- end }}
 
 {{- define "dawarich.podSecurityContext" -}}
-fsGroup: 1000
-fsGroupChangePolicy: OnRootMismatch
-runAsNonRoot: true
-runAsGroup: 1000
-runAsUser: 1000
 securityContext:
+  fsGroup: 1000
+  fsGroupChangePolicy: OnRootMismatch
+  runAsNonRoot: true
+  runAsGroup: 1000
+  runAsUser: 1000
   seccompProfile:
     type: RuntimeDefault
 {{- end }}
