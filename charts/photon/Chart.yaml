@@ -2,5 +2,5 @@ apiVersion: v2
 name: photon
 description: Unofficial Helm chart for the Komoot/Photon geocoder
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "2.3.1"

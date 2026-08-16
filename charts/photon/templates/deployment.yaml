@@ -8,6 +8,8 @@ metadata:
     {{- include "photon.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "photon.selectorLabels" . | nindent 6 }}
@@ -96,6 +98,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 10
             failureThreshold: {{ add (div .Values.photon.maxStartupSeconds 10) 1 }}
+            successThreshold: 1
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
