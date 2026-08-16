@@ -233,3 +233,18 @@ failureThreshold: 10
 {{- define "dawarich.secretName" -}}
 {{ .Release.Name }}
 {{- end }}
+
+{{- define "dawarich.securityContext" -}}
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+{{- end }}
+
+{{- define "dawarich.podSecurityContext" -}}
+securityContext:
+  seccompProfile:
+    type: RuntimeDefault
+{{- end }}

@@ -28,10 +28,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- include "dawarich.securityContext" . | nindent 6 }}
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.image }}
@@ -48,12 +45,7 @@ spec:
             {{- include "dawarich.envFrom" . | nindent 12 }}
           env:
             {{- include "dawarich.env" . | nindent 12 }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: true
+          {{- include "dawarich.securityContext" . | nindent 10 }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -113,8 +105,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- include "dawarich.securityContext" . | nindent 6 }}
       containers:
         - name: {{ .Chart.Name }}-sidekiq
           {{- with .Values.image }}
@@ -130,8 +121,7 @@ spec:
             {{- include "dawarich.envFrom" . | nindent 12 }}
           env:
             {{- include "dawarich.env" . | nindent 12 }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- include "dawarich.securityContext" . | nindent 10 }}
           livenessProbe:
             {{- toYaml .Values.sidekiq.livenessProbe | nindent 12 }}
           readinessProbe:

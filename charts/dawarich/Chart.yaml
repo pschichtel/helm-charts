@@ -2,7 +2,7 @@ apiVersion: v2
 name: dawarich
 description: "Self-hosted alternative to Google Location History"
 type: application
-version: 0.1.11
+version: 0.1.12
 # renovate: image=ghcr.io/coturn/coturn
 appVersion: "1.12.2"
 sources:
