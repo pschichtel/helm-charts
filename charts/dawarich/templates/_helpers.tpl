@@ -114,14 +114,14 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 
 {{- define "dawarich.volumeMounts" -}}
-{{- include "commonVolumeMounts" . }}
+{{- include "dawarich.commonVolumeMounts" . }}
 {{- if .Values.dawarich.extraVolumeMounts }}
 {{ toYaml .Values.dawarich.extraVolumeMounts | indent 2 }}
 {{- end }}
 {{- end }}
 
 {{- define "dawarich.sidekiqVolumeMounts" -}}
-{{- include "commonVolumeMounts" . }}
+{{- include "dawarich.commonVolumeMounts" . }}
 {{- end }}
 
 {{- define "dawarich.envFrom" -}}
