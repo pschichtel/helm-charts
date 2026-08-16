@@ -51,7 +51,9 @@ spec:
           {{- end }}
           imagePullPolicy: {{ .pullPolicy }}
           {{- end }}
+          {{- if .Values.photon.bypassEntrypoint }}
           command: ["/photon/.venv/bin/python", "-m", "src.process_manager"]
+          {{- end }}
           env:
             - name: PUID
               value: "{{ $uid }}"
