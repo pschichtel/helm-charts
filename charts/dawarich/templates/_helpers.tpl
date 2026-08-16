@@ -74,7 +74,9 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 
 {{- define "dawarich.volumes" -}}
 - name: tmp
-  emptyDir: {}
+  emptyDir:
+    medium: Memory
+    sizeLimit: 256Mi
 {{- if .Values.persistence.public.enabled }}
 - name: public
   persistentVolumeClaim:
@@ -102,6 +104,10 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- define "dawarich.commonVolumeMounts" -}}
 - name: tmp
   mountPath: /var/app/tmp
+  subPath: app-tmp
+- name: tmp
+  mountPath: /tmp
+  subPath: tmp
 {{- if .Values.persistence.public.enabled }}
 - name: public
   mountPath: /var/app/public
