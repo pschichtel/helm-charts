@@ -150,8 +150,12 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{/* SELF_HOSTED is required in Dawarich >=0.25.4 */}}
 - name: SELF_HOSTED
   value: "true"
+- name: POD_IP
+  valueFrom:
+    fieldRef:
+      fieldPath: status.podIP
 - name: APPLICATION_HOSTS
-  value: {{ join "," .Values.dawarich.hosts | quote }}
+  value: {{ print (join "," .Values.dawarich.hosts) ",$(POD_IP):" .Values.service.port | quote }}
 - name: DOMAIN
   value: {{ .Values.dawarich.hosts | first | quote }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_HOST" "Key" "postgresHost" "Value" .Values.postgresql.host "Root" .) }}
