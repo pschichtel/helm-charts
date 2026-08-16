@@ -5,7 +5,7 @@ metadata:
   name: {{ include "dawarich.fullname" . }}
 spec:
   endpoints:
-    - port: prometheus
+    - port: http
       scheme: http
       basicAuth:
         username:

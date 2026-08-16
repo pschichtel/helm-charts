@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "dawarich.fullname" . }}
+  name: {{ include "dawarich.fullname" . }}-sidekiq
   labels:
-    {{- include "dawarich.labels" . | nindent 4 }}
+    {{- include "dawarich.labelsSidekiq" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.dawarich.replicaCount }}
+  replicas: {{ .Values.sidekiq.replicaCount }}
   selector:
     matchLabels:
-      {{- include "dawarich.selectorLabels" . | nindent 6 }}
+      {{- include "dawarich.selectorLabelsSidekiq" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -18,7 +18,7 @@ spec:
         checksum/configmap: {{ ((include (print $.Template.BasePath "/configmap.yaml") $) | fromYaml).data | toYaml | sha256sum }}
         checksum/secret: {{ ((include (print $.Template.BasePath "/secret.yaml") $) | fromYaml).data | toYaml | sha256sum }}
       labels:
-        {{- include "dawarich.labels" . | nindent 8 }}
+        {{- include "dawarich.labelsSidekiq" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -29,7 +29,7 @@ spec:
       {{- end }}
       {{- include "dawarich.podSecurityContext" . | nindent 6 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-sidekiq
           {{- with .Values.image }}
           {{- if .digest }}
           image: {{ print .registry "/" .repository "@" .digest | quote }}
@@ -38,42 +38,39 @@ spec:
           {{- end }}
           imagePullPolicy: {{ .pullPolicy }}
           {{- end }}
-          command: ['web-entrypoint.sh']
-          args: ['bin/rails', 'server', '-p', '3000', '-b', '::']
+          command: ['sidekiq-entrypoint.sh']
           envFrom:
             {{- include "dawarich.envFrom" . | nindent 12 }}
           env:
             {{- include "dawarich.env" . | nindent 12 }}
-            {{- if .Values.metrics.enabled }}
-            - name: SIDEKIQ_METRICS_URL
-              value: 'http://{{ include "dawarich.fullname" . }}-sidekiq:{{ include "dawarich.prometheusPort" . }}'
-            {{- end }}
           {{- include "dawarich.securityContext" . | nindent 10 }}
+          {{- if .Values.metrics.enabled }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
+            - name: prometheus
+              containerPort: {{ include "dawarich.prometheusPort" . }}
               protocol: TCP
+          {{- end }}
           livenessProbe:
-            {{- include "dawarich.livenessProbe" . | nindent 12 }}
+            {{- toYaml .Values.sidekiq.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- include "dawarich.readinessProbe" . | nindent 12 }}
+            {{- toYaml .Values.sidekiq.readinessProbe | nindent 12 }}
           startupProbe:
-            {{- include "dawarich.startupProbe" . | nindent 12 }}
+            {{- toYaml .Values.sidekiq.startupProbe | nindent 12 }}
           resources:
-            {{- toYaml .Values.dawarich.resources | nindent 12 }}
+            {{- toYaml .Values.sidekiq.resources | nindent 12 }}
           volumeMounts:
-            {{- include "dawarich.volumeMounts" . | trim | nindent 12 }}
+            {{- include "dawarich.sidekiqVolumeMounts" . | trim | nindent 12 }}
       volumes:
         {{- include "dawarich.volumes" . | trim | nindent 8 }}
-      {{- with .Values.dawarich.nodeSelector }}
+      {{- with .Values.sidekiq.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dawarich.affinity }}
+      {{- with .Values.sidekiq.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.dawarich.tolerations }}
+      {{- with .Values.sidekiq.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
