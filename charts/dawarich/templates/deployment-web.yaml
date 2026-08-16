@@ -46,7 +46,7 @@ spec:
             {{- include "dawarich.env" . | nindent 12 }}
             {{- if .Values.metrics.enabled }}
             - name: SIDEKIQ_METRICS_URL
-              value: 'http://{{ include "dawarich.fullname" . }}-sidekiq:{{ include "dawarich.prometheusPort" . }}'
+              value: 'http://{{ include "dawarich.fullname" . }}-sidekiq:{{ include "dawarich.prometheusPort" . }}/metrics'
             {{- end }}
           {{- include "dawarich.securityContext" . | nindent 10 }}
           ports:
