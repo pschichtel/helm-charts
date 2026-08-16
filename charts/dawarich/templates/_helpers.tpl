@@ -142,9 +142,11 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 
 {{- define "dawarich.env" -}}
 - name: RAILS_ENV
-  value: "production"
+  value: 'production'
 - name: RAILS_LOG_TO_STDOUT
-  value: "true"
+  value: 'true'
+- name: TMPDIR
+  value: '/tmp'
 {{/* SELF_HOSTED is required in Dawarich >=0.25.4 */}}
 - name: SELF_HOSTED
   value: "true"
