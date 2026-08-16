@@ -73,6 +73,8 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 
 {{- define "dawarich.volumes" -}}
+- name: tmp
+  emptyDir: {}
 {{- if .Values.persistence.public.enabled }}
 - name: public
   persistentVolumeClaim:
@@ -96,35 +98,30 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 {{- end }}
 
-{{- define "dawarich.volumeMounts" -}}
+{{- define "dawarich.commonVolumeMounts" -}}
+- name: tmp
+  mountPath: /tmp
 {{- if .Values.persistence.public.enabled }}
 - name: public
   mountPath: /var/app/public
 {{- end }}
-- name: watched
-  mountPath: /var/app/tmp/imports/watched
 {{- if .Values.persistence.storage.enabled }}
 - name: storage
   mountPath: /var/app/storage
 {{- end }}
+- name: watched
+  mountPath: /var/app/tmp/imports/watched
+{{- end }}
+
+{{- define "dawarich.volumeMounts" -}}
+{{- include "commonVolumeMounts" . }}
 {{- if .Values.dawarich.extraVolumeMounts }}
 {{ toYaml .Values.dawarich.extraVolumeMounts | indent 2 }}
 {{- end }}
 {{- end }}
 
 {{- define "dawarich.sidekiqVolumeMounts" -}}
-{{- if .Values.persistence.public.enabled }}
-- name: public
-  mountPath: /var/app/public
-{{- end }}
-{{- if .Values.persistence.watched.enabled }}
-- name: watched
-  mountPath: /var/app/tmp/imports/watched
-{{- end }}
-{{- if .Values.persistence.storage.enabled }}
-- name: storage
-  mountPath: /var/app/storage
-{{- end }}
+{{- include "commonVolumeMounts" . }}
 {{- end }}
 
 {{- define "dawarich.envFrom" -}}
