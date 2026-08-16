@@ -69,6 +69,10 @@ spec:
               value: {{ .Values.photon.region }}
             - name: LANGUAGES
               value: {{ .Values.photon.languages | join "," }}
+            {{- if .Values.metrics.enabled }}
+            - name: ENABLE_METRICS
+              value: "true"
+            {{- end }}
           ports:
             - name: http
               containerPort: 2322

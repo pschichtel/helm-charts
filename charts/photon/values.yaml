@@ -86,3 +86,7 @@ photon:
     - en
   maxStartupSeconds: 3600
 
+metrics:
+  enabled: false
+  serviceMonitor:
+    enabled: false
