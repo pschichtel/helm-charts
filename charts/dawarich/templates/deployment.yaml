@@ -50,6 +50,11 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            {{- if .Values.metrics.enabled }}
+            - name: prometheus
+              containerPort: {{ include "dawarich.prometheusPort" . }}
+              protocol: TCP
+            {{- end }}
           livenessProbe:
             {{- include "dawarich.livenessProbe" . | nindent 12 }}
           readinessProbe:
@@ -122,6 +127,12 @@ spec:
           env:
             {{- include "dawarich.env" . | nindent 12 }}
           {{- include "dawarich.securityContext" . | nindent 10 }}
+          {{- if .Values.metrics.enabled }}
+          ports:
+            - name: prometheus
+              containerPort: {{ include "dawarich.prometheusPort" . }}
+              protocol: TCP
+          {{- end }}
           livenessProbe:
             {{- toYaml .Values.sidekiq.livenessProbe | nindent 12 }}
           readinessProbe:

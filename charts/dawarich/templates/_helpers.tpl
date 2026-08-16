@@ -135,6 +135,10 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 
 {{- define "dawarich.env" -}}
+- name: RAILS_ENV
+  value: "production"
+- name: RAILS_LOG_TO_STDOUT
+  value: "true"
 {{/* SELF_HOSTED is required in Dawarich >=0.25.4 */}}
 - name: SELF_HOSTED
   value: "true"
@@ -159,8 +163,6 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
   value: {{ print "redis://" $redisAddr | quote }}
 {{- end }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "SECRET_KEY_BASE" "Key" "keyBase" "Value" .Values.keyBase "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "PHOTON_API_KEY" "Key" "photonApiKey" "Value" .Values.photonApiKey "Optional" true "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "GEOAPIFY_API_KEY" "Key" "geoapifyApiKey" "Value" .Values.geoapifyApiKey "Optional" true "Root" .) }}
 {{- if .Values.oidc.enabled }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "OIDC_CLIENT_ID" "Key" "oidcClientId" "Value" .Values.oidc.clientId "Root" .) }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "OIDC_CLIENT_SECRET" "Key" "oidcClientSecret" "Value" .Values.oidc.clientSecret "Root" .) }}
@@ -175,7 +177,30 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 - name: ALLOW_EMAIL_PASSWORD_REGISTRATION
   value: {{ .Values.oidc.allowEmailPasswordRegistration | quote }}
 {{- end }}
+{{- if .Values.metrics.enabled }}
+- name: PROMETHEUS_EXPORTER_ENABLED
+  value: "true"
+- name: PROMETHEUS_EXPORTER_HOST
+  value: "0.0.0.0"
+- name: PROMETHEUS_EXPORTER_PORT
+  value: "{{ include "dawarich.prometheusPort" . }}"
 {{- end }}
+{{- if .Values.photon.enabled }}
+{{- with .Values.photon.host }}
+- name: PHOTON_API_HOST
+  value: "{{ . }}"
+{{- end }}
+- name: PHOTON_API_USE_HTTPS
+  value: "{{ .Values.photon.useHttps }}"
+{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "PHOTON_API_KEY" "Key" "photonApiKey" "Value" .Values.photon.apiKey "Optional" true "Root" .) }}
+{{- end }}
+{{- if .Values.ingress.enabled }}
+- name: DOMAIN
+  value: {{ .Values.ingress.hosts | first | quote }}
+{{- end }}
+{{- end }}
+
+{{- define "dawarich.prometheusPort" }}9394{{ end }}
 
 {{- define "dawarich.livenessProbe" }}
 httpGet:
