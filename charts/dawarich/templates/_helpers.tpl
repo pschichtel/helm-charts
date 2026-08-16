@@ -142,9 +142,6 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{/* SELF_HOSTED is required in Dawarich >=0.25.4 */}}
 - name: SELF_HOSTED
   value: "true"
-{{/* STORE_GEODATA was introduced in Dawarich 0.28.0 */}}
-- name: STORE_GEODATA
-  value: "true"
 - name: APPLICATION_HOSTS
   value: {{ join "," .Values.dawarich.hosts | quote }}
 - name: DOMAIN
@@ -195,6 +192,8 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 - name: PHOTON_API_USE_HTTPS
   value: "{{ .Values.photon.useHttps }}"
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "PHOTON_API_KEY" "Key" "photonApiKey" "Value" .Values.photon.apiKey "Optional" true "Root" .) }}
+- name: STORE_GEODATA
+  value: "{{ .Values.photon.store }}"
 {{- end }}
 {{- end }}
 

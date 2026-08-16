@@ -45,6 +45,7 @@ photon:
   host: null
   useHttps: true
   apiKey: null
+  store: true
 
 # OIDC (OpenID Connect) authentication configuration
 oidc:
