@@ -146,7 +146,9 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 - name: STORE_GEODATA
   value: "true"
 - name: APPLICATION_HOSTS
-  value: {{ join "," .Values.dawarich.hosts }}
+  value: {{ join "," .Values.dawarich.hosts | quote }}
+- name: DOMAIN
+  value: {{ .Values.dawarich.hosts | first | quote }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_HOST" "Key" "postgresHost" "Value" .Values.postgresql.host "Root" .) }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_PORT" "Key" "postgresPort" "Value" .Values.postgresql.port "Root" .) }}
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_NAME" "Key" "postgresDatabase" "Value" .Values.postgresql.auth.database "Root" .) }}
@@ -193,10 +195,6 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 - name: PHOTON_API_USE_HTTPS
   value: "{{ .Values.photon.useHttps }}"
 {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "PHOTON_API_KEY" "Key" "photonApiKey" "Value" .Values.photon.apiKey "Optional" true "Root" .) }}
-{{- end }}
-{{- if .Values.ingress.enabled }}
-- name: DOMAIN
-  value: {{ .Values.ingress.hosts | first | quote }}
 {{- end }}
 {{- end }}
 
