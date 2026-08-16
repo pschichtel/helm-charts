@@ -1,0 +1,10 @@
+{{- if not .Values.persistence.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ print (include "photon.fullname" .) | quote }}
+  labels:
+    {{- include "photon.labels" . | nindent 4 }}
+spec:
+  {{- toYaml .Values.persistence.pvc | nindent 2 }}
+{{- end }}

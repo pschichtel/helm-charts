@@ -1,0 +1,125 @@
+{{- $uid := 9011 }}
+{{- $gid := 9011 }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "photon.fullname" . }}
+  labels:
+    {{- include "photon.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "photon.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "photon.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ $uid }}
+        runAsGroup: {{ $gid }}
+        fsGroup: {{ $gid }}
+        fsGroupChangePolicy: "OnRootMismatch"
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          {{- with .Values.image }}
+          {{- if .digest }}
+          image: {{ print .registry "/" .repository "@" .digest | quote }}
+          {{- else }}
+          image: {{ print .registry "/" .repository ":" (.tag | default $.Chart.AppVersion) | quote }}
+          {{- end }}
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
+          command: ["/photon/.venv/bin/python", "-m", "src.process_manager"]
+          env:
+            - name: PUID
+              value: "{{ $uid }}"
+            - name: PGID
+              value: "{{ $gid }}"
+            - name: UPDATE_STRATEGY
+              value: {{ .Values.photon.updateStrategy }}
+            - name: UPDATE_INTERVAL
+              value: {{ .Values.photon.updateInterval }}
+            - name: REGION
+              value: {{ .Values.photon.region }}
+            - name: LANGUAGES
+              value: {{ .Values.photon.languages | join "," }}
+          ports:
+            - name: http
+              containerPort: 2322
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: http
+            initialDelaySeconds: 240
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 4
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: http
+            initialDelaySeconds: 240
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 4
+            timeoutSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /status
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: {{ add (div .Values.photon.maxStartupSeconds 10) 1 }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          - name: storage
+            mountPath: /photon/data
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim | default (include "photon.fullname" .) }}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
