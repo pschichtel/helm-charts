@@ -11,5 +11,11 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- if .Values.metrics.enabled }}
+    - port: {{ include "dawarich.prometheusPort" . }}
+      targetPort: prometheus
+      protocol: TCP
+      name: prometheus
+    {{- end }}
   selector:
     {{- include "dawarich.selectorLabels" . | nindent 4 }}
