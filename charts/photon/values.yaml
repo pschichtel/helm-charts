@@ -77,8 +77,6 @@ persistence:
         storage: 250Gi
 
 photon:
-  # temporary flag to bypass the entrypoint until it properly supports readOnlyRootFilesystem
-  bypassEntrypoint: true
   updateStrategy: PARALLEL
   updateInterval: 720h
   region: planet
