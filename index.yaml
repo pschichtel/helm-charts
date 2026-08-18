@@ -4714,6 +4714,16 @@ entries:
     version: 0.1.0
   photon:
   - apiVersion: v2
+    appVersion: 2.4.0
+    created: "2026-08-18T21:33:15.704126378Z"
+    description: Unofficial Helm chart for the Komoot/Photon geocoder
+    digest: 034648c9d345ee8247c416bfdad97f149ca889cabacdee5720870669af722800
+    name: photon
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/photon-0.2.0/photon-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 2.3.1
     created: "2026-08-16T19:18:49.935221866Z"
     description: Unofficial Helm chart for the Komoot/Photon geocoder
@@ -7091,4 +7101,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-16T21:39:44.928906019Z"
+generated: "2026-08-18T21:33:15.705008708Z"
