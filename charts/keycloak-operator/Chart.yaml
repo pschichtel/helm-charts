@@ -2,12 +2,12 @@ apiVersion: v2
 name: keycloak-operator
 description: A Helm chart for Kubernetes
 type: application
-version: 0.8.5
+version: 0.8.6
 # renovate: github-releases=keycloak/keycloak
-appVersion: 26.7.2
+appVersion: 26.7.3
 
 dependencies:
 - name: keycloak-operator-crds
   repository: https://schich.tel/helm-charts
-  version: 1.7.4
+  version: 1.7.5
   condition: crds.enabled
