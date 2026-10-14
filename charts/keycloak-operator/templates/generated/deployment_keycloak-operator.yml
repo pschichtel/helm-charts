@@ -29,6 +29,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: kc.operator.keycloak.image
+              value: quay.io/keycloak/keycloak:{{ .Chart.AppVersion }}
             - name: RELATED_IMAGE_KEYCLOAK
               value: quay.io/keycloak/keycloak:{{ .Chart.AppVersion }}
             - name: QUARKUS_OPERATOR_SDK_CONTROLLERS_KEYCLOAKREALMIMPORTCONTROLLER_NAMESPACES
@@ -83,6 +85,7 @@ spec:
           imagePullSecrets: {{- toYaml . | nindent 12 }}
           {{- end }}
       serviceAccountName: {{ include "keycloak-operator.fullname" $ }}
+      terminationGracePeriodSeconds: 10
       {{- with .Values.nodeSelector  }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}
