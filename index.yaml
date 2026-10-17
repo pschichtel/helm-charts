@@ -490,6 +490,16 @@ entries:
     version: 0.1.0
   crproxy:
   - apiVersion: v2
+    appVersion: 0.12.6
+    created: "2026-10-17T12:59:24.954234042Z"
+    description: A Helm chart for baocloud's crproxy
+    digest: d70a7c21417b33c6b3603d8134956851bad4d368f753cf676232dc7dc7e2b4dc
+    name: crproxy
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/crproxy-0.2.0/crproxy-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.8.0
     created: "2026-02-01T18:33:31.488227161Z"
     description: A Helm chart for baocloud's crproxy
@@ -7386,4 +7396,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-14T16:54:41.854947888Z"
+generated: "2026-10-17T12:59:24.955201771Z"
