@@ -35,15 +35,22 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: roundcubemail
           image: {{ tpl .Values.image . }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "IfNotPresent" }}
-          command:
-            - /bin/bash
-          args:
-            - "-c"
-            - "{{ include "roundcube.deployment.command" . }}"
+          securityContext:
+            runAsUser: 82
+            runAsGroup: 82
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
           env:
             - name: ROUNDCUBEMAIL_DEFAULT_HOST
               value: "{{ include "roundcube.encryption" .Values.imap.encryption }}{{ required "no IMAP host defined" .Values.imap.host }}"
@@ -109,6 +116,9 @@ spec:
             {{- end }}
           volumeMounts:
             - name: config
+              mountPath: /usr/local/etc/php/conf.d/zz-roundcube.ini
+              subPath: roundcube.ini
+            - name: config
               mountPath: /usr/local/etc/php/conf.d/zzz-custom.ini
               subPath: php.ini
             - name: config
@@ -128,26 +138,36 @@ spec:
         - name: nginx
           image: {{ .Values.deployment.containers.nginx.image }}
           imagePullPolicy: {{ .Values.deployment.containers.nginx.imagePullPolicy }}
+          securityContext:
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
           volumeMounts:
             - name: shared-files
               mountPath: /var/www/html
+              readOnly: true
             - name: config
-              mountPath: /etc/nginx/nginx.conf
+              mountPath: /etc/nginx/conf.d/default.conf
               subPath: nginx.conf
           ports:
-            - containerPort: {{ .Values.deployment.port }}
+            - name: http
+              containerPort: 8080
               protocol: TCP
           readinessProbe:
             httpGet:
               path: /
-              port: {{ .Values.deployment.port }}
+              port: http
             timeoutSeconds: 2
             periodSeconds: 3
             initialDelaySeconds: 5
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.deployment.port }}
+              port: http
             timeoutSeconds: 2
             periodSeconds: 3
             initialDelaySeconds: 5

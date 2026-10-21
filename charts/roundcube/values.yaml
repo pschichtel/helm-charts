@@ -1,6 +1,6 @@
 
 ## Roundcube Docker image
-image: roundcube/roundcubemail:{{ .Chart.AppVersion }}-fpm-alpine
+image: roundcube/roundcubemail:{{ .Chart.AppVersion }}-fpm-alpine-nonroot
 
 ## ImagePullPolicy for Roundcube Docker image
 imagePullPolicy: IfNotPresent
@@ -161,9 +161,6 @@ deployment:
     ## Deployment strategy type
     type: RollingUpdate
 
-  ## Roundcube container's HTTP port
-  port: 80
-
   ## Define additional ImagePullSecrets.
   imagePullSecrets:
     ## You can refer to existing ImagePullSecrets as follows:
@@ -221,14 +218,14 @@ deployment:
 
   containers:
     nginx:
-      image: nginx:1.25.4
+      image: docker.io/nginxinc/nginx-unprivileged:1.31.7
       imagePullPolicy: IfNotPresent
 
 
 ## Additional configuration for the Service resource
 service:
   ## Service port for HTTP
-  port: 80
+  port: 8080
 
   ## Additional annotations for the Service resource
   additionalAnnotations: {}

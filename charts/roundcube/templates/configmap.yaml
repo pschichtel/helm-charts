@@ -8,6 +8,9 @@ metadata:
 data:
   php.ini: |
     {{- .Values.config.customPhpConfig | default "" | nindent 4 }}
+  roundcube.ini: |
+    post_max_size={{ .Values.config.uploadMaxFilesize }}
+    upload_max_filesize={{ .Values.config.uploadMaxFilesize }}
   roundcube.config.php: |
     <?php
     {{ range $plugin, $settings := .Values.config.plugins }}
@@ -28,38 +31,29 @@ data:
   php-fpm.conf: |
     {{- .Values.config.customPhpFpmConfig | default "" | nindent 4 }}
   nginx.conf: |
-    events {
+    server {
+      listen 8080 default_server;
+      listen [::]:8080 default_server;
 
-    }
-
-    http {
-      include       /etc/nginx/mime.types;
-      default_type  application/octet-stream;
-
-      keepalive_timeout  65;
       client_max_body_size {{ .Values.config.uploadMaxFilesize }};
+      keepalive_timeout  65;
 
-      server {
-        listen {{ .Values.deployment.port }} default_server;
-        listen [::]:{{ .Values.deployment.port }} default_server;
+      root /var/www/html/public_html;
+      server_name _;
 
-        root /var/www/html/public_html;
-        server_name _;
+      index index.php;
 
-        index index.php;
+      location / {
+        try_files $uri $uri/ =404;
+      }
 
-        location / {
-          try_files $uri $uri/ =404;
-        }
+      location ~ \.php(?:$|/) {
+        fastcgi_split_path_info ^(.+\.php)(.*)$;
 
-        location ~ \.php(?:$|/) {
-          fastcgi_split_path_info ^(.+\.php)(.*)$;
-
-          include fastcgi_params;
-          fastcgi_param REQUEST_METHOD $request_method;
-          fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-          fastcgi_param PATH_INFO       $fastcgi_path_info;
-          fastcgi_pass localhost:9000;
-        }
+        include fastcgi_params;
+        fastcgi_param REQUEST_METHOD $request_method;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO       $fastcgi_path_info;
+        fastcgi_pass 127.0.0.1:9000;
       }
     }
