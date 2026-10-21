@@ -97,19 +97,6 @@ ssl://
 {{- end -}}
 
 
-{{- define "roundcube.deployment.command" -}}
-{{- $hasPlugins := false }}
-{{- range .Values.config.plugins }}
-{{- if .enabled }}
-{{- $hasPlugins = true }}
-{{- end }}
-{{- end }}
-{{- if $hasPlugins -}}
-(cd /usr/src/roundcubemail && composer require 'roundcube/plugin-installer:>=0.3.5') &&
-{{ end }}/docker-entrypoint.sh php-fpm
-{{- end -}}
-
-
 {{- define "roundcube.helm2php" -}}
 {{- $kind := kindOf . -}}
 {{- if has $kind (list "slice" "map") -}}
