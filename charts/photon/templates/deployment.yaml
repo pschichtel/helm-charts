@@ -54,10 +54,6 @@ spec:
           imagePullPolicy: {{ .pullPolicy }}
           {{- end }}
           env:
-            - name: PUID
-              value: "{{ $uid }}"
-            - name: PGID
-              value: "{{ $gid }}"
             - name: UPDATE_STRATEGY
               value: {{ .Values.photon.updateStrategy }}
             - name: UPDATE_INTERVAL
