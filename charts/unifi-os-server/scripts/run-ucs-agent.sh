@@ -2,8 +2,6 @@
 # ucs-agent (Go), foreground.
 set -e
 
-# --- console identity metadata (see uos-meta.sh)
-bash /scripts/uos-meta.sh || true
 source /usr/lib/ucs-agent/scripts/envs.sh
 
 # --- wait for postgres

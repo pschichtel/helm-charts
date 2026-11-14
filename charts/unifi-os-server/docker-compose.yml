@@ -140,6 +140,10 @@ services:
     network_mode: service:unifi-core
     volumes:
       - ./scripts:/scripts:ro
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
       - ulp-go-data:/data/ulp-go
       - ulp-go-srv:/srv/ulp-go
       - uos-run:/run
@@ -157,6 +161,10 @@ services:
     network_mode: service:unifi-core
     volumes:
       - ./scripts:/scripts:ro
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
       - uid-agent-data:/data/uid
       - uid-agent-srv:/srv/uid
       - uos-run:/run
@@ -174,6 +182,10 @@ services:
     network_mode: service:unifi-core
     volumes:
       - ./scripts:/scripts:ro
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
       - unifi-directory-data:/data/unifi-directory
       - uos-run:/run
     depends_on:
@@ -190,6 +202,10 @@ services:
     network_mode: service:unifi-core
     volumes:
       - ./scripts:/scripts:ro
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
       - ucs-agent-data:/data/ucs-agent
       - uos-run:/run
     depends_on:
@@ -206,6 +222,10 @@ services:
     network_mode: service:unifi-core
     volumes:
       - ./scripts:/scripts:ro
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
       - identity-update-data:/data/unifi-identity-update
       - uos-run:/run
     depends_on:
