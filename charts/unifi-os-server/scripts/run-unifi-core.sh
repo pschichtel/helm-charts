@@ -12,7 +12,8 @@ echo "${UOS_UUID:?set UOS_UUID in .env}" > /data/uos_uuid
 # --- wait for postgres (roles/DBs are pre-created by the postgres service)
 for i in $(seq 1 60); do pg_isready -q -h postgres -p 5432 && break; sleep 2; done
 
-mkdir -p /data/unifi-core/config/http /run/unifi-core
+# logs/ must exist before nginx starts: nginx.conf writes nginx-access.log there
+mkdir -p /data/unifi-core/config/http /data/unifi-core/logs /run/unifi-core
 
 # --- idempotent service.js patches: 8s boot delay for the two top-level
 # IIFEs that race the (fake) systemd provider
@@ -101,11 +102,19 @@ chmod 644 /tmp/pre.js
 # --- pre-start hook (validated: as unifi-core, cwd /tmp)
 runuser -u unifi-core -- env TMPDIR=/tmp bash -c 'cd /tmp && /usr/share/unifi-core/app/hooks/pre-start' || true
 
-# --- nginx: full config from the image, then start it (retry: core generates
-# the site confs + certs in /data/unifi-core/config/http on boot, so the first
-# nginx -t may fail). Core reloads it at runtime via `nginx -s reload`.
+# --- nginx: full config from the image. It must be RUNNING before core starts:
+# core writes its site confs and immediately runs `nginx -s reload`; if that
+# fails, core treats the unhandled rejection as fatal and exits (the container
+# then restarts once). The config is valid without core's files (all includes
+# are wildcards), so start it now. The retry loop is only a fallback.
 cp /etc/nginx/nginx.conf.disabled /etc/nginx/nginx.conf
-( for i in $(seq 1 60); do nginx -t >/dev/null 2>&1 && nginx && break; sleep 5; done ) &
+if nginx -t >/dev/null 2>&1 && nginx; then
+  :
+else
+  echo "nginx did not start before core; retrying in the background" >&2
+  nginx -t >&2 || true
+  ( for i in $(seq 1 60); do sleep 5; nginx -t >/dev/null 2>&1 && nginx && break; done ) &
+fi
 
 # --- foreground: the core service itself
 cd /usr/share/unifi-core/app

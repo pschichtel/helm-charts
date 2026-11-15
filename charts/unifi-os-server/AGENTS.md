@@ -14,8 +14,8 @@ into one docker compose service per systemd unit. See `README.md` for layout.
   over patching binaries or image contents. If a patch is unavoidable, document
   it in the README with the root cause.
 - When a workaround is removed, update the README in the same change.
-- Keep the architecture diagrams and the port table in `scripts/netbridge.sh`
-  in sync when adding/removing services or changing ports.
+- Keep the architecture diagrams in the README in sync when adding/removing
+  services or changing ports.
 
 ## No custom images
 

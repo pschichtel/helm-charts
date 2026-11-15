@@ -1,10 +1,16 @@
 # Can the inter-service addresses be configured?
 
-Short answer: **partly, and not enough to drop the loopback bridges**
-(`scripts/netbridge.sh`). Every component has at least one peer address or
-listen address that is a literal in its code. This document records what is
-configurable, what is not, and how each claim was established, so it can be
-re-checked when the image is upgraded.
+Short answer: **partly, and not enough to run the services in separate
+network namespaces without extra plumbing.** Every component has at least one
+peer address or listen address that is a literal in its code. This is why the
+stack shares one network namespace between the app-tier services (see
+"Networking" in the README). This document records what is configurable, what
+is not, and how each claim was established, so it can be re-checked when the
+image is upgraded.
+
+"Bridge" below means a per-port TCP forwarder between containers, which is
+what separate namespaces would need for every address that cannot be
+configured (an earlier revision of this stack did that with `socat`).
 
 Scope: image `ghcr.io/unihosted/unifi-os-server-docker:5.1.42`, i.e.
 `unifi-core` 5.1.132, `unifi` (Network) 10.5.67, `ulp-go` 1.13.11,
@@ -31,9 +37,8 @@ its own loopback-only server binds.
 
 Consequence: `unifi-core`, `uid-agent`, `unifi-identity-update`,
 `unifi-directory`, `unifi` and `uos-agent` each need a bridge in at least one
-direction regardless of configuration. Using the available keys would shrink
-the port table but leave two mechanisms for the same job, so the stack keeps
-one uniform mechanism.
+direction regardless of configuration, if they were to run in separate
+namespaces.
 
 ## Method
 
@@ -208,9 +213,9 @@ Environment variables in the binary: `DISCOVERY_CLIENT_SERVER_HOST`
 - HTTP proxy environment variables are not a workaround: Go's default
   transport never proxies loopback destinations.
 
-## If the bridges should shrink anyway
+## If the services are ever separated again
 
-These edges could move from bridge to configuration today, with the caveats
+These edges could use configuration instead of a bridge, with the caveats
 above:
 
 - `ulp-go`, `ucs-agent`, `unifi-directory` → core: `ucore.api`

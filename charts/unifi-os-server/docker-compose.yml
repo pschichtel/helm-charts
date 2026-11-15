@@ -67,8 +67,7 @@ services:
 
   # ------------------------------- app tier --------------------------------
   # Owns the shared network namespace and the published ports. It never
-  # restarts, so unifi-core (which exits once on first boot, like a systemd
-  # Restart=always unit) and every other app-tier service can restart freely
+  # restarts, so unifi-core and every other app-tier service can restart freely
   # without orphaning the namespace of the containers that join it.
   netns:
     image: ${UOS_IMAGE}
