@@ -2,6 +2,6 @@ apiVersion: v2
 name: wordpress
 description: A Helm chart for WordPress
 type: application
-version: 0.11.0
+version: 0.11.1
 # renovate: image=docker.io/library/wordpress
-appVersion: "7.1.3"
+appVersion: "7.1.4"
