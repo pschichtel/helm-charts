@@ -1,7 +1,9 @@
 #!/bin/bash
 # unifi-core: the UniFi OS core service (Node.js), foreground.
-# Owns the shared network namespace of the whole app tier.
 set -e
+
+# --- loopback bridges to the other services (see netbridge.sh)
+/scripts/netbridge.sh
 
 # --- static metadata the app expects (normally provided by the firmware)
 echo linux-x64 > /usr/lib/platform

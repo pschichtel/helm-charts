@@ -8,7 +8,6 @@ compose services. No systemd anywhere; data tier is all-official images.
 
 | Service | Role |
 |---|---|
-| `netns` | Idle holder (`sleep infinity`) that owns the shared network namespace and publishes all host ports. See "Shared network namespace". |
 | `unifi-core` | OS core (nginx, D-Bus, ucore API). |
 | `uos-agent`, `uos-discovery-client` | Image units `uos-agent` (serves the `uosAgent` API on 127.0.0.1:11010/11011 that unifi-core calls) and `uos-discovery-client` (Rust, run as root like in the stock image). |
 | `unifi` | UniFi Network Application (java). 8080/8081 internally. |
@@ -19,8 +18,126 @@ compose services. No systemd anywhere; data tier is all-official images.
 | `unifi-os-server-mongodb` | Official `mongo:latest` (for the java app). |
 | `rabbitmq` | Official `rabbitmq:latest` (4.x, TLS 5671, user `ui`). |
 
-All app-tier services share one container network and communicate over
-localhost; only `netns` publishes ports to the host.
+Every service is its own container with its own network namespace on the
+compose default network. Only `unifi-core` (80, 443, 11084), `unifi` (8080,
+device inform) and `ulp-go` (9443) publish ports; everything else is
+loopback-only inside its container (see "Networking").
+
+## Architecture
+
+Runtime interactions. Solid edges are TCP, dashed edges are unix sockets in
+the shared `/run` volume. Ports are the loopback ports the apps use; across
+containers they are carried by `scripts/netbridge.sh` (see "Networking").
+Basis: unifi-core's `default.yaml` and generated nginx upstreams, the apps'
+`config.props`, and live `ss` sampling of the running stack; it is a map of
+what we know calls what, not a packet capture.
+
+```mermaid
+flowchart LR
+    browser(["Browser"])
+    devices(["UniFi devices"])
+
+    subgraph core["unifi-core"]
+        nginx["nginx<br/>:80 :443 :11084"]
+        node["core (node)<br/>IPC :11081 / gRPC :11051"]
+    end
+
+    subgraph apps["app tier (Go)"]
+        ulp["ulp-go<br/>:9080 (+ :9443)"]
+        uid["uid-agent<br/>:6080"]
+        ucs["ucs-agent<br/>:9680"]
+        dir["unifi-directory<br/>:13080"]
+        idu["unifi-identity-update<br/>:9081"]
+    end
+
+    subgraph rust["image agents (Rust)"]
+        uosa["uos-agent<br/>IPC :11010 / API :11011"]
+        disc["uos-discovery-client<br/>:11002"]
+    end
+
+    java["unifi (Java)<br/>Network app<br/>:8081 api, :8080 inform"]
+
+    subgraph data["data tier"]
+        pg[("postgres 14")]
+        mongo[("mongodb")]
+        rmq[("rabbitmq<br/>TLS :5671")]
+    end
+
+    browser -->|"https :443"| nginx
+    devices -->|":8080 inform"| java
+
+    nginx -->|"users api :9080"| ulp
+    nginx -->|"directory :13080"| dir
+    nginx -->|"uid :6080"| uid
+    nginx -->|"network :8081 / :8080"| java
+    nginx -.->|"uos-http.sock"| node
+
+    node -->|":11011 API, :11010 IPC"| uosa
+    node -->|":11002"| disc
+    node -->|":9080"| ulp
+
+    ulp -->|":11081"| node
+    ulp -->|":8081"| java
+    uid -->|":11081"| node
+    uid -->|":9080"| ulp
+    ucs -->|":11081"| node
+    ucs -->|":9080"| ulp
+    ucs -->|":9081"| idu
+    idu -->|":9080"| ulp
+    idu -->|":9680"| ucs
+    dir -->|":11081"| node
+    dir -->|":8081"| java
+    java -->|":11081"| node
+
+    uid -.->|"jsonrpc.sock"| ulp
+    ucs -.->|"jsonrpc.sock"| ulp
+    dir -.->|"jsonrpc.sock"| ulp
+    idu -.->|"jsonrpc.sock"| ulp
+
+    core -->|":5432"| pg
+    apps -->|":5432"| pg
+    java -->|":5432"| pg
+    java --> mongo
+    java --> rmq
+```
+
+Startup dependencies (`depends_on` in compose; "healthy" means the
+healthcheck must pass, "started" only that the container was created).
+
+```mermaid
+flowchart TD
+    pg[("postgres")]
+    mongo[("mongodb")]
+    rmq[("rabbitmq")]
+    core["unifi-core"]
+    java["unifi"]
+    apps["ulp-go · uid-agent · ucs-agent<br/>unifi-directory · unifi-identity-update"]
+    rust["uos-agent · uos-discovery-client"]
+
+    pg -->|healthy| core
+    core -->|started| apps
+    pg -->|healthy| apps
+    core -->|started| rust
+    core -->|started| java
+    pg -->|healthy| java
+    mongo -->|healthy| java
+    rmq -->|healthy| java
+```
+
+Not in the picture on purpose: the other UniFi OS applications (credential
+server `:9580`, Access `:12080`/`:9780`, wireguard `:6082`, Protect `:7080`,
+Drive `:16080`, Talk, Connect, ...). They are **not installed in the image**:
+`dpkg -l` shows only `unifi` (Network), `unifi-core`, `uos`, `uos-agent`,
+`uos-discovery-client`, `ulp-go`, `uid-agent`, `ucs-agent`, `unifi-directory`,
+`unifi-identity-update` and mongodb. There are no packages, binaries or
+systemd units for the others; only leftover system users (`unifi-access`,
+`unifi-protect`, ...) and a stray `unifi-access.service.d` drop-in. The ports
+come from configuration shared with other console types (core's
+`default.yaml`, the Go apps' `config.props`/binaries), so those loopback ports
+stay "connection refused" here, as on any console with only the Network app.
+Core can apparently install applications at runtime
+(`/api/applications/<id>/install`); that has not been tried and would
+conflict with the stock-image rule.
 
 Console: `https://<host>:8443` — first boot is in factory state, complete the
 setup wizard.
@@ -39,6 +156,9 @@ setup wizard.
   - `run-<go-app>.sh` — sources the app's `envs.sh`, sets `TMPDIR` and hands
     over to `as-user.sh` (prepare dirs as root, drop to the app user, exec).
   - `as-user.sh` — the shared helper described below.
+  - `netbridge.sh` — loopback bridges between containers, run first by every
+    app-tier entrypoint (see "Networking"). `run-uos-agent.sh` and
+    `run-uos-discovery-client.sh` only do that and exec the binary.
   - `run-rabbitmq.sh`, `run-unifi.sh` — official RMQ setup (TLS 5671, `ui`
     user/cert) and java RMQ TLS flags.
 - `meta/` — console identity files (`platform`, `product_name`, `app_model`,
@@ -48,20 +168,66 @@ setup wizard.
 - `postgres/initdb.d/` — runs only on a fresh volume: trust auth, app roles
   and databases (`ulp-go`, `ulp-go-syslog`, ...).
 
-## Shared network namespace
+## Networking: separate containers, bridged loopback
 
-Services join a common netns via `network_mode: service:netns`. The owner is a
-dedicated idle container, **not** `unifi-core`: on a first boot `unifi-core`
-exits once with code 0 (about 3 s in, a provisioning step; under systemd that
-is a transparent `Restart=always`). When the namespace owner restarts, docker
-recreates its netns and every container joined to it keeps the dead one
-(symptom: `ECONNREFUSED 127.0.0.1:<port>` between services, fixed only by
-restarting them). With the idle `netns` holder, any service, including
-`unifi-core`, can restart freely. Checked by restarting `unifi-core` and
-confirming the others still see all listeners.
+The apps talk to each other over `127.0.0.1:<port>` (they assume one network
+stack, as under systemd). Services do **not** share a network namespace.
+Instead every app-tier entrypoint first runs `scripts/netbridge.sh`, which
+uses `socat` (present in the stock image) to make those loopback addresses
+work across containers:
 
-Do not "fix" connection-refused errors by restarting the other services after
-boot; that previously masked this problem.
+- **outbound:** for each port owned by *another* service, listen on
+  `127.0.0.1:<port>` and forward to `<owner service>:<port>`;
+- **inbound:** for ports the service binds on loopback only, listen on the
+  container's own IP and forward to `127.0.0.1:<port>`. The app therefore sees
+  the peer as `127.0.0.1`, which keeps `http.trust.hosts`-style checks working
+  (no NAT, no source-address changes).
+
+The port/owner table lives at the top of `netbridge.sh`; each service sets
+`NETBRIDGE_SELF` in compose. **When an upgrade adds a service or moves a
+port, update that table.** Forwarders run as `nobody` (keeping only
+`NET_BIND_SERVICE` for 80/443), are restarted if they die, and cost about
+20-30 small `socat` processes per container. Services use `init: true` so
+they get reaped. Unix sockets (`/run/ulp-go/jsonrpc.sock`, ...) just work
+through the shared `uos-run` volume.
+
+Gotchas:
+
+- `127.0.0.1:<port>` is *always* open in a client container (the local
+  forwarder accepts first), so a plain TCP check (`nc -z`) proves nothing about
+  the real service. `run-unifi.sh` therefore waits for core with an HTTP
+  request to `/api/info`. Use HTTP-level checks. (A TCP check there made
+  `unifi` start before core and exit once.)
+- Cross-service calls to a service that is down fail per connection, like
+  `connection refused` would.
+- `unifi-core` still exits once with code 0 on a first boot (provisioning, a
+  transparent `Restart=always` under systemd). That is harmless now: with
+  separate namespaces nothing else is affected when it restarts. This was a
+  real problem with the earlier shared-namespace design (the namespace owner's
+  restart orphaned every joined container).
+
+### Why not just configure the addresses?
+
+Checked, and only partly possible:
+
+- *Configurable:* `ulp-go` has `ucore.api`, `ucs.agent.api` and the jsonrpc
+  socket path; `unifi-directory` has `ucs.api`; `ucs-agent` and
+  `unifi-identity-update` have `proxy.services` (JSON of URLs); core reads
+  service **ports** from `default.yaml`.
+- *Not configurable:* unifi-core's generated nginx upstreams and almost all of
+  its internal calls are ``http://127.0.0.1:${port}`` in `service.js` (only a
+  few UI/data-stream proxies read an optional `host`). Core's IPC server
+  (`11081`) and gRPC server (`11051`) bind `127.0.0.1` in code, and so do
+  several others (`ulp-go`/`ucs-agent` `http.listen`, java `8081`,
+  `uos-agent`). The Go binaries also contain a table of loopback URLs
+  (`:3423 :6080 :7080 :8081 :9081 :9580 :9680 :9780`, `localhost:8081`, ...)
+  for which no config key exists in the shipped `config.props`; whether any
+  of them has an undocumented key could not be determined from the binaries.
+
+Since core cannot be pointed at other hosts and cannot listen beyond
+loopback, bridging is needed at least for core in both directions. Mixing
+config overrides for some Go apps with bridges for the rest would give two
+mechanisms for the same thing, so everything uses the bridges.
 
 ## Postgres must be version 14
 
@@ -140,7 +306,7 @@ mechanism, and none of them have a single "log to stdout" switch):
 - **Image units not run on purpose:** cron, snmpd, smartmontools, epmd. The
   other enabled units (`uos-agent`, `uos-discovery-client`) are run.
   `uos-discovery-client` is only checked for staying up: it does L2 discovery
-  and the shared namespace is a docker bridge, so it will not see LAN
+  and its container sits on a docker bridge, so it will not see LAN
   devices (would need host networking). Not verified.
 - Whether the setup wizard can be *completed* (admin account creation etc.)
   has not been verified, only that it renders.
@@ -164,9 +330,8 @@ mechanism, and none of them have a single "log to stdout" switch):
 
 - The data tier is disposable per the requirements: recreating the
   `postgres`/`mongodb`/`rabbitmq` volumes loses state by design.
-- `netns` must not be recreated/restarted independently: everything that
-  joins its namespace then holds a dead one. If it is, force-recreate all
-  app-tier services: `docker compose up -d --force-recreate`.
+- Any single service can be restarted/recreated on its own; the bridges
+  re-resolve targets by service name on every connection.
 - Entry scripts are bind-mounted: after changing `scripts/` or
   `docker-compose.yml`, use `docker compose up -d --force-recreate <svc>`.
 - App logs: `docker compose logs <svc>` for the Go services; the java app logs to

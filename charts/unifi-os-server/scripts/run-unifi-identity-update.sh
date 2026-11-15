@@ -2,6 +2,7 @@
 # unifi-identity-update (Go), foreground, starts as root, prepares its directories and drops to the app user (see as-user.sh).
 set -e
 
+/scripts/netbridge.sh
 source /usr/lib/unifi-identity-update/scripts/envs.sh
 
 export TMPDIR="${IDENTITY_TMP_DIR}"

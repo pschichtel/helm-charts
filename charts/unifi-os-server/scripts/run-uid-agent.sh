@@ -2,6 +2,7 @@
 # uid-agent (Go), foreground, starts as root, prepares its directories and drops to the app user (see as-user.sh).
 set -e
 
+/scripts/netbridge.sh
 source /usr/lib/uid-agent/scripts/envs.sh
 
 export TMPDIR="${UID_AGENT_TMP_DIR}"
