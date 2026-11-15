@@ -140,77 +140,6 @@ app.kubernetes.io/instance: {{ .Release.Name | printf "%s-sidekiq" }}
 {{- end }}
 {{- end }}
 
-{{- define "dawarich.env" -}}
-- name: RAILS_ENV
-  value: 'production'
-- name: RAILS_LOG_TO_STDOUT
-  value: 'true'
-- name: TMPDIR
-  value: '/tmp'
-{{/* SELF_HOSTED is required in Dawarich >=0.25.4 */}}
-- name: SELF_HOSTED
-  value: "true"
-- name: POD_IP
-  valueFrom:
-    fieldRef:
-      fieldPath: status.podIP
-- name: APPLICATION_HOSTS
-  value: {{ print (join "," .Values.dawarich.hosts) ",$(POD_IP):" .Values.service.port | quote }}
-- name: DOMAIN
-  value: {{ .Values.dawarich.hosts | first | quote }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_HOST" "Key" "postgresHost" "Value" .Values.postgresql.host "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_PORT" "Key" "postgresPort" "Value" .Values.postgresql.port "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_NAME" "Key" "postgresDatabase" "Value" .Values.postgresql.auth.database "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_USERNAME" "Key" "postgresUsername" "Value" .Values.postgresql.auth.username "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "DATABASE_PASSWORD" "Key" "postgresPassword" "Value" .Values.postgresql.auth.password "Root" .) }}
-{{- if .Values.redis.auth }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "A_REDIS_PASSWORD" "Key" "redisPassword" "Value" .Values.redis.password "Root" .) }}
-{{- end }}
-- name: REDIS_URL
-{{- $redisAddr := print (tpl .Values.redis.host .) ":" .Values.redis.port }}
-{{- if .Values.redis.auth }}
-  value: {{ print "redis://:$(A_REDIS_PASSWORD)@" $redisAddr | quote }}
-{{- else }}
-  value: {{ print "redis://" $redisAddr | quote }}
-{{- end }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "SECRET_KEY_BASE" "Key" "keyBase" "Value" .Values.keyBase "Root" .) }}
-{{- if .Values.oidc.enabled }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "OIDC_CLIENT_ID" "Key" "oidcClientId" "Value" .Values.oidc.clientId "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "OIDC_CLIENT_SECRET" "Key" "oidcClientSecret" "Value" .Values.oidc.clientSecret "Root" .) }}
-- name: OIDC_ISSUER
-  value: {{ .Values.oidc.issuer | quote }}
-- name: OIDC_REDIRECT_URI
-  value: {{ .Values.oidc.redirectUri | quote }}
-- name: OIDC_AUTO_REGISTER
-  value: {{ .Values.oidc.autoRegister | quote }}
-- name: OIDC_PROVIDER_NAME
-  value: {{ .Values.oidc.providerName | quote }}
-- name: ALLOW_EMAIL_PASSWORD_REGISTRATION
-  value: {{ .Values.oidc.allowEmailPasswordRegistration | quote }}
-{{- end }}
-{{- if .Values.metrics.enabled }}
-- name: PROMETHEUS_EXPORTER_ENABLED
-  value: "true"
-- name: PROMETHEUS_EXPORTER_HOST
-  value: "0.0.0.0"
-- name: PROMETHEUS_EXPORTER_PORT
-  value: "{{ include "dawarich.prometheusPort" . }}"
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "METRICS_USERNAME" "Key" "metricsUsername" "Value" .Values.metrics.username "Root" .) }}
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "METRICS_PASSWORD" "Key" "metricsPassword" "Value" .Values.metrics.password "Root" .) }}
-{{- end }}
-{{- if .Values.photon.enabled }}
-{{- with .Values.photon.host }}
-- name: PHOTON_API_HOST
-  value: "{{ . }}"
-{{- end }}
-- name: PHOTON_API_USE_HTTPS
-  value: "{{ .Values.photon.useHttps }}"
-{{- include "dawarich.secretValueEnvRef" (dict "EnvName" "PHOTON_API_KEY" "Key" "photonApiKey" "Value" .Values.photon.apiKey "Optional" true "Root" .) }}
-- name: STORE_GEODATA
-  value: "{{ .Values.photon.store }}"
-{{- end }}
-{{- end }}
-
 {{- define "dawarich.prometheusPort" }}9394{{ end }}
 
 {{- define "dawarich.livenessProbe" }}
@@ -223,21 +152,11 @@ httpGet:
 {{- end }}
 
 {{- define "dawarich.readinessProbe" }}
-httpGet:
-  path: /api/v1/health
-  port: http
-  httpHeaders:
-    - name: Host
-      value: {{ .Values.dawarich.hosts | first }}
+{{- include "dawarich.livenessProbe" . }}
 {{- end }}
 
 {{- define "dawarich.startupProbe" }}
-httpGet:
-  path: /api/v1/health
-  port: http
-  httpHeaders:
-    - name: Host
-      value: {{ .Values.dawarich.hosts | first }}
+{{- include "dawarich.livenessProbe" . }}
 initialDelaySeconds: 30
 periodSeconds: 10
 failureThreshold: 10

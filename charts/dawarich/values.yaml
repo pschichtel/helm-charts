@@ -69,50 +69,8 @@ dawarich:
   replicaCount: 1
   hosts:
     - "dawarich.example.org"
-
-  resources: {}
-    # We usually recommend not to specify default resources and to leave this as a conscious
-    # choice for the user. This also increases chances charts run on environments with little
-    # resources, such as Minikube. If you do want to specify resources, uncomment the following
-    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-    # limits:
-    #   cpu: 100m
-    #   memory: 256Mi
-    # requests:
-    #   cpu: 500m
-    #   memory: 2Gi
-
-  nodeSelector: {}
-
-  tolerations: []
-
-  affinity: {}
-
-sidekiq:
-  replicaCount: 1
-
-  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  livenessProbe:
-    exec:
-      command:
-        - "sh"
-        - "-c"
-        - "pgrep -f sidekiq"
-  readinessProbe:
-    exec:
-      command:
-        - "sh"
-        - "-c"
-        - "pgrep -f sidekiq"
-  startupProbe:
-    exec:
-      command:
-        - "sh"
-        - "-c"
-        - "pgrep -f sidekiq"
-    initialDelaySeconds: 30
-    periodSeconds: 10
-    failureThreshold: 10
+  backgroundProcessingConcurrency: 2
+  timeZone: Europa/Berlin
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
