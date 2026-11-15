@@ -70,7 +70,7 @@ dawarich:
   hosts:
     - "dawarich.example.org"
   backgroundProcessingConcurrency: 2
-  timeZone: Europa/Berlin
+  timeZone: Europe/Berlin
 
   resources: {}
     # We usually recommend not to specify default resources and to leave this as a conscious
