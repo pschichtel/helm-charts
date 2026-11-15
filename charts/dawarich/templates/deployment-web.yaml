@@ -28,6 +28,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- include "dawarich.podSecurityContext" . | nindent 6 }}
+      terminationGracePeriodSeconds: 60
       containers:
         - name: {{ .Chart.Name }}
           {{- with .Values.image }}
