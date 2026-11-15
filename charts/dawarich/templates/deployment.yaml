@@ -134,9 +134,40 @@ spec:
           resources:
             {{- toYaml .Values.dawarich.resources | nindent 12 }}
           volumeMounts:
-            {{- include "dawarich.volumeMounts" . | trim | nindent 12 }}
+            - name: tmp
+              mountPath: /var/app/tmp
+              subPath: app-tmp
+            - name: tmp
+              mountPath: /tmp
+              subPath: tmp
+            - name: tmp
+              mountPath: /var/app/tmp/imports/watched
+              subPath: watched
+            - name: public
+              mountPath: /var/app/public
+            {{- if .Values.persistence.storage.enabled }}
+            - name: storage
+              mountPath: /var/app/storage
+            {{- end }}
+            {{- if .Values.dawarich.extraVolumeMounts }}
+            {{- toYaml .Values.dawarich.extraVolumeMounts | indent 12 }}
+            {{- end }}
       volumes:
-        {{- include "dawarich.volumes" . | trim | nindent 8 }}
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 256Mi
+        - name: public
+          emptyDir:
+            sizeLimit: 512Mi
+        {{- if .Values.persistence.storage.enabled }}
+        - name: storage
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-storage" (include "dawarich.fullname" .)) .Values.persistence.storage.existingClaim }}
+        {{- end }}
+        {{- if .Values.dawarich.extraVolumes }}
+        {{- toYaml .Values.dawarich.extraVolumes | nindent 8 }}
+        {{- end }}
       {{- with .Values.dawarich.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

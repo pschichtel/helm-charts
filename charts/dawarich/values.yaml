@@ -90,6 +90,12 @@ dawarich:
 
   affinity: {}
 
+  # Additional volumes on the output Deployment definition.
+  extraVolumes: []
+
+  # Additional volumeMounts on the output Deployment definition.
+  extraVolumeMounts: []
+
 persistence:
   public:
     # This volume mounts to /var/app/public
@@ -177,9 +183,3 @@ metrics:
     key: metricsPassword
   serviceMonitor:
     enabled: false
-
-# Additional volumes on the output Deployment definition.
-extraVolumes: []
-
-# Additional volumeMounts on the output Deployment definition.
-extraVolumeMounts: []
