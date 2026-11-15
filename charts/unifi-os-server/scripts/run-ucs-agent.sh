@@ -2,7 +2,6 @@
 # ucs-agent (Go), foreground, starts as root, prepares its directories and drops to the app user (see as-user.sh).
 set -e
 
-/scripts/netbridge.sh
 source /usr/lib/ucs-agent/scripts/envs.sh
 
 export TMPDIR="${IDENTITY_TMP_DIR}"

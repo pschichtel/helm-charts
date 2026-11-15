@@ -2,12 +2,7 @@
 # unifi: the Java "ace" application, foreground.
 set -e
 
-# --- loopback bridges to the other services (see netbridge.sh)
-/scripts/netbridge.sh
-
-# --- wait for core's IPC API (tolerates core being briefly down). Must be an
-# HTTP check: 127.0.0.1:11081 is answered by the local netbridge forwarder
-# immediately, so a plain TCP check would pass before core is actually up.
+# --- wait for core's IPC API (tolerates core being briefly down)
 for i in $(seq 1 90); do curl -sf -o /dev/null http://127.0.0.1:11081/api/info && break; sleep 2; done
 
 # --- first-boot UOS init (root)

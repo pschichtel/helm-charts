@@ -2,9 +2,9 @@
 #
 # Data tier : standard images, reached by service name
 #             unifi-os-server-mongodb (mongo), postgres, rabbitmq
-# App tier  : separate containers. The apps hard-code 127.0.0.1:<port> peers, so
-#             every entrypoint first runs scripts/netbridge.sh (socat forwards
-#             between containers); unix sockets go through the shared /run volume.
+# App tier  : all services join the network namespace of the idle `netns`
+#             container (network_mode: service:netns) and share a /run volume,
+#             so hardcoded loopback ports / unix sockets just work.
 #
 # First boot takes a few minutes: unifi-core generates the nginx site
 # configs and cert, and the nginx service waits for that.
@@ -66,18 +66,30 @@ services:
       start_period: 30s
 
   # ------------------------------- app tier --------------------------------
-  unifi-core:
+  # Owns the shared network namespace and the published ports. It never
+  # restarts, so unifi-core (which exits once on first boot, like a systemd
+  # Restart=always unit) and every other app-tier service can restart freely
+  # without orphaning the namespace of the containers that join it.
+  netns:
     image: ${UOS_IMAGE}
-    container_name: unifi-os-unifi-core
+    container_name: unifi-os-netns
     restart: unless-stopped
     init: true
-    entrypoint: ["/scripts/run-unifi-core.sh"]
+    entrypoint: ["sleep", "infinity"]
     ports:
       - "${UI_HTTP_PORT}:80"
       - "${UI_HTTPS_PORT}:443"
       - "11084:11084"
+      - "8080:8080"
+      - "9443:9443"
+
+  unifi-core:
+    image: ${UOS_IMAGE}
+    container_name: unifi-os-unifi-core
+    restart: unless-stopped
+    network_mode: service:netns
+    entrypoint: ["/scripts/run-unifi-core.sh"]
     environment:
-      NETBRIDGE_SELF: unifi-core
       UOS_UUID: ${UOS_UUID}
     volumes:
       - ./scripts:/scripts:ro
@@ -85,6 +97,8 @@ services:
       - unifi-core-data:/data/unifi-core
       - uos-run:/run
     depends_on:
+      netns:
+        condition: service_started
       postgres:
         condition: service_healthy
     healthcheck:
@@ -98,12 +112,9 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-unifi
     restart: unless-stopped
-    init: true
+    network_mode: service:netns
     entrypoint: ["/scripts/run-unifi.sh"]
-    ports:
-      - "8080:8080"
     environment:
-      NETBRIDGE_SELF: unifi
       UOS_UUID: ${UOS_UUID}
       UOS_SYSTEM_IP: ${UOS_SYSTEM_IP}
       UNIFI_POSTGRESQL_HOST: postgres
@@ -127,11 +138,7 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-ulp-go
     restart: unless-stopped
-    init: true
-    ports:
-      - "9443:9443"
-    environment:
-      NETBRIDGE_SELF: ulp-go
+    network_mode: service:netns
     entrypoint: ["/scripts/run-ulp-go.sh"]
     # app-internal per-component log files; real logging goes to stdout
     tmpfs:
@@ -157,9 +164,7 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-uid-agent
     restart: unless-stopped
-    init: true
-    environment:
-      NETBRIDGE_SELF: uid-agent
+    network_mode: service:netns
     entrypoint: ["/scripts/run-uid-agent.sh"]
     volumes:
       - ./scripts:/scripts:ro
@@ -182,9 +187,7 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-unifi-directory
     restart: unless-stopped
-    init: true
-    environment:
-      NETBRIDGE_SELF: unifi-directory
+    network_mode: service:netns
     entrypoint: ["/scripts/run-unifi-directory.sh"]
     # app-internal per-component log files; real logging goes to stdout
     tmpfs:
@@ -208,9 +211,7 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-ucs-agent
     restart: unless-stopped
-    init: true
-    environment:
-      NETBRIDGE_SELF: ucs-agent
+    network_mode: service:netns
     entrypoint: ["/scripts/run-ucs-agent.sh"]
     # app-internal per-component log files; real logging goes to stdout
     tmpfs:
@@ -235,9 +236,7 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-unifi-identity-update
     restart: unless-stopped
-    init: true
-    environment:
-      NETBRIDGE_SELF: unifi-identity-update
+    network_mode: service:netns
     entrypoint: ["/scripts/run-unifi-identity-update.sh"]
     # app-internal log files (only written on errors); real logging goes to stdout
     tmpfs:
@@ -265,12 +264,9 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-uos-agent
     restart: unless-stopped
-    init: true
-    environment:
-      NETBRIDGE_SELF: uos-agent
-    entrypoint: ["/scripts/run-uos-agent.sh"]
+    network_mode: service:netns
+    entrypoint: ["/usr/bin/uos-agent"]
     volumes:
-      - ./scripts:/scripts:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro
@@ -285,12 +281,9 @@ services:
     image: ${UOS_IMAGE}
     container_name: unifi-os-uos-discovery-client
     restart: unless-stopped
-    init: true
-    environment:
-      NETBRIDGE_SELF: uos-discovery-client
-    entrypoint: ["/scripts/run-uos-discovery-client.sh"]
+    network_mode: service:netns
+    entrypoint: ["/usr/bin/uos-discovery-client"]
     volumes:
-      - ./scripts:/scripts:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro

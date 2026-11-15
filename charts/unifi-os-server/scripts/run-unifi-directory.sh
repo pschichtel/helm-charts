@@ -2,7 +2,6 @@
 # unifi-directory (Go), foreground, starts as root, prepares its directories and drops to the app user (see as-user.sh).
 set -e
 
-/scripts/netbridge.sh
 source /usr/lib/unifi-directory/scripts/envs.sh
 
 export TMPDIR="${DIRECTORY_TMP_DIR}"
