@@ -208,26 +208,23 @@ Gotchas:
 
 ### Why not just configure the addresses?
 
-Checked, and only partly possible:
+Investigated in depth (source reading of core's JS, disassembly of the Go and
+Rust binaries, decompilation of the Java app, plus live tests); full results
+and evidence are in [docs/loopback-addresses.md](docs/loopback-addresses.md).
+Summary:
 
-- *Configurable:* `ulp-go` has `ucore.api`, `ucs.agent.api` and the jsonrpc
-  socket path; `unifi-directory` has `ucs.api`; `ucs-agent` and
-  `unifi-identity-update` have `proxy.services` (JSON of URLs); core reads
-  service **ports** from `default.yaml`.
-- *Not configurable:* unifi-core's generated nginx upstreams and almost all of
-  its internal calls are ``http://127.0.0.1:${port}`` in `service.js` (only a
-  few UI/data-stream proxies read an optional `host`). Core's IPC server
-  (`11081`) and gRPC server (`11051`) bind `127.0.0.1` in code, and so do
-  several others (`ulp-go`/`ucs-agent` `http.listen`, java `8081`,
-  `uos-agent`). The Go binaries also contain a table of loopback URLs
-  (`:3423 :6080 :7080 :8081 :9081 :9580 :9680 :9780`, `localhost:8081`, ...)
-  for which no config key exists in the shipped `config.props`; whether any
-  of them has an undocumented key could not be determined from the binaries.
+- Some addresses are configurable: `ucore.api` in `ulp-go`, `ucs-agent` and
+  `unifi-directory`; `services.<name>.host` / `controllers.<name>.host` in
+  core; `http.listen` in `ulp-go` and `ucs-agent`;
+  `DISCOVERY_CLIENT_SERVER_HOST` for the discovery client.
+- Every component still has at least one literal `127.0.0.1` peer or listen
+  address in its code. Core honours its `host` key in only 5 of about 30 call
+  sites and binds its IPC/gRPC servers to loopback in code; `uid-agent`,
+  `unifi-identity-update`, the Java app and `uos-agent` have no usable keys
+  at all.
 
-Since core cannot be pointed at other hosts and cannot listen beyond
-loopback, bridging is needed at least for core in both directions. Mixing
-config overrides for some Go apps with bridges for the rest would give two
-mechanisms for the same thing, so everything uses the bridges.
+So bridging cannot be removed by configuration, and mixing both would mean
+two mechanisms for the same job. The stack therefore bridges everything.
 
 ## Postgres must be version 14
 
