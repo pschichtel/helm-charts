@@ -181,7 +181,7 @@ failureThreshold: 10
 
 {{- define "dawarich.secretKeyRef" }}
 {{- if or .Value (not .Optional) -}}
-{{- if kindIs "map" .Value -}}
+{{- if ne .Value nil -}}
 name: {{ .Value.name | default (include "dawarich.secretName" .Root) }}
 key: {{ .Value.key | quote }}
 {{- else }}

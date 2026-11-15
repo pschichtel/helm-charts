@@ -117,8 +117,10 @@ persistence:
     size: 5Gi
 
 postgresql:
-  host: '{{ $.Release.Name }}-postgresql'
-  port: 5432
+  host:
+    key: postgresHost
+  port:
+    key: postgresPort
 
   auth:
     database:
