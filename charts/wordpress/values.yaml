@@ -5,10 +5,10 @@
 replicaCount: 1
 
 nginxImage:
-  repository: docker.io/nginxinc/nginx-unprivileged
+  repository: docker.io/nginx/nginx-unprivileged
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.29.5"
+  tag: "1.31.8"
 
 wordpressImage:
   repository: docker.io/library/wordpress
