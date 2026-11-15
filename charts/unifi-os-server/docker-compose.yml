@@ -26,16 +26,15 @@ services:
       start_period: 20s
 
   postgres:
-    image: postgres:18
+    # must stay <=14: ulp-go emits `$1AND ...` SQL that PG>=15 rejects
+    image: postgres:14
     container_name: unifi-os-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
-      # postgres:18+ keeps per-major-version clusters; mount the volume at the
-      # cluster root so the image's default PGDATA (…/18/docker) lives in it
-      - postgres-data:/var/lib/postgresql
+      - postgres-data:/var/lib/postgresql/data
       - ./postgres/initdb.d:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -q -h 127.0.0.1 -p 5432"]

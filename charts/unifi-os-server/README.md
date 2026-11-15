@@ -13,7 +13,7 @@ compose services. No systemd anywhere; data tier is all-official images.
 | `ulp-go` | ULP app framework (Go). 9080/9443 internally. |
 | `unifi-directory` | Directory (Go). 13080 internally. |
 | `ucs-agent`, `unifi-identity-update`, `uid-agent` | Identity/UCS agents (Go). |
-| `postgres` | Official `postgres:18`. Shared by all Go services. |
+| `postgres` | Official `postgres:14` (see below). Shared by all Go services. |
 | `unifi-os-server-mongodb` | Official `mongo:latest` (for the java app). |
 | `rabbitmq` | Official `rabbitmq:latest` (4.x, TLS 5671, user `ui`). |
 
@@ -36,7 +36,6 @@ setup wizard.
     `postgres` service, runs `pre-start.sh` (first-boot `ulp init`), then
     starts the app **as the `ulp-go` user via `runuser`** (root only for the
     bootstrap steps; `runuser` propagates the child's exit code).
-  - `patch-ulp-go-app.sh` — see "Known upstream bug" below.
   - `run-rabbitmq.sh`, `run-unifi.sh` — official RMQ setup (TLS 5671, `ui`
     user/cert) and java RMQ TLS flags.
 - `meta/` — console identity files (`platform`, `product_name`, `app_model`,
@@ -46,30 +45,20 @@ setup wizard.
 - `postgres/initdb.d/` — runs only on a fresh volume: trust auth, app roles
   and databases (`ulp-go`, `ulp-go-syslog`, ...).
 
-## Known upstream bug — patched in place
+## Postgres must be version 14
 
-`ulp-go` vendors a modified xorm whose postgres `GetColumns` template is
-corrupted: the query is built from
-`... c.relname = $1%s ...` by substituting the literal
-`AND s.table_schema = $2` **without a leading space**, producing invalid SQL
-(`c.relname = $1AND s.table_schema = $2`) that Postgres rejects with
-`trailing junk after parameter`. Any `Sync2()` on an existing table then
-panics the process at boot (and the 2-minute syslog cleanup ticker).
+`ulp-go` (xorm fork) always emits `... c.relname = $1AND s.table_schema = $2 ...`
+(no space after `$1`). Postgres <= 14 accepts that; 15+ rejects it with
+`trailing junk after parameter`, which panics `ulp-go` on any boot where tables
+already exist. The upstream image bundles PG 14 (and 16), so the compose file
+pins `postgres:14` instead of patching the binary. Do not bump it. Changing the
+major version requires recreating the `postgres-data` volume.
 
-`scripts/patch-ulp-go-app.sh` fixes this with a **zero-length, in-place,
-idempotent** rewrite of the single template string inside
-`/usr/sbin/ulp-go-app` (drops one space elsewhere in the same string, adds it
-after `$1`), preserving the binary's length and Go string metadata. It runs on
-every boot from `run-ulp-go.sh` before the app starts. The resulting SQL is:
-
-```sql
-... WHERE n.nspname=s.table_schema AND c.relkind = 'r'::char
-    AND c.relname = $1 AND s.table_schema = $2 AND f.attnum > 0 ...
-```
-
-Do not skip `skip_migration` or "fix" the crash by dropping tables: with the
-patch, migrations and `Sync2` work correctly on both databases
-(`ulp-go` and `ulp-go-syslog`).
+The volume mount point is tied to the image major version: `postgres:<=17`
+declares `VOLUME /var/lib/postgresql/data` (mount there; mounting the parent
+would leave the data in an anonymous volume), while `postgres:18+` uses
+`/var/lib/postgresql/<major>/docker` and expects the mount at
+`/var/lib/postgresql`. Adjust the mount when changing the major version.
 
 ## Operations notes
 
