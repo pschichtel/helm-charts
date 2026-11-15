@@ -1,0 +1,9 @@
+# Overrides the image defaults (unix socket) to use the shared postgres service.
+# Loaded via the `overrides` list in the app's stock config.props.
+db.host = postgres
+db.port = 5432
+
+# logging to stdout
+log.std = true
+log.file = false
+log.redirect_std_output = false

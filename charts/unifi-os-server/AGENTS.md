@@ -14,3 +14,12 @@ into one docker compose service per systemd unit. See `README.md` for layout.
   over patching binaries or image contents. If a patch is unavoidable, document
   it in the README with the root cause.
 - When a workaround is removed, update the README in the same change.
+
+## No custom images
+
+- Do not build or introduce custom docker images (no `Dockerfile`, no
+  `build:` in compose, no locally tagged images). Every service must use a
+  stock image (`UOS_IMAGE` or the official upstream data-tier images).
+- Needed changes belong in bind-mounted scripts/config and compose settings
+  (entrypoint scripts, `config/`, tmpfs, volumes). Running an entrypoint as
+  root to prepare the container is acceptable; see `scripts/as-user.sh`.

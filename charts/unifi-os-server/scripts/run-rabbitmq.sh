@@ -26,6 +26,9 @@ fi
 
 # TLS listener on 5671, server cert signed by the local CA, and a client
 # certificate is mandatory (the java app presents client.cert/key).
+# the first-boot block above leaves umask 077 behind; the conf must be readable by rabbitmq
+umask 022
+
 cat > /etc/rabbitmq/rabbitmq.conf <<EOF
 listeners.tcp.default = 5672
 listeners.ssl.default = 5671

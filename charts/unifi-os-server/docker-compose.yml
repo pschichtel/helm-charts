@@ -2,8 +2,8 @@
 #
 # Data tier : standard images, reached by service name
 #             unifi-os-server-mongodb (mongo), postgres, rabbitmq
-# App tier  : all services join the network namespace of `unifi-core`
-#             (network_mode: service:unifi-core) and share a /run volume,
+# App tier  : all services join the network namespace of the idle `netns`
+#             container (network_mode: service:netns) and share a /run volume,
 #             so hardcoded loopback ports / unix sockets just work.
 #
 # First boot takes a few minutes: unifi-core generates the nginx site
@@ -66,13 +66,16 @@ services:
       start_period: 30s
 
   # ------------------------------- app tier --------------------------------
-  unifi-core:
+  # Owns the shared network namespace and the published ports. It never
+  # restarts, so unifi-core (which exits once on first boot, like a systemd
+  # Restart=always unit) and every other app-tier service can restart freely
+  # without orphaning the namespace of the containers that join it.
+  netns:
     image: ${UOS_IMAGE}
-    container_name: unifi-os-unifi-core
+    container_name: unifi-os-netns
     restart: unless-stopped
-    entrypoint: ["/scripts/run-unifi-core.sh"]
-    environment:
-      UOS_UUID: ${UOS_UUID}
+    init: true
+    entrypoint: ["sleep", "infinity"]
     ports:
       - "${UI_HTTP_PORT}:80"
       - "${UI_HTTPS_PORT}:443"
@@ -90,12 +93,23 @@ services:
       - "6080:6080"
       - "6082:6082"
       - "11084:11084"
+
+  unifi-core:
+    image: ${UOS_IMAGE}
+    container_name: unifi-os-unifi-core
+    restart: unless-stopped
+    entrypoint: ["/scripts/run-unifi-core.sh"]
+    network_mode: service:netns
+    environment:
+      UOS_UUID: ${UOS_UUID}
     volumes:
       - ./scripts:/scripts:ro
       - ./fake-sd1.js:/opt/fake-sd1.js:ro
       - unifi-core-data:/data/unifi-core
       - uos-run:/run
     depends_on:
+      netns:
+        condition: service_started
       postgres:
         condition: service_healthy
     healthcheck:
@@ -110,7 +124,7 @@ services:
     container_name: unifi-os-unifi
     restart: unless-stopped
     entrypoint: ["/scripts/run-unifi.sh"]
-    network_mode: service:unifi-core
+    network_mode: service:netns
     environment:
       UOS_UUID: ${UOS_UUID}
       UOS_SYSTEM_IP: ${UOS_SYSTEM_IP}
@@ -136,9 +150,14 @@ services:
     container_name: unifi-os-ulp-go
     restart: unless-stopped
     entrypoint: ["/scripts/run-ulp-go.sh"]
-    network_mode: service:unifi-core
+    network_mode: service:netns
+    # app-internal per-component log files; real logging goes to stdout
+    tmpfs:
+      - /data/ulp-go/log:uid=999,gid=999,size=32m
     volumes:
       - ./scripts:/scripts:ro
+      - ./config/ulp-go.props:/etc/ulp-go/config.props:ro
+      - ./config/logger/ulp-go.yaml:/usr/lib/ulp-go/configs/logger/prd.yaml:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro
@@ -147,6 +166,8 @@ services:
       - ulp-go-srv:/srv/ulp-go
       - uos-run:/run
     depends_on:
+      netns:
+        condition: service_started
       unifi-core:
         condition: service_started
       postgres:
@@ -157,9 +178,11 @@ services:
     container_name: unifi-os-uid-agent
     restart: unless-stopped
     entrypoint: ["/scripts/run-uid-agent.sh"]
-    network_mode: service:unifi-core
+    network_mode: service:netns
     volumes:
       - ./scripts:/scripts:ro
+      - ./config/uid-agent.props:/etc/uid-agent/config.props:ro
+      - ./config/logger/uid-agent.yaml:/usr/lib/uid-agent/logger.yaml:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro
@@ -178,9 +201,13 @@ services:
     container_name: unifi-os-unifi-directory
     restart: unless-stopped
     entrypoint: ["/scripts/run-unifi-directory.sh"]
-    network_mode: service:unifi-core
+    network_mode: service:netns
+    # app-internal per-component log files; real logging goes to stdout
+    tmpfs:
+      - /data/unifi-directory/log:uid=979,gid=979,size=32m
     volumes:
       - ./scripts:/scripts:ro
+      - ./config/unifi-directory.props:/etc/unifi-directory/config.props:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro
@@ -198,9 +225,14 @@ services:
     container_name: unifi-os-ucs-agent
     restart: unless-stopped
     entrypoint: ["/scripts/run-ucs-agent.sh"]
-    network_mode: service:unifi-core
+    network_mode: service:netns
+    # app-internal per-component log files; real logging goes to stdout
+    tmpfs:
+      - /data/ucs-agent/log:uid=975,gid=976,size=32m
     volumes:
       - ./scripts:/scripts:ro
+      - ./config/ucs-agent.props:/etc/ucs-agent/config.props:ro
+      - ./config/logger/ucs-agent.yaml:/usr/lib/ucs-agent/configs/logger/prd.yaml:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro
@@ -218,9 +250,14 @@ services:
     container_name: unifi-os-unifi-identity-update
     restart: unless-stopped
     entrypoint: ["/scripts/run-unifi-identity-update.sh"]
-    network_mode: service:unifi-core
+    network_mode: service:netns
+    # app-internal log files (only written on errors); real logging goes to stdout
+    tmpfs:
+      - /var/log/unifi_package-identity-update:uid=974,gid=975,size=32m
     volumes:
       - ./scripts:/scripts:ro
+      - ./config/unifi-identity-update.props:/etc/unifi-identity-update/config.props:ro
+      - ./config/logger/unifi-identity-update.yaml:/usr/lib/unifi-identity-update/configs/logger/prd.yaml:ro
       - ./meta/platform:/usr/lib/platform:ro
       - ./meta/product_name:/usr/lib/product_name:ro
       - ./meta/app_model:/usr/lib/app_model:ro
@@ -232,6 +269,42 @@ services:
         condition: service_started
       postgres:
         condition: service_healthy
+
+  # Image units `uos-agent` / `uos-discovery-client` (Rust, run as root in the
+  # stock image). uos-agent serves the uosAgent API (11010/11011) that
+  # unifi-core calls (e.g. /api/v2/identity/status).
+  uos-agent:
+    image: ${UOS_IMAGE}
+    container_name: unifi-os-uos-agent
+    restart: unless-stopped
+    entrypoint: ["/usr/bin/uos-agent"]
+    network_mode: service:netns
+    volumes:
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
+      - uos-data:/data/uos
+      - uos-run:/run
+    depends_on:
+      unifi-core:
+        condition: service_started
+
+  uos-discovery-client:
+    image: ${UOS_IMAGE}
+    container_name: unifi-os-uos-discovery-client
+    restart: unless-stopped
+    entrypoint: ["/usr/bin/uos-discovery-client"]
+    network_mode: service:netns
+    volumes:
+      - ./meta/platform:/usr/lib/platform:ro
+      - ./meta/product_name:/usr/lib/product_name:ro
+      - ./meta/app_model:/usr/lib/app_model:ro
+      - ./meta/version:/usr/lib/version:ro
+      - uos-run:/run
+    depends_on:
+      unifi-core:
+        condition: service_started
 
 volumes:
   mongodb-data:
@@ -248,3 +321,4 @@ volumes:
   ucs-agent-data:
   identity-update-data:
   uos-run:
+  uos-data:
