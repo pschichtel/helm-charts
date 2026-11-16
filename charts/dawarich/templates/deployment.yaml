@@ -129,6 +129,26 @@ spec:
             {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_ACCESS_KEY_ID" "Key" "s3AccessKey" "Value" .Values.persistence.s3.accessKey "Root" .) | nindent 12 }}
             {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_SECRET_ACCESS_KEY" "Key" "s3SecretKey" "Value" .Values.persistence.s3.secretKey "Root" .) | nindent 12 }}
             {{- end }}
+            {{- if .Values.email.enabled }}
+            - name: SMTP_SERVER
+              value: {{ .Values.email.server | quote }}
+            - name: SMTP_PORT
+              value: {{ .Values.email.port | quote }}
+            - name: SMTP_STARTTLS
+              value: {{ .Values.email.startTls | quote }}
+            {{- with .Values.email.heloDomain }}
+            - name: SMTP_DOMAIN
+              value: {{ . | quote }}
+            {{- end }}
+            {{- if eq .Values.email.authentication "plain" }}
+            - name: SMTP_AUTHENTICATION
+              value: plain
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "SMTP_USERNAME" "Key" "smtpUsername" "Value" .Values.email.plainAuth.smtpUsername "Root" .) | nindent 12 }}
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "SMTP_PASSWORD" "Key" "smtpPassword" "Value" .Values.email.plainAuth.smtpPassword "Root" .) | nindent 12 }}
+            {{- end }}
+            - name: SMTP_FROM
+              value: {{ .Values.email.senderAddress | quote }}
+            {{- end }}
           {{- include "dawarich.securityContext" . | nindent 10 }}
           ports:
             - name: http

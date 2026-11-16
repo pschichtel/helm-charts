@@ -32,6 +32,8 @@ secret:
     s3Bucket: null
     s3AccessKey: null
     s3SecretKey: null
+    smtpUsername: null
+    smtpPassword: null
 
 keyBase:
   key: keyBase
@@ -100,6 +102,20 @@ dawarich:
 
   # Additional volumeMounts on the output Deployment definition.
   extraVolumeMounts: []
+
+email:
+  enabled: true
+  server: example.org
+  port: 587
+  startTls: true
+  heloDomain: null
+  authentication: none
+  plainAuth:
+    username:
+      key: smtpUsername
+    password:
+      key: smtpPassword
+  senderAddress: dawarich@example.org
 
 persistence:
   # local or s3
