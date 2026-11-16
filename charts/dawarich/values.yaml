@@ -97,7 +97,20 @@ dawarich:
   extraVolumeMounts: []
 
 persistence:
-  storage:
+  # local or s3
+  backend: local
+  s3:
+    endpoint:
+      key: s3Endpoint
+    region:
+      key: s3Region
+    bucket:
+      key: s3Bucket
+    accessKey:
+      key: s3AccessKey
+    secretKey:
+      key: s3SecretKey
+  local:
     # This volume mounts to /var/app/storage
     enabled: true
     existingClaim: ""

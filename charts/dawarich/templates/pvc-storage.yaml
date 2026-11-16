@@ -1,4 +1,4 @@
-{{- if and .Values.persistence.storage.enabled (not .Values.persistence.storage.existingClaim) }}
+{{- if and .Values.persistence.local.enabled (not .Values.persistence.local.existingClaim) }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -8,16 +8,16 @@ metadata:
     helm.sh/chart: {{ include "dawarich.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-  {{- with .Values.persistence.storage.annotations }}
+  {{- with .Values.persistence.local.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   accessModes:
-    - {{ .Values.persistence.storage.accessMode | quote }}
+    - {{ .Values.persistence.local.accessMode | quote }}
   resources:
     requests:
-      storage: {{ .Values.persistence.storage.size | quote }}
-  {{- with .Values.persistence.storage.storageClass }}
+      storage: {{ .Values.persistence.local.size | quote }}
+  {{- with .Values.persistence.local.storageClass }}
   {{- if (eq "-" .) }}
   storageClassName: ""
   {{- else }}

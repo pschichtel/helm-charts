@@ -120,6 +120,15 @@ spec:
             - name: STORE_GEODATA
               value: "{{ .Values.photon.store }}"
             {{- end }}
+            {{- if eq .Values.persistence.backend "s3" }}
+            - name: STORAGE_BACKEND
+              value: s3
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_ENDPOINT_URL" "Key" "s3Endpoint" "Value" .Values.persistence.s3.endpoint "Root" .) | nindent 12 }}
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_REGION" "Key" "s3Region" "Value" .Values.persistence.s3.region "Optional" true "Root" .) | nindent 12 }}
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_BUCKET" "Key" "s3Bucket" "Value" .Values.persistence.s3.bucket "Root" .) | nindent 12 }}
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_ACCESS_KEY_ID" "Key" "s3AccessKey" "Value" .Values.persistence.s3.accessKey "Root" .) | nindent 12 }}
+            {{- include "dawarich.secretValueEnvRef" (dict "EnvName" "AWS_SECRET_ACCESS_KEY" "Key" "s3SecretKey" "Value" .Values.persistence.s3.secretKey "Root" .) | nindent 12 }}
+            {{- end }}
           {{- include "dawarich.securityContext" . | nindent 10 }}
           ports:
             - name: http
@@ -145,7 +154,7 @@ spec:
               subPath: watched
             - name: public
               mountPath: /var/app/public
-            {{- if .Values.persistence.storage.enabled }}
+            {{- if and (eq .Values.persistence.backend "local") .Values.persistence.local.enabled }}
             - name: storage
               mountPath: /var/app/storage
             {{- end }}
@@ -163,7 +172,7 @@ spec:
         {{- if .Values.persistence.storage.enabled }}
         - name: storage
           persistentVolumeClaim:
-            claimName: {{ default (printf "%s-storage" (include "dawarich.fullname" .)) .Values.persistence.storage.existingClaim }}
+            claimName: {{ default (printf "%s-storage" (include "dawarich.fullname" .)) .Values.persistence.local.existingClaim }}
         {{- end }}
         {{- if .Values.dawarich.extraVolumes }}
         {{- toYaml .Values.dawarich.extraVolumes | nindent 8 }}
