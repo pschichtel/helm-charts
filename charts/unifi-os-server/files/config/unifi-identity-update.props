@@ -1,0 +1,6 @@
+# Static overrides for the stock config.props. At container start the
+# entrypoint copies this to /etc/<app>/config.props (on the app's `overrides`
+# list) and appends the database settings (see files/scripts/lib.sh).
+
+# logging goes to stdout/stderr (see config/logger/unifi-identity-update.yaml); do not capture std into files
+log.redirect_std_output = false

@@ -1,0 +1,329 @@
+# Default values for unifi-os-server.
+#
+# The chart runs UniFi OS Server (UniFi OS core, the UniFi Network application
+# and the UniFi identity services) as ONE pod with one container per service.
+# The services talk to each other over 127.0.0.1 and unix sockets, which only
+# works when they share a pod. It is a single-instance application: there is
+# no replica count and no autoscaling.
+#
+# PostgreSQL, MongoDB and RabbitMQ are NOT part of this chart. Point it at
+# existing instances (e.g. managed by CloudNativePG, the MongoDB Community
+# operator and the RabbitMQ Cluster Operator) and provide their credentials
+# through Secrets.
+
+image:
+  # -- UniFi OS Server image (all services run from the same image).
+  repository: ghcr.io/unihosted/unifi-os-server-docker
+  # -- Image pull policy.
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to the chart appVersion.
+  tag: ""
+
+# -- Secrets for pulling the image from a private registry.
+imagePullSecrets: []
+# -- Override the chart name.
+nameOverride: ""
+# -- Override the full name of the release's resources.
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a service account.
+  create: true
+  # -- Mount the service account token. The pod does not use the Kubernetes API.
+  automount: false
+  # -- Annotations for the service account.
+  annotations: {}
+  # -- Name of the service account. Generated from the fullname if empty.
+  name: ""
+
+# -- Annotations for the pod.
+podAnnotations: {}
+# -- Labels for the pod.
+podLabels: {}
+
+# -- Pod security context. The containers must start as root: the entrypoints
+# prepare directories and then drop to each service's own user (the Go
+# services) or run it via runuser (core, Network), like the systemd units in
+# the stock image do. The pod therefore needs Pod Security level "baseline".
+podSecurityContext: {}
+
+# -- Security context applied to every container (see podSecurityContext).
+securityContext: {}
+
+console:
+  # -- Stable device UUID of the console (`/data/uos_uuid`). Keep it constant
+  # for the life of an installation. If empty, a UUID is derived from the
+  # release namespace and name, so it stays stable across upgrades and
+  # re-installs under the same name.
+  uuid: ""
+  # -- Address that the Network application advertises to devices
+  # (`system_ip` in its system.properties), e.g. the LoadBalancer IP of the
+  # service. Leave empty to let the application pick its own address, which
+  # inside a pod is usually not reachable by devices.
+  systemIP: ""
+  # -- Console identity files mounted at /usr/lib/{platform,product_name,app_model,version}.
+  # The stock image does not ship them; they are the only source of the console identity.
+  identity:
+    platform: linux-x64
+    productName: UniFi OS Server
+    appModel: UOSSERVER
+    # -- Firmware version string. Derived from the image tag if empty
+    # (`UOSSERVER.0000000.<tag>.000000.0000.0000`).
+    version: ""
+
+# PostgreSQL is used by UniFi OS core and the Go identity services
+# (ulp-go, uid-agent, ucs-agent, unifi-directory).
+postgresql:
+  # -- Connection settings per service. Each field is either read from a
+  # Secret, `{key: <key>, name: <Secret>}` (`name` defaults to the service's
+  # `secretName`, so every field can come from a different Secret), or a plain
+  # `{value: <string>}` (not allowed for `password`); `value` wins over
+  # `key`. Databases must exist before the chart is installed; unset database
+  # fields default to the stock image's names.
+  #
+  # The schema migrations of the Go services assign object ownership to roles
+  # with fixed names, so those services must log in as exactly these users:
+  # ulpGo `ulp-go`, uidAgent `uid`, ucsAgent `ucs-agent`, unifiDirectory
+  # `unifi-directory` (each needs full privileges on its database). unifiCore
+  # can use any user. Passwords must not contain whitespace, quotes,
+  # backslashes or `$`. ulpGo's `syslogDatabase` (its activity log) is a
+  # second database on the same server, used with the same user.
+  auth:
+    unifiCore:
+      secretName: ""
+      host: {key: host}
+      port: {key: port}
+      username: {key: username}
+      password: {key: password}
+      database: {}              # default: unifi-core
+    ulpGo:
+      secretName: ""
+      host: {key: host}
+      port: {key: port}
+      username: {key: username}
+      password: {key: password}
+      database: {}              # default: ulp-go
+      syslogDatabase: {}        # default: ulp-go-syslog
+    uidAgent:
+      secretName: ""
+      host: {key: host}
+      port: {key: port}
+      username: {key: username}
+      password: {key: password}
+      database: {}              # default: uid
+    ucsAgent:
+      secretName: ""
+      host: {key: host}
+      port: {key: port}
+      username: {key: username}
+      password: {key: password}
+      database: {}              # default: ucs-agent
+    unifiDirectory:
+      secretName: ""
+      host: {key: host}
+      port: {key: port}
+      username: {key: username}
+      password: {key: password}
+      database: {}              # default: unifi-directory
+
+# MongoDB is used by the UniFi Network application. The connection fields
+# work like postgresql.auth.<service>: `{key: <key>, name: <Secret>}` from a
+# Secret (`name` defaults to `secretName`) or `{value: ...}` (not for
+# `password`); `value` wins over `key`.
+mongodb:
+  # -- Default Secret for the fields read from a Secret.
+  secretName: ""
+  # -- MongoDB hosts as `host:port`, comma-separated or a list, e.g.
+  # `{value: [mongodb-svc.db.svc.cluster.local:27017]}`. Required.
+  hosts: {}
+  # -- Replica set name (the MongoDBCommunity resource name for the MongoDB
+  # operator). Optional.
+  replicaSet: {}
+  # -- Authentication database. Default `admin`.
+  authSource: {}
+  # -- Username. The user needs `dbOwner` on `database`, `statDatabase`,
+  # `<database>_audit` and `<database>_restore`, and `clusterMonitor` on
+  # `admin`.
+  username: {key: username}
+  # -- Password.
+  password: {key: password}
+  # -- Main database of the Network application. Default `ace`.
+  database: {}
+  # -- Statistics database of the Network application. Default `ace_stat`.
+  statDatabase: {}
+  # -- Connect with TLS.
+  tls: false
+  # -- Extra connection string options, e.g. `connectTimeoutMS=10000`.
+  extraOptions: ""
+
+# RabbitMQ is used by the UniFi Network application. Connection fields as for
+# mongodb. The defaults match the `<cluster>-default-user` Secret of the
+# RabbitMQ Cluster Operator, which has every field: setting `secretName` is
+# enough.
+rabbitmq:
+  # -- Default Secret for the fields read from a Secret.
+  secretName: ""
+  # -- RabbitMQ host.
+  host: {key: host}
+  # -- AMQP port (5671 is the usual port with TLS).
+  port: {key: port}
+  # -- Username.
+  username: {key: username}
+  # -- Password.
+  password: {key: password}
+  tls:
+    # -- Connect with TLS.
+    enabled: false
+    # -- Secret containing the CA certificate that signed the RabbitMQ server certificate.
+    caSecret: ""
+    # -- Key of the CA certificate in caSecret.
+    caKey: ca.crt
+    # -- Verify that the server certificate matches the RabbitMQ host.
+    verifyHostname: true
+
+service:
+  # -- Service type. Devices must reach the inform (8080/TCP) and STUN
+  # (3478/UDP) ports, so LoadBalancer is the usual choice in production.
+  type: ClusterIP
+  # -- Annotations for the service.
+  annotations: {}
+  # -- Fixed IP for a LoadBalancer service, if your load balancer supports it.
+  loadBalancerIP: ""
+  # -- Source ranges allowed to reach a LoadBalancer service.
+  loadBalancerSourceRanges: []
+  # -- External traffic policy for LoadBalancer/NodePort services.
+  externalTrafficPolicy: ""
+  # -- Exposed ports. Set `enabled: false` to drop one. `nodePort` is used
+  # for NodePort/LoadBalancer services when set.
+  ports:
+    http:
+      enabled: true
+      port: 80
+      protocol: TCP
+    https:
+      enabled: true
+      port: 443
+      protocol: TCP
+    inform:
+      enabled: true
+      port: 8080
+      protocol: TCP
+    stun:
+      enabled: true
+      port: 3478
+      protocol: UDP
+    speedtest:
+      enabled: true
+      port: 6789
+      protocol: TCP
+    portal-http:
+      enabled: false
+      port: 8880
+      protocol: TCP
+    portal-https:
+      enabled: false
+      port: 8843
+      protocol: TCP
+
+ingress:
+  # -- Create an Ingress for the web UI.
+  enabled: false
+  # -- IngressClass name.
+  className: ""
+  # -- Ingress annotations. The UI is served over HTTPS with a self-signed
+  # certificate; most controllers need to be told, e.g. for ingress-nginx:
+  # `nginx.ingress.kubernetes.io/backend-protocol: HTTPS`.
+  annotations: {}
+  # -- Service port (name) the Ingress routes to.
+  servicePort: https
+  hosts:
+    - host: unifi.example.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # -- TLS configuration.
+  tls: []
+
+persistence:
+  # -- Persist the services' data (`/data/*`, `/srv/*`, `/var/lib/unifi`) in a
+  # PersistentVolumeClaim. Without it all state outside the databases is lost
+  # when the pod is recreated.
+  enabled: true
+  # -- Use an existing PVC instead of creating one.
+  existingClaim: ""
+  # -- StorageClass of the PVC. Empty uses the cluster default.
+  storageClass: ""
+  # -- Access modes of the PVC.
+  accessModes:
+    - ReadWriteOnce
+  # -- Size of the PVC.
+  size: 10Gi
+  # -- Annotations for the PVC.
+  annotations: {}
+  # -- Keep the PVC when the release is uninstalled (`helm.sh/resource-policy: keep`).
+  # A re-install with the same release name picks it up again.
+  keepOnUninstall: true
+
+# -- Size limit of the in-memory volumes that take the services' internal log
+# files (all real logging goes to stdout/stderr).
+logVolumeSizeLimit: 32Mi
+
+# -- Enable the startup/liveness/readiness probes of unifi-core, unifi and ulp-go.
+probes:
+  enabled: true
+
+# -- Per-container settings. `resources` and `extraEnv` are available for
+# every container.
+containers:
+  unifiCore:
+    # -- libuv thread pool size of UniFi OS core (UV_THREADPOOL_SIZE; the stock
+    # unit uses 256). Each thread counts against PID limits: lower it if the
+    # cluster sets a low podPidsLimit (core aborts at start otherwise).
+    uvThreadpoolSize: 256
+    resources: {}
+    extraEnv: []
+  unifi:
+    # -- Java maximum heap (-Xmx) of the Network application.
+    javaMaxHeap: 512M
+    resources: {}
+    extraEnv: []
+  ulpGo:
+    resources: {}
+    extraEnv: []
+  uidAgent:
+    resources: {}
+    extraEnv: []
+  ucsAgent:
+    resources: {}
+    extraEnv: []
+  unifiDirectory:
+    resources: {}
+    extraEnv: []
+  unifiIdentityUpdate:
+    resources: {}
+    extraEnv: []
+  uosAgent:
+    resources: {}
+    extraEnv: []
+  uosDiscoveryClient:
+    resources: {}
+    extraEnv: []
+
+# -- Grace period for stopping the pod.
+terminationGracePeriodSeconds: 60
+
+# -- Additional volumes on the pod.
+volumes: []
+# -- Additional volume mounts, added to every container.
+volumeMounts: []
+
+# -- Node selector.
+nodeSelector: {}
+# -- Tolerations.
+tolerations: []
+# -- Affinity.
+affinity: {}
+
+tests:
+  # -- Image of the `helm test` pod (needs wget with TLS support).
+  image: busybox:1.37

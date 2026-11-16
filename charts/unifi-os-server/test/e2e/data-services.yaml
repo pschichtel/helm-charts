@@ -1,0 +1,106 @@
+# External data services for the end-to-end test of the chart: MongoDB from
+# the MongoDB Community operator (mongodb-kubernetes) and RabbitMQ from the
+# RabbitMQ Cluster Operator. PostgreSQL is in postgres-<provisioner>.yaml.
+# Sized for a small test cluster, not production.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unifi
+---
+# --- MongoDB (UniFi Network). mongodb-kubernetes creates the service account
+# its replica set pods run as only in the operator's namespace; with a
+# cluster-wide watch it has to exist in the target namespace too.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongodb-kubernetes-appdb
+  namespace: unifi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mongodb-kubernetes-appdb
+  namespace: unifi
+rules:
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get]
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [patch, delete, get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mongodb-kubernetes-appdb
+  namespace: unifi
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mongodb-kubernetes-appdb
+subjects:
+  - kind: ServiceAccount
+    name: mongodb-kubernetes-appdb
+    namespace: unifi
+---
+# The operator creates the secret
+# unifi-mongo-admin-unifi (username/password/connection strings).
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-mongo-password
+  namespace: unifi
+type: Opaque
+stringData:
+  password: e2e-mongo-Passw0rd
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: unifi-mongo
+  namespace: unifi
+spec:
+  members: 1
+  type: ReplicaSet
+  version: "8.0.38"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: unifi
+      db: admin
+      passwordSecretRef:
+        name: unifi-mongo-password
+      scramCredentialsSecretName: unifi-mongo-scram
+      roles:
+        - {name: dbOwner, db: ace}
+        - {name: dbOwner, db: ace_stat}
+        - {name: dbOwner, db: ace_audit}
+        - {name: dbOwner, db: ace_restore}
+        - {name: clusterMonitor, db: admin}   # serverStatus
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+        - metadata: {name: data-volume}
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources: {requests: {storage: 2Gi}}
+        - metadata: {name: logs-volume}
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources: {requests: {storage: 1Gi}}
+---
+# --- RabbitMQ (UniFi Network). The operator creates the secret
+# unifi-rmq-default-user (username/password).
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: unifi-rmq
+  namespace: unifi
+spec:
+  replicas: 1
+  resources:
+    requests: {cpu: 100m, memory: 512Mi}
+    limits: {memory: 1Gi}
+  persistence:
+    storage: 1Gi

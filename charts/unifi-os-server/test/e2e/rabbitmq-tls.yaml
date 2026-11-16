@@ -1,0 +1,40 @@
+# Optional: TLS for the test RabbitMQ (needs cert-manager, installed by
+# setup.sh). Apply, then run the chart with values-rabbitmq-tls.yaml on top.
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: unifi-selfsigned
+  namespace: unifi
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: unifi-rmq-tls
+  namespace: unifi
+spec:
+  secretName: unifi-rmq-tls     # tls.crt, tls.key, ca.crt
+  isCA: true
+  commonName: unifi-rmq.unifi.svc
+  dnsNames:
+    - unifi-rmq.unifi.svc
+    - unifi-rmq.unifi.svc.cluster.local
+  issuerRef:
+    name: unifi-selfsigned
+    kind: Issuer
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: unifi-rmq
+  namespace: unifi
+spec:
+  replicas: 1
+  resources:
+    requests: {cpu: 100m, memory: 512Mi}
+    limits: {memory: 1Gi}
+  persistence:
+    storage: 1Gi
+  tls:
+    secretName: unifi-rmq-tls

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "unifi-os-server.fullname" . }}
+  labels:
+    {{- include "unifi-os-server.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  {{- with .Values.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if and .Values.service.externalTrafficPolicy (has .Values.service.type (list "LoadBalancer" "NodePort")) }}
+  externalTrafficPolicy: {{ .Values.service.externalTrafficPolicy }}
+  {{- end }}
+  ports:
+    {{- range $name, $p := .Values.service.ports }}
+    {{- if $p.enabled }}
+    - name: {{ $name }}
+      port: {{ $p.port }}
+      targetPort: {{ $name }}
+      protocol: {{ $p.protocol | default "TCP" }}
+      {{- if and $p.nodePort (has $.Values.service.type (list "LoadBalancer" "NodePort")) }}
+      nodePort: {{ $p.nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  selector:
+    {{- include "unifi-os-server.selectorLabels" . | nindent 4 }}

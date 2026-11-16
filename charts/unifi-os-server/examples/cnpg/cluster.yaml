@@ -1,0 +1,52 @@
+# PostgreSQL for the unifi-os-server chart, run by CloudNativePG (>= 1.25 for
+# the Database resources in databases.yaml).
+#
+# - PostgreSQL 14 is required: ulp-go sends SQL that 15+ rejects
+#   ("c.relname = $1AND"). Pin the image; do not let it float to 15+.
+# - The four Go services must log in as roles with exactly these names (their
+#   schema migrations contain OWNER TO "<role>"). They are managed roles with
+#   passwords from the Secrets created by create-role-secrets.sh.
+# - unifi-core can use any user: it gets the bootstrap database and owner,
+#   with credentials in the generated Secret unifi-pg-app.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: unifi-pg
+spec:
+  # 3 = primary + 2 replicas with automatic failover; the chart connects to
+  # the -rw Service, which always points at the primary. 1 is fine for a
+  # small installation.
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:14.21-standard-trixie
+
+  storage:
+    size: 10Gi
+    # storageClass: ""
+
+  # resources:
+  #   requests: {cpu: 250m, memory: 512Mi}
+  #   limits: {memory: 1Gi}
+
+  bootstrap:
+    initdb:
+      database: unifi-core
+      owner: unifi-core
+
+  managed:
+    roles:
+      - name: ulp-go
+        ensure: present
+        login: true
+        passwordSecret: {name: unifi-pg-ulp-go}
+      - name: uid
+        ensure: present
+        login: true
+        passwordSecret: {name: unifi-pg-uid}
+      - name: ucs-agent
+        ensure: present
+        login: true
+        passwordSecret: {name: unifi-pg-ucs-agent}
+      - name: unifi-directory
+        ensure: present
+        login: true
+        passwordSecret: {name: unifi-pg-unifi-directory}

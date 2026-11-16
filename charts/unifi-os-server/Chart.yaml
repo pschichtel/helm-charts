@@ -1,0 +1,20 @@
+apiVersion: v2
+name: unifi-os-server
+description: >-
+  UniFi OS Server (UniFi OS core, UniFi Network and the UniFi identity
+  services) as one pod with one container per service, using external
+  PostgreSQL, MongoDB and RabbitMQ.
+type: application
+# Chart version (SemVer). Bump on every change to the chart.
+version: 0.2.1
+# UniFi OS Server version of the default image tag.
+appVersion: "5.1.42"
+# Mixed TCP/UDP LoadBalancer services (inform + STUN) need Kubernetes 1.26+.
+kubeVersion: ">=1.26.0-0"
+keywords:
+  - unifi
+  - unifi-os
+  - unifi-network
+  - ubiquiti
+sources:
+  - https://github.com/unihosted/unifi-os-server-docker

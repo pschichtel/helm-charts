@@ -1,0 +1,56 @@
+# One database per Go service, each owned by its fixed-name role. ulp-go has
+# two (its main database and its activity log). The names are free, but must
+# match postgresql.databases in the chart values (values.yaml here uses
+# these). unifi-core's database is created by the Cluster bootstrap.
+#
+# databaseReclaimPolicy: retain keeps the database in PostgreSQL when the
+# resource is deleted.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-ulp-go
+spec:
+  cluster: {name: unifi-pg}
+  name: ulp-go
+  owner: ulp-go
+  databaseReclaimPolicy: retain
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-ulp-go-syslog
+spec:
+  cluster: {name: unifi-pg}
+  name: ulp-go-syslog
+  owner: ulp-go
+  databaseReclaimPolicy: retain
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-uid
+spec:
+  cluster: {name: unifi-pg}
+  name: uid
+  owner: uid
+  databaseReclaimPolicy: retain
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-ucs-agent
+spec:
+  cluster: {name: unifi-pg}
+  name: ucs-agent
+  owner: ucs-agent
+  databaseReclaimPolicy: retain
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-unifi-directory
+spec:
+  cluster: {name: unifi-pg}
+  name: unifi-directory
+  owner: unifi-directory
+  databaseReclaimPolicy: retain

@@ -1,0 +1,9 @@
+# chart-testing configuration, run from the repository root:
+#   ct lint --config charts/unifi-os-server/ct.yaml
+chart-dirs:
+  - charts
+charts:
+  - charts/unifi-os-server
+target-branch: main
+validate-maintainers: false
+check-version-increment: false

@@ -3,8 +3,8 @@
 Short answer: **partly, and not enough to run the services in separate
 network namespaces without extra plumbing.** Every component has at least one
 peer address or listen address that is a literal in its code. This is why the
-stack shares one network namespace between the app-tier services (see
-"Networking" in the README). This document records what is configurable, what
+chart runs all services in one pod, sharing a network namespace (see "One
+pod: the services must share a network namespace" in the README). This document records what is configurable, what
 is not, and how each claim was established, so it can be re-checked when the
 image is upgraded.
 
