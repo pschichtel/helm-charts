@@ -1,0 +1,9 @@
+# Overlay for values.yaml: connect to RabbitMQ with TLS (see rabbitmq-tls.yaml).
+# The port comes from the default-user Secret, which the operator switches
+# to 5671 when TLS is enabled.
+rabbitmq:
+  tls:
+    enabled: true
+    caSecret: unifi-rmq-tls
+    caKey: ca.crt
+    verifyHostname: true

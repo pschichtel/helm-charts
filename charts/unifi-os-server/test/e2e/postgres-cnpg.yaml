@@ -1,0 +1,147 @@
+# PostgreSQL for the end-to-end test, provisioned with CloudNativePG alone:
+# the fixed-name roles of the Go services as managed roles and one Database
+# resource per service. Used when POSTGRES_PROVISIONER=cnpg (the default).
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-pg-ulp-go
+  namespace: unifi
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+stringData:
+  username: ulp-go
+  password: e2eUlpGoPassw0rd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-pg-uid
+  namespace: unifi
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+stringData:
+  username: uid
+  password: e2eUidPassw0rd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-pg-ucs-agent
+  namespace: unifi
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+stringData:
+  username: ucs-agent
+  password: e2eUcsAgentPassw0rd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-pg-unifi-directory
+  namespace: unifi
+  labels:
+    cnpg.io/reload: "true"
+type: kubernetes.io/basic-auth
+stringData:
+  username: unifi-directory
+  password: e2eDirectoryPassw0rd
+---
+# --- PostgreSQL. Must be version 14 or older: ulp-go sends "c.relname = $1AND"
+# which PostgreSQL 15+ rejects (see the repository README).
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: unifi-pg
+  namespace: unifi
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:14.21-standard-trixie
+  storage:
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: unifi-core
+      owner: unifi
+  # The app user "unifi" (secret unifi-pg-app) is used by unifi-core. The Go
+  # services must log in as roles with fixed names (their schema migrations
+  # assign ownership to them), managed here from basic-auth secrets.
+  managed:
+    roles:
+      - name: ulp-go
+        ensure: present
+        login: true
+        passwordSecret:
+          name: unifi-pg-ulp-go
+      - name: uid
+        ensure: present
+        login: true
+        passwordSecret:
+          name: unifi-pg-uid
+      - name: ucs-agent
+        ensure: present
+        login: true
+        passwordSecret:
+          name: unifi-pg-ucs-agent
+      - name: unifi-directory
+        ensure: present
+        login: true
+        passwordSecret:
+          name: unifi-pg-unifi-directory
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-ulp-go
+  namespace: unifi
+spec:
+  cluster:
+    name: unifi-pg
+  name: ulp-go
+  owner: ulp-go
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-ulp-go-syslog
+  namespace: unifi
+spec:
+  cluster:
+    name: unifi-pg
+  name: ulp-go-syslog
+  owner: ulp-go
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-uid
+  namespace: unifi
+spec:
+  cluster:
+    name: unifi-pg
+  name: uid
+  owner: uid
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-ucs-agent
+  namespace: unifi
+spec:
+  cluster:
+    name: unifi-pg
+  name: ucs-agent
+  owner: ucs-agent
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-unifi-directory
+  namespace: unifi
+spec:
+  cluster:
+    name: unifi-pg
+  name: unifi-directory
+  owner: unifi-directory

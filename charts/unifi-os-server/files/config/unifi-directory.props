@@ -1,0 +1,8 @@
+# Static overrides for the stock config.props. At container start the
+# entrypoint copies this to /etc/<app>/config.props (on the app's `overrides`
+# list) and appends the database settings (see files/scripts/lib.sh).
+
+# logging to stdout
+log.std = true
+log.file = false
+log.redirect_std_output = false

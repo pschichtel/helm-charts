@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "unifi-os-server.fullname" . }}-scripts
+  labels:
+    {{- include "unifi-os-server.labels" . | nindent 4 }}
+data:
+  {{- range $path, $_ := .Files.Glob "files/scripts/*" }}
+  {{ base $path }}: |-
+    {{- $.Files.Get $path | nindent 4 }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "unifi-os-server.fullname" . }}-config
+  labels:
+    {{- include "unifi-os-server.labels" . | nindent 4 }}
+data:
+  {{- range $path, $_ := .Files.Glob "files/config/*.props" }}
+  {{ base $path }}: |-
+    {{- $.Files.Get $path | nindent 4 }}
+  {{- end }}
+  {{- range $path, $_ := .Files.Glob "files/config/logger/*.yaml" }}
+  logger-{{ base $path }}: |-
+    {{- $.Files.Get $path | nindent 4 }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "unifi-os-server.fullname" . }}-identity
+  labels:
+    {{- include "unifi-os-server.labels" . | nindent 4 }}
+data:
+  platform: {{ .Values.console.identity.platform | quote }}
+  product_name: {{ .Values.console.identity.productName | quote }}
+  app_model: {{ .Values.console.identity.appModel | quote }}
+  version: {{ include "unifi-os-server.firmwareVersion" . | quote }}

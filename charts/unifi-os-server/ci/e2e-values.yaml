@@ -1,0 +1,50 @@
+# chart-testing (ct) values: the e2e data services from test/e2e.
+postgresql:
+  auth:
+    unifiCore:
+      secretName: unifi-pg-app                 # CloudNativePG: <cluster>-app, has every field
+      database:
+        key: dbname
+    ulpGo:
+      secretName: unifi-pg-ulp-go              # managed role secret: username, password
+      # host and port from the app secret
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+    uidAgent:
+      secretName: unifi-pg-uid
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+    ucsAgent:
+      secretName: unifi-pg-ucs-agent
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+    unifiDirectory:
+      secretName: unifi-pg-unifi-directory
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+mongodb:
+  secretName: unifi-mongo-admin-unifi   # MongoDB operator: <resource>-<db>-<user> (username, password)
+  hosts:
+    value: [unifi-mongo-svc.unifi.svc.cluster.local:27017]
+  replicaSet:
+    value: unifi-mongo
+rabbitmq:
+  secretName: unifi-rmq-default-user    # RabbitMQ operator: <cluster>-default-user (host, port, username, password)
+persistence:
+  size: 2Gi

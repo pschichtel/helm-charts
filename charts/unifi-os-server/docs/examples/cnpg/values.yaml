@@ -1,0 +1,48 @@
+# PostgreSQL part of the unifi-os-server chart values for the cluster in this
+# folder, with the chart installed in the same namespace. Combine with your
+# MongoDB and RabbitMQ settings:
+#   helm install uos charts/unifi-os-server -n <namespace> \
+#     -f charts/unifi-os-server/docs/examples/cnpg/values.yaml -f my-values.yaml
+#
+# unifi-core uses the Secret CloudNativePG generates for the bootstrap
+# database (it has every field). The Go services take user and password from
+# their role Secrets and host and port from that same app Secret. Their
+# database names are the chart defaults, which databases.yaml uses.
+postgresql:
+  auth:
+    unifiCore:
+      secretName: unifi-pg-app
+      database:
+        key: dbname
+    ulpGo:
+      secretName: unifi-pg-ulp-go
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+    uidAgent:
+      secretName: unifi-pg-uid
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+    ucsAgent:
+      secretName: unifi-pg-ucs-agent
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
+    unifiDirectory:
+      secretName: unifi-pg-unifi-directory
+      host:
+        name: unifi-pg-app
+        key: host
+      port:
+        name: unifi-pg-app
+        key: port
