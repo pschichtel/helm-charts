@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.1
+    controller-gen.kubebuilder.io/version: v0.22.0
   name: federations.rabbitmq.com
   labels:
     app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
@@ -122,6 +122,11 @@ spec:
                       type: string
                   type: object
                 reconnectDelay:
+                  default: 1
+                  description: |-
+                    Time in seconds to wait before reconnecting after a federation link goes down.
+                    Defaults to 1, matching the RabbitMQ default. Setting this to 0 reconnects with no
+                    delay, which can produce a reconnection storm against an unavailable upstream.
                   type: integer
                 resourceCleanupMode:
                   description: |-

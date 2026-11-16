@@ -1,0 +1,17 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+  name: cluster-operator-serving-cert
+spec:
+  dnsNames:
+    - cluster-operator-webhook-service.rabbitmq-system.svc
+    - cluster-operator-webhook-service.rabbitmq-system.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: selfsigned-issuer
+  secretName: cluster-operator-webhook-server-cert

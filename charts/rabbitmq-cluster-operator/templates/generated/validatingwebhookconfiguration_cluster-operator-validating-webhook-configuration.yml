@@ -1,0 +1,31 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: rabbitmq-system/cluster-operator-serving-cert
+  name: cluster-operator-validating-webhook-configuration
+  labels:
+    app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: cluster-operator-webhook-service
+        namespace: rabbitmq-system
+        path: /validate-rabbitmq-com-v1beta1-rabbitmqcluster
+    failurePolicy: Fail
+    name: vrabbitmqcluster-v1beta1.kb.io
+    rules:
+      - apiGroups:
+          - rabbitmq.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - rabbitmqclusters
+    sideEffects: None

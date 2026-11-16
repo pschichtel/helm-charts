@@ -10,6 +10,18 @@ metadata:
   name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-leader-election-role'
 rules:
   - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
       - coordination.k8s.io
     resources:
       - leases
@@ -27,3 +39,4 @@ rules:
       - events
     verbs:
       - create
+      - patch

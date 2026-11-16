@@ -4,8 +4,10 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/component: rabbitmq-operator
+    app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: {{ include "rabbitmq-topology-operator.name" $ }}
     app.kubernetes.io/part-of: rabbitmq
+    control-plane: controller-manager
     app.kubernetes.io/instance: {{ .Release.Name }}
   name: {{ include "rabbitmq-topology-operator.fullname" $ }}
 spec:
@@ -16,36 +18,50 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      {{- with .Values.podAnnotations  }}
+      annotations: {{- toYaml . | nindent 8 }}
+      {{- end }}
       labels:
         app.kubernetes.io/component: rabbitmq-operator
         app.kubernetes.io/name: {{ include "rabbitmq-topology-operator.name" $ }}
         app.kubernetes.io/part-of: rabbitmq
+        control-plane: controller-manager
         app.kubernetes.io/instance: {{ .Release.Name }}
-      {{- with .Values.podAnnotations  }}
-      annotations: {{- toYaml . | nindent 8 }}
-      {{- end }}
     spec:
       containers:
-        - command:
+        - args:
+            - --metrics-bind-address=:8443
+            - --leader-elect
+            - --health-probe-bind-address=:8081
+            - --metrics-secure
+            - --metrics-cert-path=/tmp/k8s-metrics-server/metrics-certs
+          command:
             - /manager
-          env:
-            - name: OPERATOR_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
           image: {{ print .Values.image.registry "/" .Values.image.repository ":" (.Values.image.tag | default .Chart.AppVersion) }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
           name: manager
           ports:
             - containerPort: 9443
               name: webhook-server
               protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
           resources: {{- .Values.resources | toYaml | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
-                - All
+                - ALL
+            readOnlyRootFilesystem: true
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
@@ -53,9 +69,17 @@ spec:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert
               readOnly: true
+            - mountPath: /tmp/k8s-metrics-server/metrics-certs
+              name: metrics-certs
+              readOnly: true
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.image.imagePullSecrets  }}
           imagePullSecrets: {{- toYaml . | nindent 12 }}
           {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: {{ include "rabbitmq-topology-operator.fullname" $ }}
       terminationGracePeriodSeconds: 10
       volumes:
@@ -63,6 +87,17 @@ spec:
           secret:
             defaultMode: 420
             secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'
+        - name: metrics-certs
+          secret:
+            items:
+              - key: ca.crt
+                path: ca.crt
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+            optional: false
+            secretName: metrics-server-cert
       {{- with .Values.nodeSelector  }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}

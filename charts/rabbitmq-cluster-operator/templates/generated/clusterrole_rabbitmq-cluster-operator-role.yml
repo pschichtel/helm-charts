@@ -2,12 +2,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  labels:
-    app.kubernetes.io/component: rabbitmq-operator
-    app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
-    app.kubernetes.io/part-of: rabbitmq
-    app.kubernetes.io/instance: '{{ .Release.Name }}'
   name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-role'
+  labels:
+    app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
 rules:
   - apiGroups:
       - ""
@@ -21,6 +19,7 @@ rules:
       - create
       - get
       - list
+      - patch
       - update
       - watch
   - apiGroups:
@@ -46,6 +45,7 @@ rules:
     verbs:
       - get
       - list
+      - patch
       - update
       - watch
   - apiGroups:
@@ -63,6 +63,7 @@ rules:
       - delete
       - get
       - list
+      - patch
       - update
       - watch
   - apiGroups:
@@ -81,6 +82,7 @@ rules:
       - create
       - get
       - list
+      - patch
       - update
       - watch
   - apiGroups:
@@ -95,6 +97,7 @@ rules:
       - rabbitmqclusters/status
     verbs:
       - get
+      - patch
       - update
   - apiGroups:
       - rbac.authorization.k8s.io
@@ -103,7 +106,9 @@ rules:
       - roles
     verbs:
       - create
+      - delete
       - get
       - list
+      - patch
       - update
       - watch

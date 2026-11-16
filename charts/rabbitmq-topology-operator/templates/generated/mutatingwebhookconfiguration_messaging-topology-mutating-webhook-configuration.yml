@@ -1,0 +1,30 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: rabbitmq-system/messaging-topology-serving-cert
+  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-mutating-webhook-configuration'
+  labels:
+    app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+webhooks:
+  - admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: messaging-topology-webhook-service
+        namespace: rabbitmq-system
+        path: /mutate-rabbitmq-com-v1beta1-queue
+    failurePolicy: Fail
+    name: mqueue.kb.io
+    rules:
+      - apiGroups:
+          - rabbitmq.com
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+        resources:
+          - queues
+    sideEffects: None

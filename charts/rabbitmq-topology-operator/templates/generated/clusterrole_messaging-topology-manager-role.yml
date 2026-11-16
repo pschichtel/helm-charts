@@ -10,22 +10,13 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - events
-    verbs:
-      - create
-      - get
-      - patch
-  - apiGroups:
-      - ""
-    resources:
       - secrets
     verbs:
       - create
       - get
       - list
-      - watch
-      - patch
       - update
+      - watch
   - apiGroups:
       - ""
     resources:
@@ -34,6 +25,13 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
   - apiGroups:
       - rabbitmq.com
     resources:

@@ -1,0 +1,17 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
+    app.kubernetes.io/instance: '{{ .Release.Name }}'
+  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'
+spec:
+  dnsNames:
+    - messaging-topology-controller-metrics-service.rabbitmq-system.svc
+    - messaging-topology-controller-metrics-service.rabbitmq-system.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-issuer'
+  secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'

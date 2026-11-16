@@ -2,14 +2,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
   labels:
+    app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
+    control-plane: controller-manager
     app.kubernetes.io/instance: '{{ .Release.Name }}'
+  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
 spec:
   ports:
-    - port: 443
-      targetPort: 9443
+    - name: https
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
   selector:
     app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
+    control-plane: controller-manager
     app.kubernetes.io/instance: '{{ .Release.Name }}'
