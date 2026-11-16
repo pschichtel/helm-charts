@@ -4,4 +4,4 @@ description: teamspeak3 server
 type: application
 version: 1.0.2
 # renovate: image=docker.io/library/teamspeak
-appVersion: 3.13.7
+appVersion: 3.13.9

@@ -4,4 +4,4 @@ description: A helm chart to deploy restic jobs for backup cleaning.
 type: application
 version: 0.5.1
 # renovate: image=ghcr.io/restic/restic
-appVersion: 0.18.1
+appVersion: 0.19.1
