@@ -6,19 +6,12 @@
       matchUpdateTypes: ['pinDigest'],
       enabled: false,
     },
-    {
-      matchFileNames: ['charts/**'],
-      groupName: '{{packageFileDir}}',
-    },
   ],
-  bumpVersions: [
-    {
-      name: 'helm-chart-version',
-      filePatterns: ['{{packageFileDir}}/Chart.yaml'],
-      matchStrings: ['(?:^|\\n)version:\\s*[\'"]?(?<version>\\d+\\.\\d+\\.\\d+)'],
-      bumpType: 'patch',
-    },
-  ],
+  postUpgradeTasks: {
+    commands: ['bash scripts/bump-chart-versions.sh'],
+    fileFilters: ['charts/**/Chart.yaml'],
+    executionMode: 'branch',
+  },
   customManagers: [
     {
       customType: 'regex',
