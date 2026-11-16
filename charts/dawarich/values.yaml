@@ -27,6 +27,11 @@ secret:
     oidcClientSecret: null
     metricsUsername: metrics
     metricsPassword: metrics
+    s3Endpoint: null
+    s3Region: null
+    s3Bucket: null
+    s3AccessKey: null
+    s3SecretKey: null
 
 keyBase:
   key: keyBase
