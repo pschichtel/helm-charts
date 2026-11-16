@@ -6553,6 +6553,27 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/teamspeak3-1.0.0/teamspeak3-1.0.0.tgz
     version: 1.0.0
+  unifi-os-server:
+  - apiVersion: v2
+    appVersion: 5.1.42
+    created: "2026-11-16T01:37:28.058417897Z"
+    description: UniFi OS Server (UniFi OS core, UniFi Network and the UniFi identity
+      services) as one pod with one container per service, using external PostgreSQL,
+      MongoDB and RabbitMQ.
+    digest: 8d00d494bd462a764aa78e5212cfa6637484dad3369f154d68ee1f4dd321304c
+    keywords:
+    - unifi
+    - unifi-os
+    - unifi-network
+    - ubiquiti
+    kubeVersion: '>=1.26.0-0'
+    name: unifi-os-server
+    sources:
+    - https://github.com/unihosted/unifi-os-server-docker
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/unifi-os-server-0.1.0/unifi-os-server-0.1.0.tgz
+    version: 0.1.0
   unifi-protect:
   - apiVersion: v2
     appVersion: latest
@@ -7639,4 +7660,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-16T01:08:16.86977732Z"
+generated: "2026-11-16T01:37:28.059177795Z"
