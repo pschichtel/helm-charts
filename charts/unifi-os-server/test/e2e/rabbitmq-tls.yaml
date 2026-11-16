@@ -32,8 +32,11 @@ metadata:
 spec:
   replicas: 1
   resources:
-    requests: {cpu: 100m, memory: 512Mi}
-    limits: {memory: 1Gi}
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   persistence:
     storage: 1Gi
   tls:

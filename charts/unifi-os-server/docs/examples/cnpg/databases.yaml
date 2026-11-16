@@ -10,7 +10,8 @@ kind: Database
 metadata:
   name: unifi-pg-ulp-go
 spec:
-  cluster: {name: unifi-pg}
+  cluster:
+    name: unifi-pg
   name: ulp-go
   owner: ulp-go
   databaseReclaimPolicy: retain
@@ -20,7 +21,8 @@ kind: Database
 metadata:
   name: unifi-pg-ulp-go-syslog
 spec:
-  cluster: {name: unifi-pg}
+  cluster:
+    name: unifi-pg
   name: ulp-go-syslog
   owner: ulp-go
   databaseReclaimPolicy: retain
@@ -30,7 +32,8 @@ kind: Database
 metadata:
   name: unifi-pg-uid
 spec:
-  cluster: {name: unifi-pg}
+  cluster:
+    name: unifi-pg
   name: uid
   owner: uid
   databaseReclaimPolicy: retain
@@ -40,7 +43,8 @@ kind: Database
 metadata:
   name: unifi-pg-ucs-agent
 spec:
-  cluster: {name: unifi-pg}
+  cluster:
+    name: unifi-pg
   name: ucs-agent
   owner: ucs-agent
   databaseReclaimPolicy: retain
@@ -50,7 +54,8 @@ kind: Database
 metadata:
   name: unifi-pg-unifi-directory
 spec:
-  cluster: {name: unifi-pg}
+  cluster:
+    name: unifi-pg
   name: unifi-directory
   owner: unifi-directory
   databaseReclaimPolicy: retain

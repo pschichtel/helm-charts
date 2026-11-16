@@ -4,7 +4,7 @@ This directory is a Helm chart (`charts/unifi-os-server`) that runs the services
 the UniFi OS Server image (`ghcr.io/unihosted/unifi-os-server-docker`) as one
 pod with one container per former systemd unit. PostgreSQL, MongoDB and
 RabbitMQ are external. It also holds the chart's development material
-(`test/`, `examples/`, `docs/`, `ct.yaml`), excluded from the package via
+(`test/`, `docs/` including `docs/examples/`, `ct.yaml`), excluded from the package via
 `.helmignore`. Paths are relative to this directory; run commands from the
 repository root. See `README.md` for layout and findings. The chart is
 meant to be published, so treat values, docs and defaults as public API.
@@ -22,9 +22,9 @@ meant to be published, so treat values, docs and defaults as public API.
 - When a workaround is removed, update the README in the same change.
 - Keep the architecture diagrams in the README in sync when adding/removing
   services or changing ports.
-- User-facing chart docs live in `README.md.gotmpl` and
-  the `# --` comments in `values.yaml`; regenerate the chart README with
-  `helm-docs` after changing either.
+- Keep comments in `values.yaml` to the bare minimum (style of the other
+  charts in the repository): only what the key name and default do not make
+  obvious, e.g. template-side defaults. Explanations belong in `README.md`.
 
 ## No custom images
 
@@ -40,7 +40,6 @@ meant to be published, so treat values, docs and defaults as public API.
 
 - Bump `version` in `Chart.yaml` for every chart change; `appVersion` follows
   the default image tag.
-- New values need a `# --` comment and an entry in `values.schema.json`.
 - Credentials only ever come from existing Secrets; never render secrets
   from values.
 

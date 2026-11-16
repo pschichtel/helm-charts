@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Creates the password Secrets of the four fixed-name PostgreSQL roles with
 # random passwords. Existing Secrets are left alone, so it is safe to re-run.
-#   charts/unifi-os-server/examples/cnpg/create-role-secrets.sh <namespace>
+#   charts/unifi-os-server/docs/examples/cnpg/create-role-secrets.sh <namespace>
 #
 # The passwords are hex: the Go services insert them unquoted into their
 # connection strings and config files, so whitespace, quotes, backslashes

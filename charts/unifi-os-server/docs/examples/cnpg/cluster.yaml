@@ -24,8 +24,11 @@ spec:
     # storageClass: ""
 
   # resources:
-  #   requests: {cpu: 250m, memory: 512Mi}
-  #   limits: {memory: 1Gi}
+  #   requests:
+  #     cpu: 250m
+  #     memory: 512Mi
+  #   limits:
+  #     memory: 1Gi
 
   bootstrap:
     initdb:
@@ -37,16 +40,20 @@ spec:
       - name: ulp-go
         ensure: present
         login: true
-        passwordSecret: {name: unifi-pg-ulp-go}
+        passwordSecret:
+          name: unifi-pg-ulp-go
       - name: uid
         ensure: present
         login: true
-        passwordSecret: {name: unifi-pg-uid}
+        passwordSecret:
+          name: unifi-pg-uid
       - name: ucs-agent
         ensure: present
         login: true
-        passwordSecret: {name: unifi-pg-ucs-agent}
+        passwordSecret:
+          name: unifi-pg-ucs-agent
       - name: unifi-directory
         ensure: present
         login: true
-        passwordSecret: {name: unifi-pg-unifi-directory}
+        passwordSecret:
+          name: unifi-pg-unifi-directory

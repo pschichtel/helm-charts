@@ -73,22 +73,34 @@ spec:
         name: unifi-mongo-password
       scramCredentialsSecretName: unifi-mongo-scram
       roles:
-        - {name: dbOwner, db: ace}
-        - {name: dbOwner, db: ace_stat}
-        - {name: dbOwner, db: ace_audit}
-        - {name: dbOwner, db: ace_restore}
-        - {name: clusterMonitor, db: admin}   # serverStatus
+        - name: dbOwner
+          db: ace
+        - name: dbOwner
+          db: ace_stat
+        - name: dbOwner
+          db: ace_audit
+        - name: dbOwner
+          db: ace_restore
+        # serverStatus
+        - name: clusterMonitor
+          db: admin
   statefulSet:
     spec:
       volumeClaimTemplates:
-        - metadata: {name: data-volume}
+        - metadata:
+            name: data-volume
           spec:
             accessModes: [ReadWriteOnce]
-            resources: {requests: {storage: 2Gi}}
-        - metadata: {name: logs-volume}
+            resources:
+              requests:
+                storage: 2Gi
+        - metadata:
+            name: logs-volume
           spec:
             accessModes: [ReadWriteOnce]
-            resources: {requests: {storage: 1Gi}}
+            resources:
+              requests:
+                storage: 1Gi
 ---
 # --- RabbitMQ (UniFi Network). The operator creates the secret
 # unifi-rmq-default-user (username/password).
@@ -100,7 +112,10 @@ metadata:
 spec:
   replicas: 1
   resources:
-    requests: {cpu: 100m, memory: 512Mi}
-    limits: {memory: 1Gi}
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   persistence:
     storage: 1Gi

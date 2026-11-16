@@ -19,10 +19,10 @@ example was tested with 1.30.
 Everything goes into the namespace the chart is installed in:
 
 ```console
-charts/unifi-os-server/examples/cnpg/create-role-secrets.sh unifi
-kubectl apply -k charts/unifi-os-server/examples/cnpg -n unifi
+charts/unifi-os-server/docs/examples/cnpg/create-role-secrets.sh unifi
+kubectl apply -k charts/unifi-os-server/docs/examples/cnpg -n unifi
 kubectl -n unifi wait cluster.postgresql.cnpg.io/unifi-pg --for=condition=Ready --timeout=10m
-helm install uos charts/unifi-os-server -n unifi -f charts/unifi-os-server/examples/cnpg/values.yaml -f my-values.yaml
+helm install uos charts/unifi-os-server -n unifi -f charts/unifi-os-server/docs/examples/cnpg/values.yaml -f my-values.yaml
 ```
 
 `my-values.yaml` holds the MongoDB and RabbitMQ settings (and anything else).

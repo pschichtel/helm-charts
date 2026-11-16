@@ -5,9 +5,8 @@ description: >-
   services) as one pod with one container per service, using external
   PostgreSQL, MongoDB and RabbitMQ.
 type: application
-# Chart version (SemVer). Bump on every change to the chart.
-version: 0.2.1
-# UniFi OS Server version of the default image tag.
+version: 0.1.0
+# renovate: image=ghcr.io/unihosted/unifi-os-server-docker
 appVersion: "5.1.42"
 # Mixed TCP/UDP LoadBalancer services (inform + STUN) need Kubernetes 1.26+.
 kubeVersion: ">=1.26.0-0"

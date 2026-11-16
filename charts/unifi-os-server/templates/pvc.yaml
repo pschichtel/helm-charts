@@ -5,14 +5,9 @@ metadata:
   name: {{ include "unifi-os-server.pvcName" . }}
   labels:
     {{- include "unifi-os-server.labels" . | nindent 4 }}
-  {{- if or .Values.persistence.annotations .Values.persistence.keepOnUninstall }}
+  {{- with .Values.persistence.annotations }}
   annotations:
-    {{- if .Values.persistence.keepOnUninstall }}
-    helm.sh/resource-policy: keep
-    {{- end }}
-    {{- with .Values.persistence.annotations }}
     {{- toYaml . | nindent 4 }}
-    {{- end }}
   {{- end }}
 spec:
   accessModes:

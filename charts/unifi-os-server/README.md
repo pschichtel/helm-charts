@@ -27,11 +27,10 @@ it, for maintenance and image upgrades.
     for core). Shipped as a ConfigMap mounted at `/scripts`.
   - `files/config/` — static property overrides per Go service and their
     stdout-only logger configs (see Logging).
-  - `values.schema.json`, `README.md.gotmpl` (rendered with `helm-docs`),
-    `ci/` (values for `ct lint`).
+  - `ci/` (values for `ct lint`).
 - `test/e2e/` — kind cluster config, operator and data-service setup, chart
   values, the test script, and an optional RabbitMQ TLS overlay.
-- `examples/cnpg/` — manifests for a CloudNativePG cluster that works with
+- `docs/examples/cnpg/` — manifests for a CloudNativePG cluster that works with
   the chart (roles, databases, role Secrets, chart values).
 - `docs/loopback-addresses.md` — why the services have to share a network
   namespace (reverse-engineering results).
@@ -237,7 +236,7 @@ settings:
 
 - CloudNativePG managed-role Secrets have just `username` and `password`;
   host and port can come from the cluster's `-app` Secret (see
-  `examples/cnpg`).
+  `docs/examples/cnpg`).
 - The MongoDB operator's `<resource>-<db>-<user>` Secret has `username`,
   `password` and full connection strings, no hosts or replica set: those are
   plain values. (The connection strings are not used: the app needs two
@@ -247,8 +246,8 @@ settings:
   `rabbitmq.secretName` alone is enough, also with TLS: the operator then
   switches the Secret's `port` to 5671 (checked with v2.23.3).
 
-`value` wins over `key`, because Helm merges the defaults (`{key: host}` ...)
-with user values. Defaults that are plain values (database names,
+`value` wins over `key`, because Helm merges the defaults (`host.key: host`
+...) with user values. Defaults that are plain values (database names,
 `mongodb.authSource`/`database`/`statDatabase`) live in the template
 (`unifi-os-server.fieldDefaults`) rather than in `values.yaml` for the same
 reason: a user-set `key` would otherwise be shadowed by a default `value`.
@@ -409,8 +408,7 @@ mongodb-kubernetes and the RabbitMQ Cluster Operator plus the data services
 ready without restarts, runs `helm test`, and waits for the setup wizard in a
 headless browser. See [test/e2e/README.md](test/e2e/README.md).
 
-Static checks: `ct lint --config charts/unifi-os-server/ct.yaml`, `helm-docs` for the chart README,
-and `helm template ... | kubeconform -strict` (Kubernetes 1.26 and current).
+Static checks: `ct lint --config charts/unifi-os-server/ct.yaml` and `helm template ... | kubeconform -strict` (Kubernetes 1.26 and current).
 
 ## Known gaps
 
