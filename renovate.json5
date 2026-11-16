@@ -1,5 +1,14 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  packageRules: [
+    {
+      // appVersion in Chart.yaml cannot carry a digest, so a pinDigest update through the
+      // custom regex managers is a no-op that fails the whole grouped branch ("update failure").
+      matchManagers: ['custom.regex'],
+      matchUpdateTypes: ['pinDigest'],
+      enabled: false,
+    },
+  ],
   customManagers: [
     {
       customType: 'regex',
