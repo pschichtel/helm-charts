@@ -169,7 +169,7 @@ spec:
         - name: public
           emptyDir:
             sizeLimit: 512Mi
-        {{- if .Values.persistence.storage.enabled }}
+        {{- if .Values.persistence.local.enabled }}
         - name: storage
           persistentVolumeClaim:
             claimName: {{ default (printf "%s-storage" (include "dawarich.fullname" .)) .Values.persistence.local.existingClaim }}
