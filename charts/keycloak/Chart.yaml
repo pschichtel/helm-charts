@@ -2,12 +2,12 @@ apiVersion: v2
 name: keycloak
 description: A Helm chart for Kubernetes
 type: application
-version: 0.10.0
+version: 0.10.1
 # renovate: github-releases=keycloak/keycloak
-appVersion: 26.8.1
+appVersion: 26.8.2
 
 dependencies:
 - name: keycloak-operator
   repository: https://schich.tel/helm-charts
-  version: 0.9.0
+  version: 0.9.1
   condition: keycloak-operator.enabled
