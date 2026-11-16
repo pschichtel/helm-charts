@@ -3,6 +3,6 @@ name: powerdns-admin
 description: A PowerDNS web interface with advanced features
 home: https://github.com/PowerDNS-Admin/PowerDNS-Admin
 type: application
-version: 0.5.1
+version: 0.5.2
 # renovate: image=docker.io/powerdnsadmin/pda-legacy
-appVersion: 0.4.2
+appVersion: v0.6.1
