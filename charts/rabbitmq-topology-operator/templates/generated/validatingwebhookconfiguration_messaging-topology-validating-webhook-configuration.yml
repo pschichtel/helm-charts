@@ -13,7 +13,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-binding
     failurePolicy: Fail
@@ -33,7 +33,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-exchange
     failurePolicy: Fail
@@ -53,7 +53,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-federation
     failurePolicy: Fail
@@ -73,7 +73,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-operatorpolicy
     failurePolicy: Fail
@@ -93,7 +93,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-permission
     failurePolicy: Fail
@@ -113,7 +113,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-policy
     failurePolicy: Fail
@@ -133,7 +133,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-queue
     failurePolicy: Fail
@@ -153,7 +153,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-schemareplication
     failurePolicy: Fail
@@ -173,7 +173,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-shovel
     failurePolicy: Fail
@@ -193,7 +193,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1alpha1-superstream
     failurePolicy: Fail
@@ -213,7 +213,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-topicpermission
     failurePolicy: Fail
@@ -233,7 +233,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-user
     failurePolicy: Fail
@@ -253,7 +253,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /validate-rabbitmq-com-v1beta1-vhost
     failurePolicy: Fail

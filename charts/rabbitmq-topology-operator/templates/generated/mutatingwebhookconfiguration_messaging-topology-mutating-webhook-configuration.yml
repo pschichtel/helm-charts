@@ -13,7 +13,7 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook'
+        name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service'
         namespace: '{{ .Release.Namespace }}'
         path: /mutate-rabbitmq-com-v1beta1-queue
     failurePolicy: Fail
