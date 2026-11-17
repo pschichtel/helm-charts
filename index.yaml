@@ -5565,6 +5565,16 @@ entries:
   rabbitmq-cluster-operator:
   - apiVersion: v2
     appVersion: 2.23.3
+    created: "2026-11-17T01:41:03.46298188Z"
+    description: A Helm chart for rabbitmq's cluster operator
+    digest: d1e50fe3ee85098496a65f37b1419e022a0088a678459a67c5f4d50b534ca3a4
+    name: rabbitmq-cluster-operator
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/rabbitmq-cluster-operator-0.2.1/rabbitmq-cluster-operator-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 2.23.3
     created: "2026-11-16T23:36:13.557620568Z"
     description: A Helm chart for rabbitmq's cluster operator
     digest: 14991c1811c4a981a21205325ed3c275c6c6b993584ae30ea49e932ed44bceb9
@@ -7887,4 +7897,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-17T00:02:49.303749093Z"
+generated: "2026-11-17T01:41:03.664303458Z"
