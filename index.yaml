@@ -1487,6 +1487,16 @@ entries:
     version: 0.1.0
   factorio:
   - apiVersion: v2
+    appVersion: 2.1.25
+    created: "2026-11-17T00:02:46.659479863Z"
+    description: A Helm chart for Factorio
+    digest: 0b3e581d223b2bed8317ed780eb4fea24ba64b7f4034ab6f1cd7d9a096fd9d46
+    name: factorio
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/factorio-0.1.2/factorio-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: 2.0.67
     created: "2025-09-22T23:25:15.822713471Z"
     description: A Helm chart for Factorio
@@ -1507,6 +1517,17 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/factorio-0.1.0/factorio-0.1.0.tgz
     version: 0.1.0
   gickup:
+  - apiVersion: v2
+    appVersion: 0.10.47
+    created: "2026-11-17T00:02:46.914460982Z"
+    description: A helm chart to deploy gickup.
+    digest: bd2ae4cbd4f5fac27ea76dc79aeeb05fd80156ef58550c0ca993584b205858f5
+    home: https://github.com/cooperspencer/gickup
+    name: gickup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.5/gickup-0.0.5.tgz
+    version: 0.0.5
   - apiVersion: v2
     appVersion: 0.10.38
     created: "2025-04-06T15:42:17.509204145Z"
@@ -1552,6 +1573,29 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/gickup-0.0.1/gickup-0.0.1.tgz
     version: 0.0.1
   graylog:
+  - apiVersion: v2
+    appVersion: 7.2.2-1
+    created: "2026-11-17T00:02:47.140234243Z"
+    description: Graylog is the centralized log management solution built to open
+      standards for capturing, storing, and enabling real-time analysis of terabytes
+      of machine data.
+    digest: 8cb8f9811a4ec1c936caf51ba50e672e9d50b1d1ccccadb94328842f63a01452
+    home: https://www.graylog.org
+    icon: https://global-uploads.webflow.com/5a218ef7897bf400019e2f16/5a218ef7897bf400019e2f60_logo-graylog.png
+    keywords:
+    - graylog
+    - logs
+    - syslog
+    - gelf
+    maintainers:
+    - email: phillip@schich.tel
+      name: Phillip Schichtel
+    name: graylog
+    sources:
+    - https://github.com/pschichtel/charts
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/graylog-0.5.1/graylog-0.5.1.tgz
+    version: 0.5.1
   - apiVersion: v2
     appVersion: 7.0.3-1
     created: "2026-01-10T13:39:17.369065841Z"
@@ -5123,6 +5167,16 @@ entries:
     version: 0.1.0
   pev2:
   - apiVersion: v2
+    appVersion: 2.22.0
+    created: "2026-11-17T00:02:47.353070346Z"
+    description: A Helm chart for the PEV2 application to analyse PG query plans.
+    digest: 1765ba0bc462e56936b55dffddd7912f76e3a7da996c0c0cb8884912eeb120bc
+    name: pev2
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/pev2-0.3.1/pev2-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     appVersion: 2.20.1
     created: "2026-02-23T13:47:34.362850104Z"
     description: A Helm chart for the PEV2 application to analyse PG query plans.
@@ -5234,6 +5288,17 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/photon-0.1.0/photon-0.1.0.tgz
     version: 0.1.0
   powerdns:
+  - apiVersion: v2
+    appVersion: 5.0.8
+    created: "2026-11-17T00:02:47.584777434Z"
+    description: A Helm chart to deploy PowerDNS to Kubernetes
+    digest: f40bd17b56e074911f16f00632c28c313f5d9e80eaeb03e9bc331bb219b3888e
+    home: https://www.powerdns.com/
+    name: powerdns
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/powerdns-0.10.1/powerdns-0.10.1.tgz
+    version: 0.10.1
   - apiVersion: v2
     appVersion: 5.0.3
     created: "2026-03-30T23:32:40.472120265Z"
@@ -5389,6 +5454,17 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/powerdns-0.1.0/powerdns-0.1.0.tgz
     version: 0.1.0
   powerdns-admin:
+  - apiVersion: v2
+    appVersion: v0.6.1
+    created: "2026-11-17T00:02:47.858671159Z"
+    description: A PowerDNS web interface with advanced features
+    digest: d87f838139a1bdac85300544fb4ce0dff02e209c357ed87299f779b18662584a
+    home: https://github.com/PowerDNS-Admin/PowerDNS-Admin
+    name: powerdns-admin
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/powerdns-admin-0.5.2/powerdns-admin-0.5.2.tgz
+    version: 0.5.2
   - apiVersion: v2
     appVersion: 0.4.2
     created: "2024-02-08T22:22:11.181187813Z"
@@ -5659,6 +5735,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/rabbitmq-topology-operator-0.1.1/rabbitmq-topology-operator-0.1.1.tgz
     version: 0.1.1
   restic-forget:
+  - apiVersion: v2
+    appVersion: 0.19.1
+    created: "2026-11-17T00:02:48.037513019Z"
+    description: A helm chart to deploy restic jobs for backup cleaning.
+    digest: 3d3c06f038f77165bc48973e457771cb470785af237c2e8c144baadc0dea03d3
+    name: restic-forget
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/restic-forget-0.5.2/restic-forget-0.5.2.tgz
+    version: 0.5.2
   - apiVersion: v2
     appVersion: 0.18.1
     created: "2025-09-22T23:25:47.172307974Z"
@@ -6025,6 +6111,16 @@ entries:
     version: 0.1.0
   s3-backup:
   - apiVersion: v2
+    appVersion: 0.7.1
+    created: "2026-11-17T00:02:48.219537785Z"
+    description: A helm chart to deploy s3-backup jobs.
+    digest: 1f3b6b7da1951e4bdba5ceaafaba02372935cca35beb6c2a8a3f7cfd012d0e54
+    name: s3-backup
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/s3-backup-0.10.1/s3-backup-0.10.1.tgz
+    version: 0.10.1
+  - apiVersion: v2
     appVersion: 0.7.0
     created: "2026-06-11T23:48:12.103572914Z"
     description: A helm chart to deploy s3-backup jobs.
@@ -6326,6 +6422,17 @@ entries:
     version: 0.1.0
   satisfactory:
   - apiVersion: v2
+    appVersion: v1.9.11
+    created: "2026-11-17T00:02:48.449054146Z"
+    description: A Helm chart for deploying a Satisfactory dedicated game server to
+      Kubernetes.
+    digest: b328dc34a7d8c11e8e9417b8d4757079e2fa50a943cd04bff020b0dc8a0c17b9
+    name: satisfactory
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/satisfactory-0.3.4/satisfactory-0.3.4.tgz
+    version: 0.3.4
+  - apiVersion: v2
     appVersion: v1.9.9
     created: "2025-06-10T23:51:51.042019922Z"
     description: A Helm chart for deploying a Satisfactory dedicated game server to
@@ -6594,6 +6701,16 @@ entries:
     version: 0.0.1
   teamspeak3:
   - apiVersion: v2
+    appVersion: 3.13.9
+    created: "2026-11-17T00:02:48.654573126Z"
+    description: teamspeak3 server
+    digest: e22e237d772a961b79249e137d6309e31aaaa05e955df02d37a3b985db929716
+    name: teamspeak3
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/teamspeak3-1.0.3/teamspeak3-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
     appVersion: 3.13.7
     created: "2023-10-24T21:35:33.895158114Z"
     description: teamspeak3 server
@@ -6624,6 +6741,26 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/teamspeak3-1.0.0/teamspeak3-1.0.0.tgz
     version: 1.0.0
   unifi-os-server:
+  - apiVersion: v2
+    appVersion: 5.1.42
+    created: "2026-11-17T00:02:48.883360839Z"
+    description: UniFi OS Server (UniFi OS core, UniFi Network and the UniFi identity
+      services) as one pod with one container per service, using external PostgreSQL,
+      MongoDB and RabbitMQ.
+    digest: d4346594d4a2dd0c7ca73299086dcf10a1fe81a74eb3e557f84da8525da6dc02
+    keywords:
+    - unifi
+    - unifi-os
+    - unifi-network
+    - ubiquiti
+    kubeVersion: '>=1.26.0-0'
+    name: unifi-os-server
+    sources:
+    - https://github.com/unihosted/unifi-os-server-docker
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/unifi-os-server-0.1.1/unifi-os-server-0.1.1.tgz
+    version: 0.1.1
   - apiVersion: v2
     appVersion: 5.1.42
     created: "2026-11-16T01:37:28.058417897Z"
@@ -6786,6 +6923,16 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/unifi-protect-0.1.0/unifi-protect-0.1.0.tgz
     version: 0.1.0
   vaultwarden:
+  - apiVersion: v2
+    appVersion: 1.37.5
+    created: "2026-11-17T00:02:49.07743991Z"
+    description: A Helm chart for Kubernetes
+    digest: e81fbbbc3a3c2c3baaeb5720fa543428fdbb7c6c3e8c4c901b87b75a7bdcfdb5
+    name: vaultwarden
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/vaultwarden-0.9.5/vaultwarden-0.9.5.tgz
+    version: 0.9.5
   - apiVersion: v2
     appVersion: 1.37.4
     created: "2026-10-06T12:36:46.901431476Z"
@@ -7661,6 +7808,16 @@ entries:
     version: 0.1.0
   znc:
   - apiVersion: v2
+    appVersion: 1.10.3
+    created: "2026-11-17T00:02:49.302721902Z"
+    description: A Helm chart for the ZNC IRC bouncer
+    digest: 08699754625e16deca3eb918ee81e0a1cd4959a1c54ffc0985c6a872c8241112
+    name: znc
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/znc-0.3.2/znc-0.3.2.tgz
+    version: 0.3.2
+  - apiVersion: v2
     appVersion: 1.10.1
     created: "2025-07-06T19:09:01.663703126Z"
     description: A Helm chart for the ZNC IRC bouncer
@@ -7730,4 +7887,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-16T23:36:13.86003986Z"
+generated: "2026-11-17T00:02:49.303749093Z"
