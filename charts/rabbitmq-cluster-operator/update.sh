@@ -25,7 +25,7 @@ for f in *.yml
 do
     kind="$(yq '.kind | downcase' "$f")"
     name="$(yq '.metadata.name' "$f")"
-    echo "Processing kind: $kind"
+    echo "Processing kind: $kind ($name)"
 
     # these match names and thus need to happen before renaming
     if [ "$kind" = "certificate" ] && [ "$name" = "cluster-operator-serving-cert" ]
@@ -43,6 +43,7 @@ do
     yq -i '.metadata.name |= sub(strenv(NAME_PREFIX), strenv(RESOURCE_FULLNAME))' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
+
     if [ "$kind" = 'clusterrolebinding' ] || [ "$kind" = "rolebinding" ]
     then
         yq -i '.roleRef.name |= sub(strenv(NAME_PREFIX), strenv(RESOURCE_FULLNAME)) | .subjects = (.subjects | map(.namespace = "{{ .Release.Namespace }}" | .name |= sub(strenv(NAME_PREFIX), strenv(RESOURCE_FULLNAME))))' "$f"
@@ -78,11 +79,16 @@ do
         yq -i '.spec.secretName = .metadata.name' "$f"
         yq -i '.spec.issuerRef.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
     fi
-    if [ "$kind" = "mutatingwebhookconfiguration" ] || [ "$kind" = "validatingwebhookconfiguration" ]
+    if [ "$kind" = 'service' ]
     then
+        yq -i '.spec.selector["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
+        yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
+    fi
+    if [ "$kind" = "validatingwebhookconfiguration" ] || [ "$kind" = "mutatingwebhookconfiguration" ]
+    then
+        yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-serving-cert"' "$f"
         yq -i '.webhooks |= map(.clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
         yq -i '.webhooks |= map(.clientConfig.service.name = strenv(RESOURCE_FULLNAME) + "-webhook-service")' "$f"
-        yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-serving-cert"' "$f"
     fi
 done
 

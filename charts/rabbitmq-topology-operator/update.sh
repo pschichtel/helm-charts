@@ -85,10 +85,11 @@ do
         yq -i '.spec.selector["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     fi
-    if [ "$kind" = 'validatingwebhookconfiguration' ] || [ "$kind" = "mutatingwebhookconfiguration" ]
+    if [ "$kind" = "validatingwebhookconfiguration" ] || [ "$kind" = "mutatingwebhookconfiguration" ]
     then
         yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-serving-cert"' "$f"
-        yq -i '.webhooks |= map(.clientConfig.service.name = strenv(RESOURCE_FULLNAME) + "-webhook-service" | .clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
+        yq -i '.webhooks |= map(.clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
+        yq -i '.webhooks |= map(.clientConfig.service.name = strenv(RESOURCE_FULLNAME) + "-webhook-service")' "$f"
     fi
 done
 
