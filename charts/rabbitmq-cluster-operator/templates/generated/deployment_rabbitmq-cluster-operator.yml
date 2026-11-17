@@ -82,7 +82,7 @@ spec:
       volumes:
         - name: cluster-operator-webhook-certs
           secret:
-            secretName: cluster-operator-webhook-server-cert
+            secretName: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-serving-cert'
       {{- with .Values.nodeSelector  }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}

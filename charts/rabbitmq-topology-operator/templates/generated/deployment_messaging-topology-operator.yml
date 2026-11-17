@@ -86,7 +86,7 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'
+            secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-serving-cert'
         - name: metrics-certs
           secret:
             items:

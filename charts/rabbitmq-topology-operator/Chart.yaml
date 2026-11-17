@@ -2,7 +2,7 @@ apiVersion: v2
 name: rabbitmq-topology-operator
 description: A Helm chart for rabbitmq's topology operator
 type: application
-version: 0.2.2
+version: 0.2.3
 # renovate: github-releases=rabbitmq/messaging-topology-operator
 appVersion: "1.20.6"
 
