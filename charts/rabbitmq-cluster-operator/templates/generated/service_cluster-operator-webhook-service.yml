@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
     app.kubernetes.io/instance: '{{ .Release.Name }}'
-  name: cluster-operator-webhook-service
+  name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-webhook-service'
 spec:
   ports:
     - port: 443

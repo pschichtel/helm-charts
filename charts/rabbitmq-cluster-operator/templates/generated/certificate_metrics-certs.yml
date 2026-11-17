@@ -6,11 +6,11 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
     app.kubernetes.io/instance: '{{ .Release.Name }}'
-  name: metrics-certs
+  name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-metrics-certs'
 spec:
   dnsNames:
-    - SERVICE_NAME.SERVICE_NAMESPACE.svc
-    - SERVICE_NAME.SERVICE_NAMESPACE.svc.cluster.local
+    - '{{ include "rabbitmq-cluster-operator.fullname" $ }}-metrics-certs.{{ .Release.Namespace }}.svc'
+    - '{{ include "rabbitmq-cluster-operator.fullname" $ }}-metrics-certs.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}'
   issuerRef:
     kind: Issuer
     name: selfsigned-issuer

@@ -3,8 +3,8 @@ apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
   annotations:
-    cert-manager.io/inject-ca-from: rabbitmq-system/cluster-operator-serving-cert
-  name: cluster-operator-mutating-webhook-configuration
+    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/{{ include "rabbitmq-cluster-operator.fullname" $ }}-serving-cert'
+  name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-mutating-webhook-configuration'
   labels:
     app.kubernetes.io/name: '{{ include "rabbitmq-cluster-operator.name" $ }}'
     app.kubernetes.io/instance: '{{ .Release.Name }}'
@@ -13,8 +13,8 @@ webhooks:
       - v1
     clientConfig:
       service:
-        name: cluster-operator-webhook-service
-        namespace: rabbitmq-system
+        name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-webhook-service'
+        namespace: '{{ .Release.Namespace }}'
         path: /mutate-rabbitmq-com-v1beta1-rabbitmqcluster
     failurePolicy: Fail
     name: mrabbitmqcluster-v1beta1.kb.io
