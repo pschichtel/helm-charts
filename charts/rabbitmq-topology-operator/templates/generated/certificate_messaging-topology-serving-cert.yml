@@ -6,12 +6,12 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: '{{ include "rabbitmq-topology-operator.name" $ }}'
     app.kubernetes.io/instance: '{{ .Release.Name }}'
-  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'
+  name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-serving-cert'
 spec:
   dnsNames:
-    - messaging-topology-webhook-service.rabbitmq-system.svc
-    - messaging-topology-webhook-service.rabbitmq-system.svc.cluster.local
+    - '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service.{{ .Release.Namespace }}.svc'
+    - '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-service.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}'
   issuerRef:
     kind: Issuer
     name: '{{ include "rabbitmq-topology-operator.fullname" $ }}-issuer'
-  secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-webhook-cert'
+  secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-serving-cert'

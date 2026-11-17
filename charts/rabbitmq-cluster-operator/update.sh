@@ -30,6 +30,7 @@ do
     # these match names and thus need to happen before renaming
     if [ "$kind" = "certificate" ] && [ "$name" = "cluster-operator-serving-cert" ]
     then
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-serving-cert"' "$f"
         yq -i '.spec.dnsNames |= [ strenv(RESOURCE_FULLNAME) + "-webhook-service.{{ .Release.Namespace }}.svc", strenv(RESOURCE_FULLNAME) + "-webhook-service.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}" ]' "$f"
     fi
     if [ "$kind" = "certificate" ] && [ "$name" = "metrics-certs" ]
@@ -66,6 +67,15 @@ do
         sed -i -r "s/'\\{\\{(.+)}}'/{{\\1}}/g" "$f"
         # introduce with blocks
         sed -i -r -r "s/(\\s+)([^:]+):\s+with([0-9]+):\\{\\{\\s*(.+?)}}/\\1{{- with \\4 }}\\n\\1\\2: {{- toYaml . | nindent \\3 }}\\n\\1{{- end }}/g" "$f"
+    fi
+    if [ "$kind" = 'issuer' ]
+    then
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
+    fi
+    if [ "$kind" = 'certificate' ]
+    then
+        yq -i '.spec.secretName = .metadata.name' "$f"
+        yq -i '.spec.issuerRef.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
     fi
     if [ "$kind" = "mutatingwebhookconfiguration" ] || [ "$kind" = "validatingwebhookconfiguration" ]
     then

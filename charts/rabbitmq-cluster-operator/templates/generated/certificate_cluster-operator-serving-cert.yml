@@ -13,5 +13,5 @@ spec:
     - '{{ include "rabbitmq-cluster-operator.fullname" $ }}-webhook-service.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}'
   issuerRef:
     kind: Issuer
-    name: selfsigned-issuer
-  secretName: cluster-operator-webhook-server-cert
+    name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-issuer'
+  secretName: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-serving-cert'

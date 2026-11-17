@@ -13,5 +13,5 @@ spec:
     - '{{ include "rabbitmq-cluster-operator.fullname" $ }}-metrics-certs.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}'
   issuerRef:
     kind: Issuer
-    name: selfsigned-issuer
-  secretName: rabbitmq-cluster-operator-metrics-server-cert
+    name: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-issuer'
+  secretName: '{{ include "rabbitmq-cluster-operator.fullname" $ }}-metrics-certs'

@@ -24,7 +24,21 @@ export IMAGE='{{ print .Values.image.registry "/" .Values.image.repository ":" (
 for f in *.yml
 do
     kind="$(yq '.kind | downcase' "$f")"
-    echo "Processing kind: $kind"
+    name="$(yq '.metadata.name' "$f")"
+    echo "Processing kind: $kind ($name)"
+
+    # these match names and thus need to happen before renaming
+    if [ "$kind" = "certificate" ] && [ "$name" = "messaging-topology-serving-cert" ]
+    then
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-serving-cert"' "$f"
+        yq -i '.spec.dnsNames |= [ strenv(RESOURCE_FULLNAME) + "-webhook-service.{{ .Release.Namespace }}.svc", strenv(RESOURCE_FULLNAME) + "-webhook-service.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}" ]' "$f"
+    fi
+    if [ "$kind" = "certificate" ] && [ "$name" = "messaging-topology-metrics-certs" ]
+    then
+        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-metrics-certs"' "$f"
+        yq -i '.spec.dnsNames |= [ strenv(RESOURCE_FULLNAME) + "-metrics-certs.{{ .Release.Namespace }}.svc", strenv(RESOURCE_FULLNAME) + "-metrics-certs.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}" ]' "$f"
+    fi
+
     yq -i 'del(.metadata.namespace)' "$f"
     yq -i '.metadata.name |= sub(strenv(NAME_PREFIX), strenv(RESOURCE_FULLNAME))' "$f"
     yq -i '.metadata.labels["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
@@ -62,19 +76,18 @@ do
     fi
     if [ "$kind" = 'certificate' ]
     then
-        yq -i '.spec.secretName = strenv(RESOURCE_FULLNAME) + "-webhook-cert" | .metadata.name = .spec.secretName' "$f"
+        yq -i '.spec.secretName = .metadata.name' "$f"
         yq -i '.spec.issuerRef.name = strenv(RESOURCE_FULLNAME) + "-issuer"' "$f"
-        yq -i '.spec.dnsNames |= map(sub("^webhook-service\.rabbitmq-system\.svc", strenv(RESOURCE_FULLNAME) + "-webhook.{{ .Release.Namespace }}.svc"))' "$f"
     fi
     if [ "$kind" = 'service' ]
     then
-        yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-webhook"' "$f"
+        #yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-webhook"' "$f"
         yq -i '.spec.selector["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     fi
-    if [ "$kind" = 'validatingwebhookconfiguration' ]
+    if [ "$kind" = 'validatingwebhookconfiguration' ] || [ "$kind" = "mutatingwebhookconfiguration" ]
     then
-        yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ print .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-webhook-cert"' "$f"
+        yq -i '.metadata.annotations["cert-manager.io/inject-ca-from"] = "{{ .Release.Namespace }}/" + strenv(RESOURCE_FULLNAME) + "-webhook-cert"' "$f"
         yq -i '.webhooks |= map(.clientConfig.service.name = strenv(RESOURCE_FULLNAME) + "-webhook" | .clientConfig.service.namespace = "{{ .Release.Namespace }}")' "$f"
     fi
 done
