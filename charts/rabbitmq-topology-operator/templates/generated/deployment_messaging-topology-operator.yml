@@ -97,7 +97,7 @@ spec:
               - key: tls.key
                 path: tls.key
             optional: false
-            secretName: metrics-server-cert
+            secretName: '{{ include "rabbitmq-topology-operator.fullname" $ }}-metrics-certs'
       {{- with .Values.nodeSelector  }}
       nodeSelector: {{- toYaml . | nindent 8 }}
       {{- end }}

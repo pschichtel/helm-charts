@@ -65,6 +65,7 @@ do
         yq -i '.spec.template.spec.affinity                                 = "with8:{{ .Values.affinity }}"' "$f"
         yq -i '.spec.template.metadata.annotations                          = "with8:{{ .Values.podAnnotations }}"' "$f"
         yq -i '.spec.template.spec.volumes[0].secret.secretName             = strenv(RESOURCE_FULLNAME) + "-serving-cert"' "$f"
+        yq -i '.spec.template.spec.volumes[1].secret.secretName             = strenv(RESOURCE_FULLNAME) + "-metrics-certs"' "$f"
         # remove unneeded quoting
         sed -i -r "s/'\\{\\{(.+)}}'/{{\\1}}/g" "$f"
         # introduce with blocks
@@ -81,7 +82,6 @@ do
     fi
     if [ "$kind" = 'service' ]
     then
-        #yq -i '.metadata.name = strenv(RESOURCE_FULLNAME) + "-webhook"' "$f"
         yq -i '.spec.selector["app.kubernetes.io/name"]     = strenv(RESOURCE_NAME)' "$f"
         yq -i '.spec.selector["app.kubernetes.io/instance"] = "{{ .Release.Name }}"' "$f"
     fi
