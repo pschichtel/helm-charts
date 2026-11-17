@@ -5666,6 +5666,16 @@ entries:
   rabbitmq-topology-operator:
   - apiVersion: v2
     appVersion: 1.20.6
+    created: "2026-11-17T16:39:19.459164961Z"
+    description: A Helm chart for rabbitmq's topology operator
+    digest: 84184405ba940f9bbf5dc9f19fe184d12629d61e9ddc6cc87b78fd3338ea0bc8
+    name: rabbitmq-topology-operator
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/rabbitmq-topology-operator-0.2.5/rabbitmq-topology-operator-0.2.5.tgz
+    version: 0.2.5
+  - apiVersion: v2
+    appVersion: 1.20.6
     created: "2026-11-17T10:43:26.544955392Z"
     description: A Helm chart for rabbitmq's topology operator
     digest: ac11e319c4edf4c5dc0f017360ccf1b17d39a7e22e1617dadf53c4a2926b7c56
@@ -7957,4 +7967,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-17T10:43:26.545862688Z"
+generated: "2026-11-17T16:39:19.460377117Z"
