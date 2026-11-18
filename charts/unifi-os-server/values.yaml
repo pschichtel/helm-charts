@@ -134,7 +134,6 @@ service:
   web:
     type: ClusterIP
     annotations: {}
-    loadBalancerIP: ""
     loadBalancerSourceRanges: []
     externalTrafficPolicy: ""
     ports:

@@ -460,7 +460,7 @@ Static checks: `ct lint --config charts/unifi-os-server/ct.yaml` and `helm templ
 
 Two Services, so that the web side and the device side can be exposed
 differently (`service.web`, `service.device`; each has `type`, `annotations`,
-`loadBalancerIP`, `loadBalancerSourceRanges`, `externalTrafficPolicy` and
+`loadBalancerSourceRanges`, `externalTrafficPolicy` and
 `ports`):
 
 - `<fullname>` (web): `http` 80 and `https` 443, the UI. The ingress points
