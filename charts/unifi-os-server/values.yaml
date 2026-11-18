@@ -14,6 +14,9 @@ serviceAccount:
   annotations: {}
   name: ""
 
+# fixed hostname of the pod (default: the pod name, which changes on every restart)
+podHostname: ""
+
 podAnnotations: {}
 podLabels: {}
 
@@ -24,6 +27,7 @@ securityContext: {}
 
 console:
   # derived from the release namespace and name if empty
+  # use `uuidgen --namespace @dns --name example.com --sha1` to generate one
   uuid: ""
   # address advertised to devices, e.g. the LoadBalancer IP
   systemIP: ""

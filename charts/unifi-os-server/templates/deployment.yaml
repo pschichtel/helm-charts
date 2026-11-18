@@ -33,6 +33,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "unifi-os-server.serviceAccountName" . }}
+      {{- with .Values.podHostname }}
+      hostname: {{ . }}
+      {{- end }}
       # Service links would inject variables such as RABBITMQ_PORT=tcp://...
       # for services in the namespace, clashing with the entrypoints' settings.
       enableServiceLinks: false

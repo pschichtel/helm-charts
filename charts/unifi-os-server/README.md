@@ -431,6 +431,13 @@ Both Services can share one IP with the controller's own mechanism (MetalLB
 in `annotations`), but then the web ports are reachable on it as well if the
 web Service is a LoadBalancer too.
 
+## Pod hostname
+
+By default the pod's hostname is its name, which changes whenever the pod is
+recreated. `podHostname` sets a fixed one (`spec.hostname`). Whether the image's
+services use the hostname (for example as the console name) has not been
+verified.
+
 ## Known gaps
 
 - The setup wizard is verified to render, not to complete (admin account,
