@@ -313,9 +313,6 @@ metadata:
   {{- end }}
 spec:
   type: {{ $cfg.type }}
-  {{- if and (eq $cfg.type "LoadBalancer") $cfg.loadBalancerIP }}
-  loadBalancerIP: {{ $cfg.loadBalancerIP }}
-  {{- end }}
   {{- with $cfg.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
     {{- toYaml . | nindent 4 }}
