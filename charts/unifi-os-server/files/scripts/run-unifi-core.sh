@@ -90,9 +90,9 @@ with os.fdopen(fd, "w") as f:
     json.dump(cfg, f, indent=2)
 EOF
 
-# --- ownership (pre-start chowns the rest)
-chown -R unifi-core:unifi-core /data/unifi-core
-chown unifi-core:unifi-core /run/unifi-core; chmod 755 /run/unifi-core
+# --- /run/unifi-core (systemd: RuntimeDirectory, mode 0755) holds jwks.json,
+# which the other services read
+chmod 755 /run/unifi-core
 
 # --- D-Bus system bus + fake systemd1 provider (root)
 mkdir -p /var/run/dbus
@@ -109,8 +109,13 @@ process.on('exit', function(c){ try { process.stderr.write('NODE-EXIT code=' + c
 EOF
 chmod 644 /tmp/pre.js
 
-# --- pre-start hook (validated: as unifi-core, cwd /tmp)
-runuser -u unifi-core -- env TMPDIR=/tmp bash -c 'cd /tmp && /usr/share/unifi-core/app/hooks/pre-start' || true
+# --- pre-start hook, as root like the stock unit. unifi-core.service has
+# User=unifi-core, but the image's drop-in unifi-core.service.d/cap.conf
+# overrides it with User=root, so core and its hooks run as root with
+# USER=root. As another user the hook cannot chown node_modules/@ubnt, and core
+# then cannot write the device manifest into the setup UI ("Unknown Device").
+# Its systemctl and postgres calls fail harmlessly.
+env USER=root GROUP=root TMPDIR=/tmp bash -c 'cd /tmp && /usr/share/unifi-core/app/hooks/pre-start' || true
 
 # --- nginx: full config from the image. It must be RUNNING before core starts:
 # core writes its site confs and immediately runs `nginx -s reload`; if that
@@ -128,7 +133,7 @@ fi
 
 # --- foreground: the core service itself
 cd /usr/share/unifi-core/app
-exec runuser -u unifi-core -- env \
+exec env \
   NODE_ENV=production UV_THREADPOOL_SIZE="${UV_THREADPOOL_SIZE:-256}" \
   NODE_CONFIG_DIR="/usr/share/unifi-core/app/config/:/data/unifi-core/config/overrides/" \
   /usr/bin/node24 --require /tmp/pre.js --expose-gc --max-old-space-size=300 --openssl-legacy-provider \

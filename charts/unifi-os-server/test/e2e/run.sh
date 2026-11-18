@@ -34,7 +34,7 @@ if command -v chromium >/dev/null; then
       --virtual-time-budget=30000 --dump-dom https://127.0.0.1:18443/ 2>/dev/null \
       | grep -oE 'data-label="[^"]+"' | head -2 | tr '\n' ' ' || true)
     echo "  UI: ${labels:-<nothing yet>}"
-    if echo "$labels" | grep -q "Name Your UniFi Console"; then ok=1; break; fi
+    if echo "$labels" | grep -q "Name Your UniFi"; then ok=1; break; fi
     sleep 10
   done
   [ -n "$ok" ] || { echo "FAIL: setup wizard did not appear"; exit 1; }
