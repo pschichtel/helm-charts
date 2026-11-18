@@ -37,6 +37,12 @@ unifi-os-server:
   # ingress:
   #   enabled: true
   #   hosts: [unifi.example.com]
+  #   # e.g. HAProxy (haproxytech); HTTP/1.1 to the backend is required, see
+  #   # "Ingress and reverse proxies" in the chart README
+  #   className: haproxy
+  #   annotations:
+  #     haproxy.org/server-ssl: "true"
+  #     haproxy.org/server-proto: "h1"
   postgresql:
     auth:
       unifiCore:

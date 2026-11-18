@@ -476,6 +476,36 @@ Both Services can share one IP with the controller's own mechanism (MetalLB
 in `annotations`), but then the web ports are reachable on it as well if the
 web Service is a LoadBalancer too.
 
+## Ingress and reverse proxies
+
+The UI is HTTPS-only (port 80 redirects to 443, self-signed certificate), so
+an ingress should talk HTTPS to the `https` port of the web Service
+(`ingress.servicePort: https`, the default) without verifying the backend
+certificate. The UI depends on WebSockets (`/api/ws/system`,
+`/proxy/network/wss/...`).
+
+**The proxy must talk HTTP/1.1 to the backend.** The pod's nginx offers
+HTTP/2 via ALPN but cannot carry WebSockets over HTTP/2 (RFC 8441). A proxy
+that negotiates HTTP/2 to the backend makes every WebSocket fail; the browser
+shows `net::ERR_HTTP2_SERVER_REFUSED_STREAM` and the console stays empty or
+half-loaded after login. Browsers may use HTTP/2 to the proxy itself.
+
+HAProxy Kubernetes Ingress (haproxytech), verified with chart 1.56.4:
+`server-ssl` alone generates `ssl alpn h2,http/1.1`; `server-proto: h1`
+removes the ALPN:
+
+```yaml
+ingress:
+  enabled: true
+  className: haproxy
+  annotations:
+    haproxy.org/server-ssl: "true"
+    haproxy.org/server-proto: "h1"
+```
+
+ingress-nginx talks HTTP/1.1 to backends anyway
+(`nginx.ingress.kubernetes.io/backend-protocol: HTTPS`).
+
 ## Pod hostname
 
 By default the pod's hostname is its name, which changes whenever the pod is
