@@ -532,6 +532,16 @@ verified.
 - `console.systemIP` (`system_ip`) is passed to the Network app; its effect on
   the inform address has not been verified with a real device.
 - Image units deliberately not run: cron, snmpd, smartmontools, epmd.
+- **Reinstalling keeps old state if any volume survives.** The MongoDB
+  database (Network app), the PostgreSQL databases (core, ulp-go, ...) and the
+  data PVC belong together. A Network database from an earlier installation
+  next to a new core and ulp-go gives a Network app whose live-update
+  WebSocket (`/proxy/network/wss/s/default/events`) closes right after
+  opening, in a loop, and `GET /proxy/network/api/self` returns 500;
+  `server.log` shows `Received invalid ObjectId[factory_default]` and
+  `websocket session error: Cannot invoke "com.ubnt.data.xTAqASU.getId()"`.
+  Wipe all of them together (local hostpath provisioners such as minikube's
+  reuse directories by PVC name, so deleting the PVCs is not enough there).
 - `GET /api/v2/identity/status` returns 404 without a session (the agent's API
   answers 404 for unauthenticated/unknown paths); a 500 `ECONNREFUSED :11011`
   would mean `uos-agent` is down.
