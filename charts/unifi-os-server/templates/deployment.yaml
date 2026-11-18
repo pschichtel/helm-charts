@@ -39,6 +39,10 @@ spec:
       # Service links would inject variables such as RABBITMQ_PORT=tcp://...
       # for services in the namespace, clashing with the entrypoints' settings.
       enableServiceLinks: false
+      # One process namespace for all containers: a reboot or service restart
+      # from core signals every process, so all containers restart
+      # (files/scripts/systemctl.sh).
+      shareProcessNamespace: true
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- with .Values.podSecurityContext }}
       securityContext:

@@ -23,8 +23,8 @@ it, for maintenance and image upgrades.
   - `templates/`, `values.yaml`.
   - `files/scripts/` — entrypoints (`run-*.sh`), the shared helpers
     `lib.sh` (config rendering, Postgres checks) and `as-user.sh` (directory
-    setup and privilege drop), and `fake-sd1.js` (fake systemd D-Bus provider
-    for core). Shipped as a ConfigMap mounted at `/scripts`.
+    setup and privilege drop), `fake-sd1.js` (fake systemd D-Bus provider
+    for core) and `systemctl.sh` (`systemctl` replacement in core). Shipped as a ConfigMap mounted at `/scripts`.
   - `files/config/` — static property overrides per Go service and their
     stdout-only logger configs (see Logging).
   - `ci/` (values for `ct lint`).
@@ -350,11 +350,56 @@ low `podPidsLimit` need it lower, or a higher limit.
   name unless set, so it is stable across upgrades and `helm template`
   renders.
 
+## No systemd: `systemctl` shim, restart and reboot
+
+Core calls `systemctl` and `ubnt-systool` (which calls `systemctl`) for many
+things; without systemd every such call failed. The `unifi-core` container
+replaces `/bin/systemctl` with `files/scripts/systemctl.sh` (the original
+stays as `/bin/systemctl.real`; `/sbin/reboot`, `poweroff` and `halt` are
+symlinks to it). `/bin` is a real directory in the image and `ubnt-systool`
+sets `PATH=/bin:...` itself, so a shim earlier in `PATH` would not do.
+
+- `reboot`, `poweroff`, `halt`, and `restart`/`stop`/`kill` of one of the
+  UniFi services (`unifi`, `ulp-go`, ...): restart all containers of the pod
+  with `kill -TERM -1` (3 s delay, so the API call still answers). This needs
+  `shareProcessNamespace: true`. A container whose main process exits is
+  restarted by the kubelet; the pod itself stays. Restarting everything for a
+  single service is deliberate: it is rare, and simpler than tracking each
+  container's processes. `nginx`: `nginx -s reload`.
+- `is-system-running`: `running`; `is-active`/`is-enabled`: `active`/
+  `enabled`; everything else (`enable`, `disable`, `mask`, `daemon-reload`,
+  `restart cron`, transient `systemd-run` units, ...): success, no effect.
+
+What this fixed:
+
+- **Time zone**: `ubnt-systool timezone <tz>` writes `/etc/localtime` and
+  `/etc/timezone`, then runs `systemctl restart cron`; that failed, so core
+  logged `Failed to change the timezone` and never stored one. With
+  `timezone: null` the Network UI crashed ("UniFi is having trouble with this
+  direction", `RangeError: Invalid time zone specified: null` in the browser
+  console). Core now sets it from GeoIP at startup (fallback UTC) and on
+  setup.
+- **Reboot**: `POST /api/system/reboot` (and `/poweroff`) restart the pod's
+  containers. The UniFi OS **UI has no Restart/Power Off/Reset buttons on UOS
+  Server, by design**: the console settings hide them when `isUOSServer`
+  (`unifi-portal`, `edit:os-settings:restart && !isCloudConsole &&
+  !isUOSServer`). On a stock install those actions live in the host-side "UOS
+  Server Manager", which injects `window.UOS_SERVER` into the page; it does
+  not exist here (also the cause of the harmless 500 `No connection to UOS
+  Server Manager` from `/api/backup/setup/has-legacy-net` during setup).
+- Core's restarts of the Network app (`systemctl restart unifi`, e.g. after
+  changing "Network Memory Limit"); these restart the whole pod.
+
+Core writes its logs to files under `/data/unifi-core/logs` (`system.log`,
+`errors.log`, `ulp.log`, ...), not to the container log; look there first.
+
 ## Go services drop privileges in the entrypoint
 
 Each Go container starts as root only long enough for `as-user.sh` to create
 and chown its directories, then `exec`s the app via `setpriv` as the app's own
-user (PID 1, signals delivered directly).
+user, as the container's main process (signals delivered directly). The pod
+shares one process namespace (see "No systemd"), so PID 1 is the pause
+container.
 
 - **Users** (resolved inside the image, uids as of 5.1.42): `ulp-go` 999,
   `uid` 991, `ucs-agent` 975, `unifi-directory` 979, `ucs-update` 974 for
@@ -440,8 +485,9 @@ verified.
 
 ## Known gaps
 
-- The setup wizard is verified to render, not to complete (admin account,
-  adoption of a device).
+- The setup wizard is verified to complete with a local account ("Proceed
+  Without a UI Account"), not with a UI account, and device adoption is not
+  verified.
 - `uos-discovery-client` runs but cannot see the LAN from a pod network
   (layer-2 discovery). Devices must be adopted via `set-inform`, DHCP option
   43 or DNS.

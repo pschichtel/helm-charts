@@ -94,6 +94,11 @@ EOF
 # which the other services read
 chmod 755 /run/unifi-core
 
+# --- systemctl shim (reboot, unit restarts; see systemctl.sh). /sbin/reboot,
+# poweroff and halt are symlinks to /bin/systemctl.
+[ -e /bin/systemctl.real ] || mv /bin/systemctl /bin/systemctl.real
+install -m 755 /scripts/systemctl.sh /bin/systemctl
+
 # --- D-Bus system bus + fake systemd1 provider (root)
 mkdir -p /var/run/dbus
 rm -f /var/run/dbus/system_bus_socket /var/run/dbus/pid
