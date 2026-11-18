@@ -1,0 +1,11 @@
+# databaseReclaimPolicy: retain keeps the database when this resource is deleted.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: unifi-pg-unifi-directory
+spec:
+  cluster:
+    name: unifi-pg
+  name: unifi-directory
+  owner: unifi-directory
+  databaseReclaimPolicy: retain

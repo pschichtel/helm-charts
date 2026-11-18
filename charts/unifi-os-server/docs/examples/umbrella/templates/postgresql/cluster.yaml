@@ -1,0 +1,24 @@
+# PostgreSQL 14, pinned: ulp-go sends SQL that 15+ rejects. unifi-core uses the
+# bootstrap database and the generated Secret unifi-pg-app; the other services
+# use the DatabaseRoles in role-*.yaml, whose names are fixed (their schema
+# migrations contain OWNER TO "<role>").
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: unifi-pg
+spec:
+  instances: {{ .Values.cnpg.instances }}
+  imageName: ghcr.io/cloudnative-pg/postgresql:14.21-standard-trixie
+  storage:
+    size: {{ .Values.cnpg.storage.size }}
+    {{- with .Values.cnpg.storage.storageClass }}
+    storageClass: {{ . }}
+    {{- end }}
+  {{- with .Values.cnpg.resources }}
+  resources:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  bootstrap:
+    initdb:
+      database: unifi-core
+      owner: unifi-core

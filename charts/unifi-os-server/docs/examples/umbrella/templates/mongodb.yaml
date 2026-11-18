@@ -1,0 +1,89 @@
+{{- if .Values.mongodb.createAppdbRbac }}
+# The operator creates this service account only in its own namespace.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mongodb-kubernetes-appdb
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mongodb-kubernetes-appdb
+rules:
+  - apiGroups: [""]
+    resources: [secrets]
+    verbs: [get]
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [patch, delete, get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mongodb-kubernetes-appdb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: mongodb-kubernetes-appdb
+subjects:
+  - kind: ServiceAccount
+    name: mongodb-kubernetes-appdb
+    namespace: {{ .Release.Namespace }}
+---
+{{- end }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: unifi-mongo-password
+type: Opaque
+stringData:
+  password: {{ include "stack.password" (dict "ctx" $ "name" "unifi-mongo-password") }}
+---
+# The operator creates the Secret unifi-mongo-admin-unifi (username, password).
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: unifi-mongo
+spec:
+  members: {{ .Values.mongodb.members }}
+  type: ReplicaSet
+  version: {{ .Values.mongodb.version | quote }}
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: unifi
+      db: admin
+      passwordSecretRef:
+        name: unifi-mongo-password
+      scramCredentialsSecretName: unifi-mongo-scram
+      roles:
+        {{- range list "ace" "ace_stat" "ace_audit" "ace_restore" }}
+        - name: dbOwner
+          db: {{ . }}
+        {{- end }}
+        - name: clusterMonitor
+          db: admin
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            accessModes: [ReadWriteOnce]
+            {{- with .Values.mongodb.storage.storageClass }}
+            storageClassName: {{ . }}
+            {{- end }}
+            resources:
+              requests:
+                storage: {{ .Values.mongodb.storage.size }}
+        - metadata:
+            name: logs-volume
+          spec:
+            accessModes: [ReadWriteOnce]
+            {{- with .Values.mongodb.storage.storageClass }}
+            storageClassName: {{ . }}
+            {{- end }}
+            resources:
+              requests:
+                storage: 1Gi

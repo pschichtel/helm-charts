@@ -1,0 +1,12 @@
+# The operator creates the Secret unifi-rmq-default-user (host, port, username, password).
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: unifi-rmq
+spec:
+  replicas: {{ .Values.rabbitmq.replicas }}
+  persistence:
+    storage: {{ .Values.rabbitmq.storage.size }}
+    {{- with .Values.rabbitmq.storage.storageClass }}
+    storageClassName: {{ . }}
+    {{- end }}

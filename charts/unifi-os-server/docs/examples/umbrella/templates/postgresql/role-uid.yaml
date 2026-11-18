@@ -1,0 +1,13 @@
+# databaseRoleReclaimPolicy: retain keeps the role when this resource is deleted.
+apiVersion: postgresql.cnpg.io/v1
+kind: DatabaseRole
+metadata:
+  name: unifi-pg-uid
+spec:
+  cluster:
+    name: unifi-pg
+  name: uid
+  login: true
+  databaseRoleReclaimPolicy: retain
+  passwordSecret:
+    name: unifi-pg-uid

@@ -1,0 +1,12 @@
+apiVersion: v2
+name: unifi-os-server-stack
+description: >-
+  UniFi OS Server with its PostgreSQL (CloudNativePG), MongoDB (MongoDB
+  Community operator) and RabbitMQ (RabbitMQ Cluster Operator) in one release.
+type: application
+version: 0.1.0
+dependencies:
+  - name: unifi-os-server
+    version: ">=0.1.0"
+    # in a real setup: the repository the chart is published to
+    repository: file://../../..

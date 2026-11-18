@@ -1,0 +1,69 @@
+# Settings of the data services in this stack; everything under
+# `unifi-os-server:` is passed to the chart itself.
+cnpg:
+  instances: 3
+  storage:
+    size: 10Gi
+    storageClass: ""
+  resources: {}
+
+mongodb:
+  members: 1
+  version: "8.0.38"
+  storage:
+    size: 5Gi
+    storageClass: ""
+  # the operator's service account for the replica set pods, only needed if the
+  # MongoDB operator is not installed in this namespace
+  createAppdbRbac: true
+
+rabbitmq:
+  replicas: 1
+  storage:
+    size: 2Gi
+    storageClass: ""
+
+# Names are fixed (not derived from the release) because subchart values
+# cannot be templated: install one stack per namespace.
+unifi-os-server:
+  # Typical exposure: devices reach inform/STUN through a LoadBalancer, the UI
+  # stays on the ClusterIP Service behind an ingress.
+  # console:
+  #   systemIP: 192.0.2.10
+  # service:
+  #   device:
+  #     type: LoadBalancer
+  #     externalTrafficPolicy: Local
+  # ingress:
+  #   enabled: true
+  #   hosts: [unifi.example.com]
+  postgresql:
+    auth:
+      unifiCore:
+        secretName: unifi-pg-app
+        database:
+          key: dbname
+      ulpGo:
+        secretName: unifi-pg-ulp-go
+        host: {name: unifi-pg-app, key: host}
+        port: {name: unifi-pg-app, key: port}
+      uidAgent:
+        secretName: unifi-pg-uid
+        host: {name: unifi-pg-app, key: host}
+        port: {name: unifi-pg-app, key: port}
+      ucsAgent:
+        secretName: unifi-pg-ucs-agent
+        host: {name: unifi-pg-app, key: host}
+        port: {name: unifi-pg-app, key: port}
+      unifiDirectory:
+        secretName: unifi-pg-unifi-directory
+        host: {name: unifi-pg-app, key: host}
+        port: {name: unifi-pg-app, key: port}
+  mongodb:
+    secretName: unifi-mongo-admin-unifi
+    hosts:
+      value: [unifi-mongo-svc:27017]
+    replicaSet:
+      value: unifi-mongo
+  rabbitmq:
+    secretName: unifi-rmq-default-user
