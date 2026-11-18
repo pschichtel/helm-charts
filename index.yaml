@@ -6843,6 +6843,26 @@ entries:
   unifi-os-server:
   - apiVersion: v2
     appVersion: 5.1.42
+    created: "2026-11-18T01:25:17.013971899Z"
+    description: UniFi OS Server (UniFi OS core, UniFi Network and the UniFi identity
+      services) as one pod with one container per service, using external PostgreSQL,
+      MongoDB and RabbitMQ.
+    digest: bc898e508498fa1d80a6bcdd8426233c9eb8f6e84dd8b5c8fdc66d008aa94866
+    keywords:
+    - unifi
+    - unifi-os
+    - unifi-network
+    - ubiquiti
+    kubeVersion: '>=1.26.0-0'
+    name: unifi-os-server
+    sources:
+    - https://github.com/unihosted/unifi-os-server-docker
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/unifi-os-server-0.2.1/unifi-os-server-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 5.1.42
     created: "2026-11-18T00:52:28.74917128Z"
     description: UniFi OS Server (UniFi OS core, UniFi Network and the UniFi identity
       services) as one pod with one container per service, using external PostgreSQL,
@@ -8007,4 +8027,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-18T00:52:28.750195493Z"
+generated: "2026-11-18T01:25:17.01452229Z"
