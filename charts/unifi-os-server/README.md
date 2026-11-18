@@ -352,8 +352,16 @@ low `podPidsLimit` need it lower, or a higher limit.
 
 ## No systemd: `systemctl` shim, restart and reboot
 
-Core calls `systemctl` and `ubnt-systool` (which calls `systemctl`) for many
-things; without systemd every such call failed. The `unifi-core` container
+Core reads unit states over D-Bus from `fake-sd1.js` (a fake
+`org.freedesktop.systemd1`). It reports the units that exist here (one per
+container, plus nginx and dbus) as active and every other unit like systemd
+reports a missing one (`LoadState` `not-found`, `inactive`); otherwise core
+treats Protect, Connect, Drive, InnerSpace, ... as installed and polls their
+status ports. `GetAll` must answer `a{sv}` with a Variant per value; a single
+Variant around the dictionary fails to marshal and the call never returns.
+
+Core also calls `systemctl` and `ubnt-systool` (which calls `systemctl`) for
+many things; without systemd every such call failed. The `unifi-core` container
 replaces `/bin/systemctl` with `files/scripts/systemctl.sh` (the original
 stays as `/bin/systemctl.real`; `/sbin/reboot`, `poweroff` and `halt` are
 symlinks to it). `/bin` is a real directory in the image and `ubnt-systool`

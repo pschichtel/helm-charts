@@ -2,8 +2,9 @@
 // Minimal fake org.freedesktop.systemd1 provider for unifi-core under docker.
 // Contract used by unifi-core (service.js A$/bf watcher + rut/Rwe factory):
 //   Manager: Introspect, Subscribe(), Unsubscribe(), LoadUnit(name) -> object path
-//   Unit:    Introspect, org.freedesktop.DBus.Properties Get(iface, "ActiveState"|"StatusText"|...)
-// Everything else: no-op success (app only reads; never Starts/Stops units).
+//   Unit:    Introspect, org.freedesktop.DBus.Properties Get/GetAll(iface, "ActiveState"|"StatusText"|...)
+// Units in PRESENT are active; others look like missing units (not-found).
+// Everything else: no-op success (restarts go through systemctl.sh).
 let dbus = null;
 for (const p of [
   '/usr/share/unifi-core/app/node_modules/dbus-next',
@@ -75,13 +76,24 @@ const UNIT_XML = `<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Intros
   </interface>
 </node>`;
 
+// Units that exist in this pod (one container each, nginx and dbus inside
+// unifi-core). Everything else - Protect, Access, Talk, Connect, Drive, ... -
+// is reported like systemd reports a missing unit, so core does not treat
+// those apps as installed and poll their status ports.
+const PRESENT = new Set([
+  'unifi-core', 'unifi', 'ulp-go', 'uid-agent', 'ucs-agent', 'unifi-directory',
+  'unifi-identity-update', 'uos-agent', 'uos-discovery-client', 'nginx', 'dbus',
+]);
+function present(name) { return PRESENT.has(String(name).replace(/\.service$/, '')); }
+
 function getProp(name, prop) {
+  const here = present(name);
   switch (prop) {
-    case 'ActiveState': return 'active';
-    case 'SubState': return 'running';
-    case 'LoadState': return 'loaded';
+    case 'ActiveState': return here ? 'active' : 'inactive';
+    case 'SubState': return here ? 'running' : 'dead';
+    case 'LoadState': return here ? 'loaded' : 'not-found';
     case 'Id': case 'Unit': return name;
-    case 'MainPID': return 1;
+    case 'MainPID': return here ? 1 : 0;
     case 'ActiveSince': return Math.floor(Date.now() / 1000);
     case 'StatusText': return '';
     default: return '';
@@ -94,9 +106,13 @@ function mgrProp(prop) {
     default: return '';
   }
 }
+// a{sv}: a plain object whose values are Variants
 function mkDict(get) {
   const dict = {};
-  for (const k of ['ActiveState', 'SubState', 'LoadState', 'Id', 'MainPID', 'StatusText']) dict[k] = get(k);
+  for (const k of ['ActiveState', 'SubState', 'LoadState', 'Id', 'MainPID', 'StatusText']) {
+    const v = get(k);
+    dict[k] = new Variant(typeof v === 'number' ? 'u' : 's', v);
+  }
   return dict;
 }
 
@@ -139,11 +155,11 @@ function main() {
           return ok('v', [new Variant('s', v)]);
         }
         if (member === 'GetAll') {
-          try { return ok('a{sv}', [new Variant('a{sv}', { Version: '252', State: 'running' })]); }
+          try { return ok('a{sv}', [{ Version: new Variant('s', '252'), State: new Variant('s', 'running') }]); }
           catch (e) { return err('org.freedesktop.DBus.Error.Failed', 'GetAll unsupported'); }
         }
         if (member === 'ListUnits' || member === 'GetUnits' || member === 'ListUnitFiles' || member === 'ListJobs') return ok('a(susoBst)', []);
-        if (member === 'GetUnitFileState') return ok('s', ['enabled']);
+        if (member === 'GetUnitFileState') return ok('s', [present(body[0] || '') ? 'enabled' : 'disabled']);
         console.log('manager no-op', member);
         return ok(''); // unknown manager method -> pretend success
       }
@@ -156,7 +172,7 @@ function main() {
         }
         if (member === 'Set') return ok('');
         if (member === 'GetAll') {
-          try { return ok('a{sv}', [new Variant('a{sv}', mkDict(k => getProp(name, k)))]); }
+          try { return ok('a{sv}', [mkDict(k => getProp(name, k))]); }
           catch (e) { console.error('GetAll variant fail', e); return err('org.freedesktop.DBus.Error.Failed', 'GetAll unsupported'); }
         }
         if (['Start', 'Stop', 'Restart', 'TryRestart', 'Reload', 'TryReload'].includes(member)) {
