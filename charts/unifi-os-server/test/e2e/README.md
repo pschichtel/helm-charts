@@ -72,7 +72,12 @@ Only relevant on unusual hosts (seen in a small VM):
   balance a Service over several endpoints in either iptables or nftables
   mode, and one such rule fails the whole sync, so no Service works
   (webhooks time out, DNS fails). `setup.sh` runs CoreDNS with one replica,
-  which leaves no multi-endpoint Service in the test cluster.
+  which leaves no multi-endpoint Service in the test cluster. That is enough
+  in iptables mode only: nftables mode uses `numgen` for single-endpoint
+  Services too (`numgen random mod 1`), so even the `kubernetes` Service
+  fails and CoreDNS never becomes ready. On such a kernel, create the cluster
+  yourself from a copy of `kind.yaml` with `kubeProxyMode: iptables` before
+  running `setup.sh` (it reuses an existing cluster).
 - **Low `kernel.pid_max`** (e.g. 8192): docker and systemd derive task limits
   from it (15% per level), which left each container with 184 tasks, too few
   for UniFi OS core's 256 libuv threads (`Aborted`, exit 134). Raise
