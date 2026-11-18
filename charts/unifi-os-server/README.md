@@ -30,8 +30,9 @@ it, for maintenance and image upgrades.
   - `ci/` (values for `ct lint`).
 - `test/e2e/` — kind cluster config, operator and data-service setup, chart
   values, the test script, and an optional RabbitMQ TLS overlay.
-- `docs/examples/cnpg/` — manifests for a CloudNativePG cluster that works with
-  the chart (roles, databases, role Secrets, chart values).
+- `docs/examples/umbrella/` — an umbrella chart that installs this chart together
+  with PostgreSQL (CloudNativePG), MongoDB and RabbitMQ, including generated
+  passwords; no scripts needed.
 - `docs/loopback-addresses.md` — why the services have to share a network
   namespace (reverse-engineering results).
 - `ct.yaml` — chart-testing configuration.
@@ -236,7 +237,7 @@ settings:
 
 - CloudNativePG managed-role Secrets have just `username` and `password`;
   host and port can come from the cluster's `-app` Secret (see
-  `docs/examples/cnpg`).
+  `docs/examples/umbrella`).
 - The MongoDB operator's `<resource>-<db>-<user>` Secret has `username`,
   `password` and full connection strings, no hosts or replica set: those are
   plain values. (The connection strings are not used: the app needs two
@@ -409,6 +410,26 @@ ready without restarts, runs `helm test`, and waits for the setup wizard in a
 headless browser. See [test/e2e/README.md](test/e2e/README.md).
 
 Static checks: `ct lint --config charts/unifi-os-server/ct.yaml` and `helm template ... | kubeconform -strict` (Kubernetes 1.26 and current).
+
+## Services
+
+Two Services, so that the web side and the device side can be exposed
+differently (`service.web`, `service.device`; each has `type`, `annotations`,
+`loadBalancerIP`, `loadBalancerSourceRanges`, `externalTrafficPolicy` and
+`ports`):
+
+- `<fullname>` (web): `http` 80 and `https` 443, the UI. The ingress points
+  here. `ClusterIP` by default.
+- `<fullname>-device`: `inform` 8080, `stun` 3478/UDP, `speedtest` 6789 and
+  the optional guest portal ports `portal-http` 8880 and `portal-https` 8843.
+  `ClusterIP` by default; typically a `LoadBalancer` with
+  `externalTrafficPolicy: Local`, so that devices keep their source address.
+  Mixed TCP/UDP on one LoadBalancer needs Kubernetes 1.26.
+
+Both Services can share one IP with the controller's own mechanism (MetalLB
+`metallb.universe.tf/allow-shared-ip`, Cilium `lbipam.cilium.io/sharing-key`
+in `annotations`), but then the web ports are reachable on it as well if the
+web Service is a LoadBalancer too.
 
 ## Known gaps
 

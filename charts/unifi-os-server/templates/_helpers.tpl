@@ -295,3 +295,46 @@ Call with (dict "root" $ "name" "<container>" "script" "<entrypoint>" "values" <
     {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
+
+{{/*
+One Service of the pod. Call with (dict "root" $ "name" <name> "cfg" <values of service.web or service.device>).
+*/}}
+{{- define "unifi-os-server.service" -}}
+{{- $cfg := .cfg -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "unifi-os-server.labels" .root | nindent 4 }}
+  {{- with $cfg.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $cfg.type }}
+  {{- if and (eq $cfg.type "LoadBalancer") $cfg.loadBalancerIP }}
+  loadBalancerIP: {{ $cfg.loadBalancerIP }}
+  {{- end }}
+  {{- with $cfg.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if and $cfg.externalTrafficPolicy (has $cfg.type (list "LoadBalancer" "NodePort")) }}
+  externalTrafficPolicy: {{ $cfg.externalTrafficPolicy }}
+  {{- end }}
+  ports:
+    {{- range $name, $p := $cfg.ports }}
+    {{- if $p.enabled }}
+    - name: {{ $name }}
+      port: {{ $p.port }}
+      targetPort: {{ $name }}
+      protocol: {{ $p.protocol | default "TCP" }}
+      {{- if and $p.nodePort (has $cfg.type (list "LoadBalancer" "NodePort")) }}
+      nodePort: {{ $p.nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
+  selector:
+    {{- include "unifi-os-server.selectorLabels" .root | nindent 4 }}
+{{- end }}

@@ -125,41 +125,51 @@ rabbitmq:
     caKey: ca.crt
     verifyHostname: true
 
+# web (UI, ingress target) and device-facing ports are separate Services
 service:
-  type: ClusterIP
-  annotations: {}
-  loadBalancerIP: ""
-  loadBalancerSourceRanges: []
-  externalTrafficPolicy: ""
-  ports:
-    http:
-      enabled: true
-      port: 80
-      protocol: TCP
-    https:
-      enabled: true
-      port: 443
-      protocol: TCP
-    inform:
-      enabled: true
-      port: 8080
-      protocol: TCP
-    stun:
-      enabled: true
-      port: 3478
-      protocol: UDP
-    speedtest:
-      enabled: true
-      port: 6789
-      protocol: TCP
-    portal-http:
-      enabled: false
-      port: 8880
-      protocol: TCP
-    portal-https:
-      enabled: false
-      port: 8843
-      protocol: TCP
+  web:
+    type: ClusterIP
+    annotations: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    externalTrafficPolicy: ""
+    ports:
+      http:
+        enabled: true
+        port: 80
+        protocol: TCP
+      https:
+        enabled: true
+        port: 443
+        protocol: TCP
+  # named <fullname>-device
+  device:
+    type: ClusterIP
+    annotations: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    externalTrafficPolicy: ""
+    ports:
+      inform:
+        enabled: true
+        port: 8080
+        protocol: TCP
+      stun:
+        enabled: true
+        port: 3478
+        protocol: UDP
+      speedtest:
+        enabled: true
+        port: 6789
+        protocol: TCP
+      portal-http:
+        enabled: false
+        port: 8880
+        protocol: TCP
+      portal-https:
+        enabled: false
+        port: 8843
+        protocol: TCP
 
 ingress:
   enabled: false
@@ -169,10 +179,7 @@ ingress:
   annotations: {}
   servicePort: https
   hosts:
-    - host: unifi.example.com
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+    - unifi.example.com
   tls: []
 
 persistence:
