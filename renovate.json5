@@ -3,8 +3,7 @@
   packageRules: [
     {
       matchManagers: ['!github-actions'],
-      matchUpdateTypes: ['pinDigest'],
-      enabled: false,
+      pinDigests: false,
     },
   ],
   postUpgradeTasks: {
@@ -35,3 +34,4 @@
     },
   ],
 }
+
