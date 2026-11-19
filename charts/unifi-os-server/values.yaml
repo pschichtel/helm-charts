@@ -228,6 +228,9 @@ containers:
   uosDiscoveryClient:
     resources: {}
     extraEnv: []
+  cron:
+    resources: {}
+    extraEnv: []
 
 terminationGracePeriodSeconds: 60
 

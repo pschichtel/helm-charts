@@ -242,6 +242,17 @@ spec:
           {{- end }}
           volumeMounts:
             {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
+
+        # --- cron: the image's scheduled jobs (log rotation, cleanups)
+        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "cron" "script" "/scripts/run-cron.sh" "values" $c.cron) | nindent 8 }}
+          {{- with $c.cron.extraEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
+            {{- include "unifi-os-server.dataMount" (dict "path" "/data/unifi-core" "sub" "unifi-core") | nindent 12 }}
+            {{- include "unifi-os-server.dataMount" (dict "path" "/data/uos" "sub" "uos-agent") | nindent 12 }}
       volumes:
         - name: scripts
           configMap:

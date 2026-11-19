@@ -66,6 +66,7 @@ flowchart LR
             uosa["uos-agent<br/>IPC :11010 / API :11011"]
             disc["uos-discovery-client<br/>:11002"]
         end
+        cron["cron"]
         java["unifi (Java)<br/>Network app<br/>:8081 api, :8080 inform"]
     end
 
@@ -100,6 +101,8 @@ flowchart LR
     dir -->|":11081"| node
     dir -->|":8081"| java
     java -->|":11081"| node
+    cron -->|":11010 alarm cleanup"| uosa
+    cron -->|"uos system prune → :11081"| node
 
     uid -.->|"jsonrpc.sock"| ulp
     ucs -.->|"jsonrpc.sock"| ulp
@@ -401,6 +404,28 @@ What this fixed:
 Core writes its logs to files under `/data/unifi-core/logs` (`system.log`,
 `errors.log`, `ulp.log`, ...), not to the container log; look there first.
 
+## Cron runs as its own container
+
+Nothing starts cron without systemd, so the `cron` container runs the
+image's `cron -f` with the image's jobs (`files/scripts/run-cron.sh`):
+
+- `/etc/cron.hourly/logrotate`: the image's logrotate rules. The one that
+  matters is `/data/unifi-core/logs/nginx-*.log` (nginx's access log on the
+  data volume, otherwise never rotated); its `postrotate` sends `USR1` to the
+  pid in `/run/nginx.pid`, which works through the shared `/run` and process
+  namespace. Core, the Network app and the Go services rotate their own logs
+  or log to stdout.
+- `/etc/cron.d/uos-agent`: hourly `POST :11010/api/v1/alarms/cleanup` to
+  uos-agent.
+- `/etc/cron.d/uos`: weekly `uos system prune`, which deletes downloaded
+  packages older than 7 days from `/data/uos/downloads` and reports that to
+  core. Nothing downloads packages here, so it normally finds nothing.
+- Removed at start: `e2scrub_all` (ext4 scrubbing), `cron.daily/apt-compat`
+  (unattended apt) and `cron.daily/dpkg`, host maintenance that does not apply.
+
+Jobs run in UTC (the container's zone, not the console's). Their output is
+discarded (`MAILTO=""`, no syslog).
+
 ## Go services drop privileges in the entrypoint
 
 Each Go container starts as root only long enough for `as-user.sh` to create
@@ -531,7 +556,7 @@ verified.
   43 or DNS.
 - `console.systemIP` (`system_ip`) is passed to the Network app; its effect on
   the inform address has not been verified with a real device.
-- Image units deliberately not run: cron, snmpd, smartmontools, epmd.
+- Image units deliberately not run: snmpd, smartmontools, epmd.
 - **Reinstalling keeps old state if any volume survives.** The MongoDB
   database (Network app), the PostgreSQL databases (core, ulp-go, ...) and the
   data PVC belong together. A Network database from an earlier installation
