@@ -4658,6 +4658,16 @@ entries:
   mediawiki:
   - apiVersion: v2
     appVersion: 1.46.2
+    created: "2026-11-23T21:17:41.966875302Z"
+    description: A Helm chart for MediaWiki
+    digest: 570c87853df836b425f105740668017f02e2f5fd2633bc45649f13d7267d286c
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.4.2/mediawiki-0.4.2.tgz
+    version: 0.4.2
+  - apiVersion: v2
+    appVersion: 1.46.2
     created: "2026-11-19T22:13:30.049176384Z"
     description: A Helm chart for MediaWiki
     digest: 4dbd7a9cfcf9ac8d7377e889a04975ce546b060e452e75f94c709216874d05e7
@@ -6056,6 +6066,23 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/restic-forget-0.1.0/restic-forget-0.1.0.tgz
     version: 0.1.0
   roundcube:
+  - apiVersion: v2
+    appVersion: 1.7.6
+    created: "2026-11-23T21:17:42.102798918Z"
+    description: Helm Chart for Roundcube
+    digest: f48aa21605057fbe4ccc5f198d1f96fcd9a744df099a15244f6b841932c0fdbd
+    keywords:
+    - roundcube
+    - roundcubemail
+    - webmail
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail-docker
+    - https://github.com/pschichtel/helm-charts
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/roundcube-0.2.3/roundcube-0.2.3.tgz
+    version: 0.2.3
   - apiVersion: v2
     appVersion: 1.7.6
     created: "2026-11-19T22:13:30.431953094Z"
@@ -7595,6 +7622,16 @@ entries:
   wordpress:
   - apiVersion: v2
     appVersion: 7.1.5
+    created: "2026-11-23T21:17:42.25882513Z"
+    description: A Helm chart for WordPress
+    digest: 5c73827cac08c058862effdeb4660cd026ccf3cd18fc3a8d83c394a2ee16d006
+    name: wordpress
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/wordpress-0.11.3/wordpress-0.11.3.tgz
+    version: 0.11.3
+  - apiVersion: v2
+    appVersion: 7.1.5
     created: "2026-11-19T22:13:30.575599232Z"
     description: A Helm chart for WordPress
     digest: f560a13c23173c656d3ca837a05680abb3bad5cd68e94ef16c66fc8167b3a240
@@ -8114,4 +8151,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-19T22:13:30.577087246Z"
+generated: "2026-11-23T21:17:42.259535093Z"
