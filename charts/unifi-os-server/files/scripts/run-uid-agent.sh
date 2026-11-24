@@ -3,6 +3,7 @@
 set -e
 
 source /scripts/lib.sh
+use_shared_timezone
 render_go_props uid-agent uid
 source /usr/lib/uid-agent/scripts/envs.sh
 

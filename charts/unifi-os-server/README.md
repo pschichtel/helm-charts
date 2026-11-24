@@ -388,8 +388,18 @@ What this fixed:
   logged `Failed to change the timezone` and never stored one. With
   `timezone: null` the Network UI crashed ("UniFi is having trouble with this
   direction", `RangeError: Invalid time zone specified: null` in the browser
-  console). Core now sets it from GeoIP at startup (fallback UTC) and on
-  setup.
+  console). Core now sets it on setup, from GeoIP (fallback UTC) if none is
+  stored, and again from its database 8 s after every start. The zone only
+  lands in core's container: `ubnt-systool` deletes `/etc/localtime` and
+  copies the zone file in its place, so a symlink or a mount there would not
+  carry it to the others. The shim's `restart cron`,
+  which `ubnt-systool` runs right after, copies `/etc/localtime` and
+  `/etc/timezone` to `/run/uos-tz/` (shared `/run`), and the other containers'
+  entrypoints link `/etc/localtime` and `/etc/timezone` there
+  (`use_shared_timezone` in `lib.sh`). glibc programs (cron, the Go services)
+  follow a change at once; Java and Node.js read the zone at start, so the
+  Network app follows on its next restart. Until core has set a zone the links
+  dangle and the containers use UTC.
 - **Reboot**: `POST /api/system/reboot` (and `/poweroff`) restart the pod's
   containers. The UniFi OS **UI has no Restart/Power Off/Reset buttons on UOS
   Server, by design**: the console settings hide them when `isUOSServer`
@@ -423,7 +433,7 @@ image's `cron -f` with the image's jobs (`files/scripts/run-cron.sh`):
 - Removed at start: `e2scrub_all` (ext4 scrubbing), `cron.daily/apt-compat`
   (unattended apt) and `cron.daily/dpkg`, host maintenance that does not apply.
 
-Jobs run in UTC (the container's zone, not the console's). Their output is
+Jobs run in the console's time zone (see above). Their output is
 discarded (`MAILTO=""`, no syslog).
 
 ## Go services drop privileges in the entrypoint

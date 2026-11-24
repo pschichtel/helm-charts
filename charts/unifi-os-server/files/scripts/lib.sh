@@ -5,6 +5,15 @@
 
 die() { echo "$*" >&2; exit 64; }
 
+# Core sets the time zone with ubnt-systool in its own container (rm + cp of
+# /etc/localtime, then "systemctl restart cron"); the systemctl shim publishes
+# the result to the shared /run/uos-tz. The other containers link to it. Until
+# core has published a zone the links dangle and the apps use UTC.
+use_shared_timezone() {
+  ln -sfn /run/uos-tz/localtime /etc/localtime
+  ln -sfn /run/uos-tz/timezone /etc/timezone
+}
+
 # The Go apps put the Postgres password into an unquoted libpq key=value DSN
 # ("... password=%s dbname=%s sslmode=disable") and read their config with
 # ${...} property expansion. Characters that break either are rejected here

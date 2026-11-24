@@ -3,6 +3,7 @@
 set -e
 
 source /scripts/lib.sh
+use_shared_timezone
 render_go_props unifi-identity-update ucs-update nodb
 source /usr/lib/unifi-identity-update/scripts/envs.sh
 

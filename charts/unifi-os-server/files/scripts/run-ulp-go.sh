@@ -3,6 +3,7 @@
 set -e
 
 source /scripts/lib.sh
+use_shared_timezone
 render_go_props ulp-go ulp-go
 source /usr/lib/ulp-go/scripts/envs.sh
 export CAPTURE_DIR="${ULP_WS_DIR}/activities_resource"

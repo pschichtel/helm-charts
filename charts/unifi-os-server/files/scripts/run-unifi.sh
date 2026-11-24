@@ -5,6 +5,8 @@
 # does not use Postgres: its Postgres code is only active with
 # unifi.active.db.mode=postgresql|combined, the default is mongo.
 set -e
+source /scripts/lib.sh
+use_shared_timezone
 
 # --- wait for core's IPC API (tolerates core being briefly down)
 for _ in $(seq 1 90); do curl -sf -o /dev/null http://127.0.0.1:11081/api/info && break; sleep 2; done

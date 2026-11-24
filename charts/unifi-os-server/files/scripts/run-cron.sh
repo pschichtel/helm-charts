@@ -8,6 +8,8 @@
 #   /etc/cron.d/uos             weekly "uos system prune": deletes downloaded
 #                               packages older than 7 days in /data/uos/downloads
 set -e
+source /scripts/lib.sh
+use_shared_timezone
 
 # Host maintenance that does not apply to a container: ext4 scrubbing,
 # unattended apt runs, dpkg status backups.

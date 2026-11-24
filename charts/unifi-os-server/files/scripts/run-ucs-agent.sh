@@ -3,6 +3,7 @@
 set -e
 
 source /scripts/lib.sh
+use_shared_timezone
 render_go_props ucs-agent ucs-agent
 source /usr/lib/ucs-agent/scripts/envs.sh
 

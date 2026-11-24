@@ -3,6 +3,7 @@
 set -e
 
 source /scripts/lib.sh
+use_shared_timezone
 render_go_props unifi-directory unifi-directory
 source /usr/lib/unifi-directory/scripts/envs.sh
 
