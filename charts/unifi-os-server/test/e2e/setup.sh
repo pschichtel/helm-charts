@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # Creates a kind cluster with the three operators and the external data
 # services the chart expects (PostgreSQL, MongoDB, RabbitMQ).
-#   charts/unifi-os-server/test/e2e/setup.sh            create everything
-#   POSTGRES_PROVISIONER=db-operator charts/unifi-os-server/test/e2e/setup.sh
-#                                provision the databases and roles with
-#                                db-operator instead of CloudNativePG alone
-# An existing cluster is reused. Use a new cluster (or delete the namespace)
-# to switch the provisioner.
+#   charts/unifi-os-server/test/e2e/setup.sh
+# An existing cluster is reused.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -15,10 +11,7 @@ IMAGE=${IMAGE:-ghcr.io/unihosted/unifi-os-server-docker:5.1.42}
 CNPG_CHART_VERSION=0.29.1          # CloudNativePG operator 1.30.1
 MCK_CHART_VERSION=1.15.0           # mongodb-kubernetes (successor of the community-operator chart)
 RABBITMQ_OPERATOR_VERSION=v2.23.3  # RabbitMQ Cluster Operator
-CERT_MANAGER_VERSION=v1.21.3       # required by the RabbitMQ operator's and db-operator's webhooks
-DB_OPERATOR_CHART_VERSION=3.17.0   # db-operator 2.44.0 (kinda.rocks)
-POSTGRES_PROVISIONER=${POSTGRES_PROVISIONER:-cnpg}   # cnpg | db-operator
-case "$POSTGRES_PROVISIONER" in cnpg|db-operator) ;; *) echo "POSTGRES_PROVISIONER must be cnpg or db-operator" >&2; exit 1;; esac
+CERT_MANAGER_VERSION=v1.21.3       # required by the RabbitMQ operator's webhooks
 
 if ! kind get clusters | grep -qx "$CLUSTER"; then
   kind create cluster --config kind.yaml --wait 180s
@@ -66,26 +59,12 @@ retry_apply() {
 retry_apply -f "https://github.com/rabbitmq/cluster-operator/releases/download/$RABBITMQ_OPERATOR_VERSION/cluster-operator.yml"
 kubectl -n rabbitmq-system rollout status deploy/rabbitmq-cluster-operator --timeout=300s
 
-if [ "$POSTGRES_PROVISIONER" = db-operator ]; then
-  helm repo add db-operator https://db-operator.github.io/charts >/dev/null
-  helm repo update db-operator >/dev/null
-  helm upgrade --install db-operator db-operator/db-operator --version "$DB_OPERATOR_CHART_VERSION" \
-    -n db-operator --create-namespace --wait --timeout 5m
-fi
-
 retry_apply -f data-services.yaml
-retry_apply -f "postgres-$POSTGRES_PROVISIONER.yaml"
+retry_apply -f postgres-cnpg.yaml
 
 echo "waiting for the data services..."
 kubectl -n unifi wait cluster.postgresql.cnpg.io/unifi-pg --for=condition=Ready --timeout=600s
-if [ "$POSTGRES_PROVISIONER" = db-operator ]; then
-  kubectl wait dbinstance.kinda.rocks/unifi-pg --for=jsonpath='{.status.status}'=true --timeout=300s
-  kubectl -n unifi wait database.kinda.rocks --all --for=jsonpath='{.status.status}'=true --timeout=300s
-  kubectl -n unifi get secret unifi-pg-unifi-core
-else
-  kubectl -n unifi wait database.postgresql.cnpg.io --all --for=jsonpath='{.status.applied}'=true --timeout=300s
-  kubectl -n unifi get secret unifi-pg-app
-fi
+kubectl -n unifi get secret unifi-pg-app
 kubectl -n unifi wait mongodbcommunity/unifi-mongo --for=jsonpath='{.status.phase}'=Running --timeout=900s
 kubectl -n unifi wait rabbitmqcluster/unifi-rmq --for=condition=AllReplicasReady --timeout=600s
 kubectl -n unifi get secret unifi-mongo-admin-unifi unifi-rmq-default-user

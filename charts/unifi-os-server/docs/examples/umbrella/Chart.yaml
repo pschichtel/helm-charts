@@ -4,7 +4,7 @@ description: >-
   UniFi OS Server with its PostgreSQL (CloudNativePG), MongoDB (MongoDB
   Community operator) and RabbitMQ (RabbitMQ Cluster Operator) in one release.
 type: application
-version: 0.1.0
+version: 0.2.0
 dependencies:
   - name: unifi-os-server
     version: ">=0.1.0"

@@ -6,6 +6,16 @@ cnpg:
     size: 10Gi
     storageClass: ""
   resources: {}
+  # in: only the UniFi pod, the cluster's own pods and the operator;
+  # out: the cluster's own pods, DNS and the Kubernetes API
+  networkPolicy:
+    enabled: true
+    operatorNamespace: cnpg-system
+    # narrow to the API server's addresses (kubectl get endpointslices -n default)
+    apiServerCIDRs: [0.0.0.0/0]
+    # further rules, e.g. metrics scraping on port 9187 or backups to object storage
+    extraIngress: []
+    extraEgress: []
 
 mongodb:
   members: 1
@@ -44,27 +54,7 @@ unifi-os-server:
   #     haproxy.org/server-ssl: "true"
   #     haproxy.org/server-proto: "h1"
   postgresql:
-    auth:
-      unifiCore:
-        secretName: unifi-pg-app
-        database:
-          key: dbname
-      ulpGo:
-        secretName: unifi-pg-ulp-go
-        host: {name: unifi-pg-app, key: host}
-        port: {name: unifi-pg-app, key: port}
-      uidAgent:
-        secretName: unifi-pg-uid
-        host: {name: unifi-pg-app, key: host}
-        port: {name: unifi-pg-app, key: port}
-      ucsAgent:
-        secretName: unifi-pg-ucs-agent
-        host: {name: unifi-pg-app, key: host}
-        port: {name: unifi-pg-app, key: port}
-      unifiDirectory:
-        secretName: unifi-pg-unifi-directory
-        host: {name: unifi-pg-app, key: host}
-        port: {name: unifi-pg-app, key: port}
+    secretName: unifi-pg-app
   mongodb:
     secretName: unifi-mongo-admin-unifi
     hosts:

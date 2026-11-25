@@ -1,0 +1,70 @@
+{{- if .Values.cnpg.networkPolicy.enabled }}
+{{- $np := .Values.cnpg.networkPolicy }}
+# The server trusts every connection (cluster.yaml), so only the UniFi pod may
+# connect. Also allowed in: the cluster's own pods (replication, join jobs)
+# and the operator, which polls each instance's status on port 8000. Out: the
+# cluster's own pods, DNS and the Kubernetes API (instance manager).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: unifi-pg
+spec:
+  podSelector:
+    matchLabels:
+      cnpg.io/cluster: unifi-pg
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: unifi-os-server
+              app.kubernetes.io/instance: {{ .Release.Name }}
+      ports:
+        - port: 5432
+    - from:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: unifi-pg
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ $np.operatorNamespace }}
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cloudnative-pg
+      ports:
+        - port: 8000
+    {{- with $np.extraIngress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: unifi-pg
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # The API server is not a pod; most CNIs match its endpoint address
+    # (port 6443), some the Service address (443).
+    - to:
+        {{- range $np.apiServerCIDRs }}
+        - ipBlock:
+            cidr: {{ . }}
+        {{- end }}
+      ports:
+        - port: 443
+        - port: 6443
+    {{- with $np.extraEgress }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

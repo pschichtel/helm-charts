@@ -10,8 +10,6 @@ CHART=../..
 
 kubectl config use-context kind-uos-e2e >/dev/null
 VALUES=(-f values.yaml)
-# Same switch as setup.sh: POSTGRES_PROVISIONER=cnpg|db-operator
-[ "${POSTGRES_PROVISIONER:-cnpg}" = cnpg ] || VALUES+=(-f "values-$POSTGRES_PROVISIONER.yaml")
 helm upgrade --install "$REL" "$CHART" -n "$NS" "${VALUES[@]}" --wait --timeout 15m
 
 pod=$(kubectl -n "$NS" get pod -l app.kubernetes.io/instance="$REL" -o jsonpath='{.items[0].metadata.name}')

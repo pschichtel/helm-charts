@@ -1,11 +1,11 @@
 apiVersion: v2
 name: unifi-os-server
 description: >-
-  UniFi OS Server (UniFi OS core, UniFi Network and the UniFi identity
-  services) as one pod with one container per service, using external
-  PostgreSQL, MongoDB and RabbitMQ.
+  UniFi OS Server as one container running the image's systemd, with apps
+  installable from the console, using external PostgreSQL, MongoDB and
+  RabbitMQ.
 type: application
-version: 0.3.2
+version: 0.4.0
 # renovate: image=ghcr.io/unihosted/unifi-os-server-docker
 appVersion: "5.1.42"
 # Mixed TCP/UDP LoadBalancer services (inform + STUN) need Kubernetes 1.26+.

@@ -5,7 +5,7 @@ three operators that must already be running in the cluster:
 
 | Template | Resources | Operator |
 |---|---|---|
-| `templates/postgresql/` | `Cluster` `unifi-pg` (PostgreSQL 14), the four fixed-name roles as `DatabaseRole`s with generated password Secrets, one `Database` per service, one file each | [CloudNativePG](https://cloudnative-pg.io) 1.30+ (`DatabaseRole`) |
+| `templates/postgresql/` | `Cluster` `unifi-pg` (PostgreSQL 14) that trusts every connection | [CloudNativePG](https://cloudnative-pg.io) |
 | `templates/mongodb.yaml` | `MongoDBCommunity` `unifi-mongo`, generated password Secret, the operator's pod service account | MongoDB Community (`mongodb-kubernetes`) |
 | `templates/rabbitmq.yaml` | `RabbitmqCluster` `unifi-rmq` | RabbitMQ Cluster Operator |
 
@@ -28,13 +28,12 @@ published to.
 
 ## Notes
 
-- **Passwords** are generated at install time (`randAlphaNum`, alphanumeric
-  because the Go services put them unquoted into connection strings) and kept
-  on upgrade by looking up the existing Secret. This needs a live cluster:
-  `helm template`, `--dry-run` without server access and GitOps tools that
-  render offline (e.g. Argo CD) generate new ones on every render. In that
-  case create the Secrets `unifi-pg-<role>` and `unifi-mongo-password` (key
-  `password`) yourself and drop them from the templates.
+- **The MongoDB password** is generated at install time (`randAlphaNum`) and
+  kept on upgrade by looking up the existing Secret. This needs a live
+  cluster: `helm template`, `--dry-run` without server access and GitOps
+  tools that render offline (e.g. Argo CD) generate a new one on every
+  render. In that case create the Secret `unifi-mongo-password` (key
+  `password`) yourself and drop it from the templates.
 - **Fixed names** (`unifi-pg`, `unifi-mongo`, `unifi-rmq`): subchart values
   cannot be templated, so the Secret names in `values.yaml` cannot follow the
   release name. Install one stack per namespace.
@@ -42,12 +41,19 @@ published to.
   replica set pods only in the operator's namespace. Set
   `mongodb.createAppdbRbac: false` if the operator runs in the release
   namespace.
-- **PostgreSQL 14**, pinned: `ulp-go` sends SQL that 15+ rejects. The four
-  roles `ulp-go`, `uid`, `ucs-agent`, `unifi-directory` have fixed names because
-  the Go services' schema migrations contain `OWNER TO "<role>"`.
-- **No TLS** to PostgreSQL: the Go services hardcode `sslmode=disable`.
-- `databaseReclaimPolicy: retain`: uninstalling leaves the databases in
-  PostgreSQL (and the Cluster's volumes, per CloudNativePG).
+- **PostgreSQL 14**, pinned: `ulp-go` sends SQL that 15+ rejects.
+- **PostgreSQL trusts every connection** (`pg_hba: host all all all trust`):
+  the UniFi apps connect without a password and create their own roles and
+  databases as `postgres`, as on a stock console.
+- **NetworkPolicy** `unifi-pg` (`templates/postgresql/networkpolicy.yaml`,
+  `cnpg.networkPolicy`) makes that trust safe: only the UniFi pod connects to
+  port 5432; the cluster's own pods talk to each other (replication); the
+  operator reaches the instances' status port 8000. Outgoing traffic is limited
+  to the cluster's own pods, DNS and the Kubernetes API (ports 443 and 6443;
+  narrow `apiServerCIDRs` to the API server's addresses). Set
+  `cnpg.networkPolicy.operatorNamespace` if the operator is not in
+  `cnpg-system`; add metrics scraping or backup targets with `extraIngress`
+  and `extraEgress`. The policy needs a CNI that enforces NetworkPolicy.
 - The pod may start before the databases are ready and restart a few times
   until they are.
 

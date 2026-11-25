@@ -1,44 +1,8 @@
 # Chart values for the end-to-end test: point the chart at the data services
-# from data-services.yaml (namespace "unifi") and their operator-made secrets.
+# from data-services.yaml and postgres-cnpg.yaml (namespace "unifi") and their
+# operator-made secrets.
 postgresql:
-  auth:
-    unifiCore:
-      secretName: unifi-pg-app                 # CloudNativePG: <cluster>-app, has every field
-      database:
-        key: dbname
-    ulpGo:
-      secretName: unifi-pg-ulp-go              # managed role secret: username, password
-      # host and port from the app secret
-      host:
-        name: unifi-pg-app
-        key: host
-      port:
-        name: unifi-pg-app
-        key: port
-    uidAgent:
-      secretName: unifi-pg-uid
-      host:
-        name: unifi-pg-app
-        key: host
-      port:
-        name: unifi-pg-app
-        key: port
-    ucsAgent:
-      secretName: unifi-pg-ucs-agent
-      host:
-        name: unifi-pg-app
-        key: host
-      port:
-        name: unifi-pg-app
-        key: port
-    unifiDirectory:
-      secretName: unifi-pg-unifi-directory
-      host:
-        name: unifi-pg-app
-        key: host
-      port:
-        name: unifi-pg-app
-        key: port
+  secretName: unifi-pg-app              # CloudNativePG: <cluster>-app (host, port)
 mongodb:
   secretName: unifi-mongo-admin-unifi   # MongoDB operator: <resource>-<db>-<user> (username, password)
   hosts:
@@ -48,4 +12,4 @@ mongodb:
 rabbitmq:
   secretName: unifi-rmq-default-user    # RabbitMQ operator: <cluster>-default-user (host, port, username, password)
 persistence:
-  size: 2Gi
+  size: 5Gi

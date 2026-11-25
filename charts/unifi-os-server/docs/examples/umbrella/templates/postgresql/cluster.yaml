@@ -1,7 +1,7 @@
-# PostgreSQL 14, pinned: ulp-go sends SQL that 15+ rejects. unifi-core uses the
-# bootstrap database and the generated Secret unifi-pg-app; the other services
-# use the DatabaseRoles in role-*.yaml, whose names are fixed (their schema
-# migrations contain OWNER TO "<role>").
+# PostgreSQL 14, pinned: ulp-go sends SQL that 15+ rejects. The UniFi apps
+# create their own roles and databases as "postgres" over a password-less
+# connection, so the server trusts every connection (see the chart README).
+# The generated Secret unifi-pg-app provides host and port.
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -20,5 +20,8 @@ spec:
   {{- end }}
   bootstrap:
     initdb:
-      database: unifi-core
-      owner: unifi-core
+      database: app
+      owner: app
+  postgresql:
+    pg_hba:
+      - host all all all trust

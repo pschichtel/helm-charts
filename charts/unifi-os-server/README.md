@@ -1,187 +1,102 @@
-# UniFi OS Server on Kubernetes (Helm chart, no systemd)
+# UniFi OS Server on Kubernetes (Helm chart)
 
-A Helm chart that runs the services of the UniFi OS Server image
-(`ghcr.io/unihosted/unifi-os-server-docker`) as one pod with one container per
-service, without systemd and without a custom image. PostgreSQL, MongoDB and
-RabbitMQ are external; the chart is tested against CloudNativePG (optionally
-with db-operator for databases and roles), the MongoDB Community operator and
-the RabbitMQ Cluster Operator.
+A Helm chart that runs the UniFi OS Server image
+(`ghcr.io/unihosted/unifi-os-server-docker`) the way its upstream Docker
+Compose file does: one container running the image's own systemd and units,
+unchanged. The difference: PostgreSQL, MongoDB and RabbitMQ are external
+instead of inside the container. Apps can be installed and updated from the
+console (InnerSpace, newer UniFi Network versions) and survive restarts. The
+chart is tested against CloudNativePG, the MongoDB Community operator and the
+RabbitMQ Cluster Operator.
+
+The design goal is simple maintenance: everything the image does is left to
+the image; the chart only replaces the three data services and makes systemd
+work in a pod. Security hardening comes later (see "Privileged container").
 
 This directory is the chart and also holds its development material (tests,
 examples, notes); the latter is excluded from the package by `.helmignore`.
 Paths below are relative to this directory; commands are run from the
 repository root.
 
-- End-to-end test: [`test/e2e`](test/e2e) (kind + the three operators).
-
-This README collects how the stack works and the non-obvious findings behind
-it, for maintenance and image upgrades.
-
 ## Layout
 
-- The chart, based on `helm create`:
-  - `templates/`, `values.yaml`.
-  - `files/scripts/` — entrypoints (`run-*.sh`), the shared helpers
-    `lib.sh` (config rendering, Postgres checks) and `as-user.sh` (directory
-    setup and privilege drop), `fake-sd1.js` (fake systemd D-Bus provider
-    for core) and `systemctl.sh` (`systemctl` replacement in core). Shipped as a ConfigMap mounted at `/scripts`.
-  - `files/config/` — static property overrides per Go service and their
-    stdout-only logger configs (see Logging).
-  - `ci/` (values for `ct lint`).
+- `templates/`, `values.yaml` — the chart.
+- `files/boot.sh` — the container's entrypoint (ConfigMap, mounted at
+  `/boot-script`): prepares the stock image for the external data services,
+  then starts systemd. Everything the chart changes in the image is in this
+  one script.
+- `ci/` — values for `ct lint`.
 - `test/e2e/` — kind cluster config, operator and data-service setup, chart
   values, the test script, and an optional RabbitMQ TLS overlay.
-- `docs/examples/umbrella/` — an umbrella chart that installs this chart together
-  with PostgreSQL (CloudNativePG), MongoDB and RabbitMQ, including generated
-  passwords; no scripts needed.
-- `docs/loopback-addresses.md` — why the services have to share a network
-  namespace (reverse-engineering results).
+- `docs/examples/umbrella/` — an umbrella chart that installs this chart
+  together with PostgreSQL (CloudNativePG), MongoDB and RabbitMQ.
 - `ct.yaml` — chart-testing configuration.
 
-## Architecture
+## How the container is set up
 
-Runtime interactions. Solid edges are TCP, dashed edges are unix sockets in
-the pod's shared `/run`. Ports are the loopback ports inside the pod. Basis:
-unifi-core's `default.yaml` and generated nginx upstreams, the apps'
-`config.props`, and live `ss` sampling of a running stack; it is a map of what
-we know calls what, not a packet capture.
+`files/boot.sh` does what the upstream entrypoint (`/root/uos-entrypoint.sh`
+in the image) does, minus its local MongoDB/PostgreSQL handling, then
+`exec /sbin/init`:
 
-```mermaid
-flowchart LR
-    browser(["Browser"])
-    devices(["UniFi devices"])
+1. Console identity: `/data/uos_uuid` and `/usr/lib/{platform,product_name,app_model,version}`
+   (not in the image). The version string must have the upstream layout
+   `UOSSERVER.0000000.<version>.0000000.000000.0000`: the `uos` CLI parses it,
+   and with another layout `uos runnable latest-versions` fails with
+   `Unsupported firmware version string`, so core cannot look up or install
+   apps. The UUID is derived from the release namespace and name unless
+   `console.uuid` is set, so it is stable across upgrades.
+2. Masks the local `rabbitmq-server`, `epmd` and `postgresql@14-main` units.
+   `postgresql.service` stays (a stub that the apps order themselves after).
+3. Replaces `mongodb.service` with a no-op unit (see "Network 10.6 starts a
+   MongoDB unit").
+4. PostgreSQL socket proxy (see "PostgreSQL").
+5. MongoDB and RabbitMQ settings of the Network app (see below).
+6. Creates `/boot/.fwupdate`, so that installed apps are restored at boot
+   (see "Apps").
+7. Masks units that do not work in a container (see "systemd in a pod").
+8. Starts upstream's log forwarder (`/root/uos-logs.cjs`) and systemd.
 
-    subgraph pod["unifi-os-server pod"]
-        subgraph core["unifi-core"]
-            nginx["nginx<br/>:80 :443"]
-            node["core (node)<br/>IPC :11081 / gRPC :11051"]
-        end
-        subgraph apps["Go services"]
-            ulp["ulp-go<br/>:9080 (+ :9443)"]
-            uid["uid-agent<br/>:6080"]
-            ucs["ucs-agent<br/>:9680"]
-            dir["unifi-directory<br/>:13080"]
-            idu["unifi-identity-update<br/>:9081"]
-        end
-        subgraph rust["image agents (Rust)"]
-            uosa["uos-agent<br/>IPC :11010 / API :11011"]
-            disc["uos-discovery-client<br/>:11002"]
-        end
-        cron["cron"]
-        java["unifi (Java)<br/>Network app<br/>:8081 api, :8080 inform"]
-    end
+No unit file of the image is edited; changes are masks, new units and
+drop-ins under `/etc/systemd/system`, written on every start (the container
+file system is new on every start).
 
-    subgraph data["external data services"]
-        pg[("PostgreSQL 14")]
-        mongo[("MongoDB")]
-        rmq[("RabbitMQ")]
-    end
+## External data services
 
-    browser -->|"https :443"| nginx
-    devices -->|":8080 inform"| java
+### PostgreSQL: a socket proxy, and the server must trust the pod
 
-    nginx -->|"users api :9080"| ulp
-    nginx -->|"directory :13080"| dir
-    nginx -->|"uid :6080"| uid
-    nginx -->|"network :8081 / :8080"| java
-    nginx -.->|"uos-http.sock"| node
+Every app that uses PostgreSQL (core, ulp-go, uid-agent, ucs-agent,
+unifi-directory, unifi-identity-update, InnerSpace, ...) connects to the
+local socket `/var/run/postgresql` as a password-less role of its own name,
+and its pre-start hook creates that role and its database as the superuser
+`postgres` (`createuser`, `createdb`, `psql` via `runuser -u postgres`). App
+packages bring these hooks with them; InnerSpace's for example hardcodes
+`PGHOST=/var/run/postgresql PGUSER=unifi-innerspace PGPASSWORD=` in its unit.
 
-    node -->|":11011 API, :11010 IPC"| uosa
-    node -->|":11002"| disc
-    node -->|":9080"| ulp
+Configuring each app for an external server would mean per-app work for
+every app and every upgrade. Instead, `uos-postgresql-proxy.socket` listens
+on `/run/postgresql/.s.PGSQL.5432` and `127.0.0.1:5432`, and
+`uos-postgresql-proxy.service` (systemd's own `systemd-socket-proxyd`)
+forwards both to the external server. The apps then behave exactly as on a
+stock console, including apps installed later.
 
-    ulp -->|":11081"| node
-    ulp -->|":8081"| java
-    uid -->|":11081"| node
-    uid -->|":9080"| ulp
-    ucs -->|":11081"| node
-    ucs -->|":9080"| ulp
-    ucs -->|":9081"| idu
-    idu -->|":9080"| ulp
-    idu -->|":9680"| ucs
-    dir -->|":11081"| node
-    dir -->|":8081"| java
-    java -->|":11081"| node
-    cron -->|":11010 alarm cleanup"| uosa
-    cron -->|"uos system prune → :11081"| node
+The price: **the external server must accept password-less connections from
+the pod for every role, including the superuser `postgres`** (`trust` in
+`pg_hba.conf`), like the stock image's local server. With CloudNativePG:
 
-    uid -.->|"jsonrpc.sock"| ulp
-    ucs -.->|"jsonrpc.sock"| ulp
-    dir -.->|"jsonrpc.sock"| ulp
-    idu -.->|"jsonrpc.sock"| ulp
-
-    core -->|":5432"| pg
-    ulp -->|":5432"| pg
-    uid -->|":5432"| pg
-    ucs -->|":5432"| pg
-    dir -->|":5432"| pg
-    java --> mongo
-    java --> rmq
+```yaml
+spec:
+  postgresql:
+    pg_hba:
+      - host all all all trust
 ```
 
-All containers of the pod start together. Ordering is handled in the
-entrypoints: core waits for PostgreSQL (`pg_isready`), the Network app waits
-for core's API (`/api/info`), and the Go services simply restart until their
-dependencies answer (normally they do not need to).
+Restrict who can reach the server with a NetworkPolicy: the umbrella example
+(`docs/examples/umbrella`, `templates/postgresql/networkpolicy.yaml`) allows
+only the UniFi pod, the cluster's own pods and the operator. Values:
+`postgresql.host` and `postgresql.port` (from a Secret or as plain values;
+CloudNativePG's `<cluster>-app` Secret has both).
 
-Not in the picture on purpose: the other UniFi OS applications (credential
-server `:9580`, Access `:12080`/`:9780`, wireguard `:6082`, Protect `:7080`,
-Drive `:16080`, Talk, Connect, ...). They are **not installed in the image**:
-`dpkg -l` shows only `unifi` (Network), `unifi-core`, `uos`, `uos-agent`,
-`uos-discovery-client`, `ulp-go`, `uid-agent`, `ucs-agent`, `unifi-directory`,
-`unifi-identity-update` and mongodb. There are no packages, binaries or
-systemd units for the others; only leftover system users (`unifi-access`,
-`unifi-protect`, ...) and a stray `unifi-access.service.d` drop-in. The ports
-come from configuration shared with other console types, so those loopback
-ports stay "connection refused", as on any console with only the Network app.
-Core can apparently install applications at runtime
-(`/api/applications/<id>/install`); that has not been tried and would conflict
-with the stock-image rule.
-
-## One pod: the services must share a network namespace
-
-The apps talk to each other over `127.0.0.1:<port>` and assume one network
-stack, as under systemd. A Kubernetes pod gives exactly that: one container
-per service, one network namespace, an `emptyDir` for `/run` (unix sockets:
-`/run/ulp-go/jsonrpc.sock`, the D-Bus socket used by `uos-agent`). An image
-upgrade that adds a port or a new call between services needs no change.
-
-The pod sandbox owns the namespace, so any container can restart without
-affecting the others. (In the earlier Docker Compose version, the namespace
-owner had to be an idle holder container: when the owning container
-restarted, every container joined to it kept a dead namespace.)
-
-### Why not separate pods?
-
-Investigated in depth (source reading of core's JS, disassembly of the Go and
-Rust binaries, decompilation of the Java app, plus live tests); results and
-evidence are in [docs/loopback-addresses.md](docs/loopback-addresses.md).
-Some addresses are configurable, but every component still has at least one
-literal `127.0.0.1` peer or listen address in its code (core binds its IPC and
-gRPC servers to loopback and hardcodes the host in ~25 of ~30 calls).
-Separate pods would need per-port loopback forwarders. A version with `socat`
-forwarders existed (commit "No more network namespace sharing") and was
-dropped: it needed a table of every port and owner, a missing entry only shows
-as "connection refused" on some code path, finding the edges took reverse
-engineering that would have to be redone per upgrade, and plain TCP readiness
-checks become meaningless (the local forwarder always accepts; this is why
-`run-unifi.sh` waits with an HTTP request).
-
-## External data services: what each component needs
-
-Established by reading the code; see the chart README for the user-facing
-summary.
-
-| Component | PostgreSQL | MongoDB | RabbitMQ |
-|---|---|---|---|
-| `unifi-core` | any user (node config `postgres.*`; `pg_dump`/`pg_restore` for backups read `PG*` env) | – | – |
-| `ulp-go` | user **`ulp-go`**, DBs `ulp-go` + `ulp-go-syslog` | – | – |
-| `uid-agent` | user **`uid`**, DB `uid` | – | – |
-| `ucs-agent` | user **`ucs-agent`**, DB `ucs-agent` | – | – |
-| `unifi-directory` | user **`unifi-directory`**, DB `unifi-directory` | – | – |
-| `unifi-identity-update` | – (no Postgres driver in the binary) | – | – |
-| `unifi` (Java) | – (only with `unifi.active.db.mode=postgresql\|combined`; default `mongo`) | `db.mongo.uri`, `statdb.mongo.uri` | `rmq.*` and Spring `spring.rabbitmq.*` |
-
-### PostgreSQL must be version 14
+#### Version 14 only
 
 `ulp-go` (xorm fork) always emits `... c.relname = $1AND s.table_schema = $2 ...`
 (no space after `$1`). PostgreSQL <= 14 accepts that; 15+ rejects it with
@@ -190,317 +105,156 @@ already exist. The stock image bundles PostgreSQL 14. Do not use a newer
 server. (PostgreSQL 14 is end of life from November 2026; there is no fix short
 of patching the binary.)
 
-### PostgreSQL: one fixed-name role per Go service
+### MongoDB
 
-The Go services' schema migrations are plain SQL files in the image
-(`/usr/lib/<app>/migrations/*.up.sql`, `pg_dump` style) containing literal
-`OWNER TO "ulp-go"` (resp. `uid`, `ucs-agent`, `unifi-directory`); there is
-no templating and no setting for it. Counted for 5.1.42 (case-insensitive;
-`ulp-go` and `ucs-agent` write `owner to`): ulp-go 53 in 8 files, uid-agent
-74 in 7, ucs-agent 5 in 4, unifi-directory 14 in 11. To re-check after an
-image upgrade: `grep -ic "owner to" /usr/lib/*/migrations/*.up.sql`. Logging in
-as another user fails on the first migration with `role "ulp-go" does not
-exist` and leaves `schema_migrations` marked dirty (`Dirty database version
-... Fix and force version` on every following start; the database has to be
-recreated or the row fixed by hand). The chart therefore takes the
-credentials per service, and the entrypoint refuses to start a Go service
-whose username does not match (`pg_check_user` in `lib.sh`).
-
-Strictly, PostgreSQL only needs the session user to be a *member* of the role
-named in `OWNER TO`; on PostgreSQL 14 a login role that is a member of a
-`NOLOGIN` role `ulp-go` could create a table and hand it to that role (checked
-with throwaway roles, not with the services). That would allow arbitrary
-login names, but `pg_check_user` would have to be relaxed, and it is untested
-with the real migrations. Each role needs full privileges on
-its database: owning it (CloudNativePG `Database` with `owner`), or `ALL` on
-the database and on schema `public` (what db-operator grants its main user;
-the database itself is then owned by the admin user, which works).
-
-Other PostgreSQL constraints of the Go services, from their DSN template
-`host=%s port=%d user=%s password=%s dbname=%s sslmode=disable`:
-
-- no TLS (`sslmode=disable` is compiled in);
-- the password is inserted unquoted, and their config files are read with
-  `${...}` expansion: passwords with whitespace, quotes, backslashes or `$`
-  are rejected by the entrypoint (`pg_check_password`).
-
-`ulp-go` has a second database (its activity log: tables `systemlog`,
-`event`, `actor`, `target`, `authentication`, `json_systemlog`; created by
-the ORM at start, no `schema_migrations`). The only setting for it is
-`db.systemlog.name` (the sole `db.systemlog.*` string in `ulp-go-app`), so it
-always uses the main connection's host, port, user and password; the chart
-exposes just `postgresql.auth.ulpGo.syslogDatabase`.
-
-The chart's connection values for all three data services
-(`postgresql.auth.<service>`, `mongodb`, `rabbitmq`) take every field
-separately, either from a Secret key (`name` defaults to the section's
-`secretName`) or as a plain `value` (not for passwords; a `password.value`
-fails the install). This fits operators whose Secrets hold only part of the
-settings:
-
-- CloudNativePG managed-role Secrets have just `username` and `password`;
-  host and port can come from the cluster's `-app` Secret (see
-  `docs/examples/umbrella`).
-- The MongoDB operator's `<resource>-<db>-<user>` Secret has `username`,
-  `password` and full connection strings, no hosts or replica set: those are
-  plain values. (The connection strings are not used: the app needs two
-  databases and its own options.)
-- The RabbitMQ Cluster Operator's `<cluster>-default-user` Secret has `host`,
-  `port`, `username` and `password`, the chart's default keys, so
-  `rabbitmq.secretName` alone is enough, also with TLS: the operator then
-  switches the Secret's `port` to 5671 (checked with v2.23.3).
-
-`value` wins over `key`, because Helm merges the defaults (`host.key: host`
-...) with user values. Defaults that are plain values (database names,
-`mongodb.authSource`/`database`/`statDatabase`) live in the template
-(`unifi-os-server.fieldDefaults`) rather than in `values.yaml` for the same
-reason: a user-set `key` would otherwise be shadowed by a default `value`.
-
-The settings reach the Go services through `/etc/<app>/config.props` (on
-each app's `overrides` list), rendered at container start from
-`files/config/<app>.props` plus the database environment variables. The
-stock `pre-start.sh` (`<app> init`) is not run: it only creates roles and
-databases (external now) and chowns directories.
-
-### PostgreSQL with db-operator
-
-[db-operator](https://github.com/db-operator/db-operator) (`kinda.rocks`)
-works with the chart; tested with 2.44.0 (chart 3.17.0) against a CloudNativePG
-server, see `test/e2e/postgres-db-operator.yaml`. Findings:
-
-- db-operator names the database and the user `<namespace>-<Database name>`,
-  which cannot match the fixed role names. It reuses a credentials Secret that
-  already exists (`POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`), so for
-  the four Go services the Secret is created up front with the fixed user
-  name; the password then has to come from whoever creates it.
-  `unifi-core` can use a generated Secret.
-- Its Secrets have `POSTGRES_DB`, `POSTGRES_USER` and `POSTGRES_PASSWORD`
-  but no host or port; `test/e2e/values-db-operator.yaml` maps them and sets
-  host and port as plain values.
-- `ulp-go` needs a second database for the same user: a second `Database`
-  with `spec.existingUser: ulp-go` gives it the main-user privileges without
-  creating or deleting the role. Its name is generated
-  (`<namespace>-ulp-go-syslog`) and read from that Database's Secret via
-  `postgresql.auth.ulpGo.syslogDatabase`.
-- `DbUser` is not used: its access types (`readOnly`, `readWrite`) only grant
-  DML on existing tables, while the Go services run their own schema
-  migrations. It happens to work on PostgreSQL 14 (where `public` is writable
-  by everyone), but the tables would then not be owned by the Database's user.
-- db-operator 2.44 serves `DbInstance` only as `v1beta1`
-  (`adminSecretRef` with capitalised `Namespace`/`Name`, `generic.host/port`);
-  the `v1` API in its main branch is not released yet. The admin Secret is
-  read from the keys `user` (default `postgres`) and `password`, which fits
-  CloudNativePG's `<cluster>-superuser` Secret (`enableSuperuserAccess: true`).
-- Deleting a `Database` drops its database and then tries `DROP USER` (unless
-  `existingUser` is set); the role only survives if it still owns objects
-  elsewhere (db-operator ignores that error). Set `deletionProtected: true`
-  outside of tests.
-
-### MongoDB: roles
+The Network app gets `db.mongo.uri` and `statdb.mongo.uri` in its
+`/var/lib/unifi/system.properties`. **The app keeps its own state in that
+file** (`uuid`, `is_setup_completed`, `ucore.caps`,
+`unifi.ucore.message_box.token`, `unifi.xmx` for the memory limit, ...), so
+`boot.sh` replaces only its own keys (`db.mongo.*`, `statdb.mongo.uri`,
+`rmq.*`, `system_ip`) and keeps the rest. Truncating the file (as an earlier
+version of this chart did) makes the app start as a new installation on
+every start: new identity, "migration to UniFi OS" on every start, and every
+request mapped to a placeholder admin `factory_default`, which breaks
+`PUT /proxy/network/api/self` (500, `Received invalid
+ObjectId[factory_default]`) and the live-update WebSocket.
 
 UniFi Network 10.5 uses `ace`, `ace_stat`, `ace_audit` (new; found through
 `not authorized on ace_audit`) and runs `serverStatus`. The user needs
 `dbOwner` on `ace`, `ace_stat`, `ace_audit` and `ace_restore`, and
 `clusterMonitor` on `admin`. The database names other than `ace`/`ace_stat`
 are built at runtime and do not appear as literals in the jar. Credentials
-are put into the URIs URL-encoded by `run-unifi.sh`.
+are put into the URIs URL-encoded by `files/boot.sh`.
+
+### Network 10.6 starts a MongoDB unit
+
+UniFi Network 10.6 runs `systemctl start unifi-mongodb`, then `mongodb`, then
+`mongod` at startup (`mongoDbInstanceService`) and refuses to start if all
+three fail (`systemctl start mongod failed (exit code 5)`), even with an
+external `db.mongo.uri`. 10.5 does not. The unit stays in "activating" and
+the app never comes up. `boot.sh` therefore replaces `mongodb.service` with
+a no-op oneshot unit instead of masking it; the app then continues with the
+configured external server. (10.6 also contains a MongoDB-to-PostgreSQL
+migrator, `com.ubnt.db.migrator.mongo2pg`; with this setup it stays on
+MongoDB.)
 
 ### RabbitMQ: Spring properties are what count
 
-The Network app has a `ConnectionFactoryCustomizer` that applies `rmq.host`,
-`rmq.port`, `rmq.username`, `rmq.password` from its `system.properties`. With
-only those set, it still connected to `127.0.0.1` (connection refused). The
-broker address took effect through Spring Boot's own `spring.rabbitmq.*`
-properties, which `run-unifi.sh` passes as `SPRING_RABBITMQ_*` environment
-variables (not `-D` flags, to keep the password off the command line). TLS
-uses `spring.rabbitmq.ssl.*` with a trust store built from the CA in a
-Secret. The compose version's client-certificate setup is not needed with the
-RabbitMQ Cluster Operator; whether some feature needs devices to reach the
-broker with client certificates (`unifi.rmq.certificates`) is unknown.
+Only the Network app uses RabbitMQ. It applies `rmq.host`, `rmq.port`,
+`rmq.username`, `rmq.password` from `system.properties`, but the broker
+address only takes effect through Spring Boot's own `spring.rabbitmq.*`
+settings. `boot.sh` writes them as `SPRING_RABBITMQ_*` variables to
+`/etc/uos-chart/unifi.env`, which a drop-in
+(`unifi.service.d/50-chart.conf`) adds to the unit. The same file sets
+`UNIFI_MQ_CERTIFICATES_DIR=` (empty): the stock value
+`/etc/rabbitmq/ssl` is for client-certificate login to the local broker.
+TLS (`rabbitmq.tls`) uses `SPRING_RABBITMQ_SSL_*` with a trust store built
+from the CA in a Secret.
 
-## UniFi OS core
+## Apps: install, update, restore
 
-### nginx must be running before core starts
+Installing an app (InnerSpace) or updating one (UniFi Network) from the
+console runs `uos runnable install`, which downloads the package to
+`/data/uos/downloads` and installs it with dpkg. The image's dpkg hooks
+(`/etc/dpkg/dpkg.cfg.d`) copy every UniFi package to `/persistent/dpkg/<suite>/packages`
+and record the action (`unpack`, `remove`) in `.../actions`
+(`/etc/default/ubnt-dpkg-cache`). On a console, `ubnt-dpkg-restore.service`
+reinstalls them from there after a firmware update, if `/boot/.fwupdate`
+exists. Here the root file system is new on every container start, so
+`boot.sh` creates `/boot/.fwupdate` every time, and `/persistent` is on the
+volume. Restoring is a local `apt-get install` from the cache (about 15 s for
+Network and InnerSpace); it never downgrades: if the image brings a newer
+version than the cache, the cached package is dropped.
 
-Core writes its nginx site configs and immediately runs `sudo nginx -s
-reload`; if that fails (`invalid PID number "" in "/run/nginx.pid"` when nginx
-is not running), the rejection is unhandled and core's `unhandledRejection`
-handler shuts down and calls `process.exit()` (exit code 0, `app.log`:
-`unhandledRejection, shutting down...`). `run-unifi-core.sh` therefore creates
-`/data/unifi-core/logs` (nginx.conf writes `nginx-access.log` there; its
-absence was the only reason `nginx -t` failed on fresh storage) and starts
-nginx synchronously before core. If `unifi-core` shows a restart after a first
-boot, this has regressed.
+Verified: install InnerSpace, update Network 10.5.67 to 10.6.109, uninstall
+and reinstall InnerSpace; after each pod restart the installed set and
+versions are as before. The app's data lives in `/data/<app>` (volume) and
+its PostgreSQL database.
 
-### Thread pool vs. PID limits
+The API behind the console's buttons, for scripting: `POST
+/api/controllers/<name>/install`, `POST /api/controllers/checkUpdates` and
+then `POST /api/controllers/<name>/update` (without a prior check, update
+answers 204 and does nothing), `POST /api/controllers/<name>/uninstall`.
 
-The stock unit sets `UV_THREADPOOL_SIZE=256`. Every libuv thread counts against
-the container's/pod's PID limit; when thread creation fails, node aborts
-before writing any log (`Aborted`, exit 134, no `app.log`). Seen in a test
-cluster with a per-container limit of 184 tasks. The chart keeps 256 by
-default and exposes `containers.unifiCore.uvThreadpoolSize`. Clusters with a
-low `podPidsLimit` need it lower, or a higher limit.
+## Volumes
 
-### Other core notes
+One PVC, mounted in parts (`subPath`): `/data` (`data`), `/var/lib/unifi`
+(`unifi-var-lib`), `/srv` (`srv`) and `/persistent` (`persistent`). Memory
+backed (tmpfs) as in the upstream compose file: `/run`, `/run/lock`, `/tmp`,
+`/var/log/journal`, `/var/opt/unifi/tmp` and `/data/unifi-core/config/http`
+(nginx snippets that core generates at every start).
 
-- The `pre-start` hook runs as `unifi-core` and logs permission errors
-  (`/srv/unifi-core`, `/etc/nginx/nginx.conf`); harmless, the entrypoint does
-  those steps as root.
-- Console identity (`/usr/lib/{platform,product_name,app_model,version}`) is
-  not in the image; the chart mounts it from a ConfigMap. The version string
-  defaults to `UOSSERVER.0000000.<image tag>.0000000.000000.0000`, the format
-  of the upstream entrypoint. The `uos` CLI parses it: with another layout
-  `uos runnable latest-versions` fails with `Unsupported firmware version
-  string`, and core cannot look up or install apps (InnerSpace).
-- The device UUID (`/data/uos_uuid`) is derived from the release namespace and
-  name unless set, so it is stable across upgrades and `helm template`
-  renders.
+## systemd in a pod
 
-## No systemd: `systemctl` shim, restart and reboot
+### Privileged container
 
-Core reads unit states over D-Bus from `fake-sd1.js` (a fake
-`org.freedesktop.systemd1`). It reports the units that exist here (one per
-container, plus nginx and dbus) as active and every other unit like systemd
-reports a missing one (`LoadState` `not-found`, `inactive`); otherwise core
-treats Protect, Connect, Drive, InnerSpace, ... as installed and polls their
-status ports. `GetAll` must answer `a{sv}` with a Variant per value; a single
-Variant around the dictionary fails to marshal and the call never returns.
+systemd needs a writable cgroup tree. The upstream compose file bind-mounts
+the host's `/sys/fs/cgroup` writable with `cgroup: host`; in Kubernetes the
+simple equivalent is `securityContext.privileged: true` (the default here).
+In a user namespace (`hostUsers: false`) that does not work: the writable
+cgroup tree then belongs to the host's root, which is not mapped
+(`Failed to create .../init.scope control group: Permission denied`).
+[KEP-5474](https://www.kubernetes.dev/resources/keps/5474/)
+(`securityContext.cgroupOptions.mountMode: ReadWrite`, alpha in 1.38) is the
+way out: with a private cgroup namespace and a user namespace, runc hands the
+container's cgroup to the container's root (runc's
+`tests/integration/cgroup_delegation.bats`). Once it is available in the
+runtime, `privileged` can be replaced by `hostUsers: false` plus that
+setting.
 
-Core also calls `systemctl` and `ubnt-systool` (which calls `systemctl`) for
-many things; without systemd every such call failed. The `unifi-core` container
-replaces `/bin/systemctl` with `files/scripts/systemctl.sh` (the original
-stays as `/bin/systemctl.real`; `/sbin/reboot`, `poweroff` and `halt` are
-symlinks to it). `/bin` is a real directory in the image and `ubnt-systool`
-sets `PATH=/bin:...` itself, so a shim earlier in `PATH` would not do.
+### Units that do not work here
 
-- `reboot`, `poweroff`, `halt`, and `restart`/`stop`/`kill` of one of the
-  UniFi services (`unifi`, `ulp-go`, ...): restart all containers of the pod
-  with `kill -TERM -1` (3 s delay, so the API call still answers). This needs
-  `shareProcessNamespace: true`. A container whose main process exits is
-  restarted by the kubelet; the pod itself stays. Restarting everything for a
-  single service is deliberate: it is rare, and simpler than tracking each
-  container's processes. `nginx`: `nginx -s reload`.
-- `is-system-running`: `running`; `is-active`/`is-enabled`: `active`/
-  `enabled`; everything else (`enable`, `disable`, `mask`, `daemon-reload`,
-  `restart cron`, transient `systemd-run` units, ...): success, no effect.
+A privileged container sees the node's devices and kernel log. Masked or
+changed by `boot.sh`:
 
-What this fixed:
+- `getty@.service`, `serial-getty@.service`: the getty generator finds the
+  node's consoles (`/dev/hvc0`), and systemd waits 90 s for their devices
+  (no udev in the container) before it starts anything.
+- `/tmp` must be a tmpfs: a disk-backed `emptyDir` is a mount of the node's
+  disk (`/dev/vda`), and `tmp.mount` then waits 90 s for that device.
+- `systemd-sysctl.service`: cannot set kernel parameters.
+- journald `ReadKMsg=no`: the node's kernel log (audit messages of every
+  container) would end up in the journal.
 
-- **Time zone**: `ubnt-systool timezone <tz>` writes `/etc/localtime` and
-  `/etc/timezone`, then runs `systemctl restart cron`; that failed, so core
-  logged `Failed to change the timezone` and never stored one. With
-  `timezone: null` the Network UI crashed ("UniFi is having trouble with this
-  direction", `RangeError: Invalid time zone specified: null` in the browser
-  console). Core now sets it on setup, from GeoIP (fallback UTC) if none is
-  stored, and again from its database 8 s after every start. The zone only
-  lands in core's container: `ubnt-systool` deletes `/etc/localtime` and
-  copies the zone file in its place, so a symlink or a mount there would not
-  carry it to the others. The shim's `restart cron`,
-  which `ubnt-systool` runs right after, copies `/etc/localtime` and
-  `/etc/timezone` to `/run/uos-tz/` (shared `/run`), and the other containers'
-  entrypoints link `/etc/localtime` and `/etc/timezone` there
-  (`use_shared_timezone` in `lib.sh`). glibc programs (cron, the Go services)
-  follow a change at once; Java and Node.js read the zone at start, so the
-  Network app follows on its next restart. Until core has set a zone the links
-  dangle and the containers use UTC.
-- **Reboot**: `POST /api/system/reboot` (and `/poweroff`) restart the pod's
-  containers. The UniFi OS **UI has no Restart/Power Off/Reset buttons on UOS
-  Server, by design**: the console settings hide them when `isUOSServer`
-  (`unifi-portal`, `edit:os-settings:restart && !isCloudConsole &&
-  !isUOSServer`). On a stock install those actions live in the host-side "UOS
-  Server Manager", which injects `window.UOS_SERVER` into the page; it does
-  not exist here (also the cause of the harmless 500 `No connection to UOS
-  Server Manager` from `/api/backup/setup/has-legacy-net` during setup).
-- Core's restarts of the Network app (`systemctl restart unifi`, e.g. after
-  changing "Network Memory Limit"); these restart the whole pod.
+### Stop, restart, reboot
 
-Core writes its logs to files under `/data/unifi-core/logs` (`system.log`,
-`errors.log`, `ulp.log`, ...), not to the container log; look there first.
+The image's `STOPSIGNAL` is `SIGRTMIN+3` (systemd's "halt"), which containerd
+sends on pod deletion: systemd stops all units in order (about 2 s). A reboot
+from the console (`POST /api/system/reboot`) ends systemd; the kubelet
+restarts the container (one container restart, exit code 129), and the
+console is back after about 40 s. Restarts of single services
+(`systemctl restart unifi`, e.g. after changing the Network memory limit) are
+done by systemd itself.
 
-## Cron runs as its own container
+### Time zone
 
-Nothing starts cron without systemd, so the `cron` container runs the
-image's `cron -f` with the image's jobs (`files/scripts/run-cron.sh`):
+Core sets the zone with `ubnt-systool timezone` (`/etc/localtime`,
+`/etc/timezone`, `systemctl restart cron`) on setup and again 8 s after
+every start from its database, so nothing needs to be persisted. Do not set
+`TZ` in the container's environment: it would override the zone chosen in the
+console.
 
-- `/etc/cron.hourly/logrotate`: the image's logrotate rules. The one that
-  matters is `/data/unifi-core/logs/nginx-*.log` (nginx's access log on the
-  data volume, otherwise never rotated); its `postrotate` sends `USR1` to the
-  pid in `/run/nginx.pid`, which works through the shared `/run` and process
-  namespace. Core, the Network app and the Go services rotate their own logs
-  or log to stdout.
-- `/etc/cron.d/uos-agent`: hourly `POST :11010/api/v1/alarms/cleanup` to
-  uos-agent.
-- `/etc/cron.d/uos`: weekly `uos system prune`, which deletes downloaded
-  packages older than 7 days from `/data/uos/downloads` and reports that to
-  core. Nothing downloads packages here, so it normally finds nothing.
-- Removed at start: `e2scrub_all` (ext4 scrubbing), `cron.daily/apt-compat`
-  (unattended apt) and `cron.daily/dpkg`, host maintenance that does not apply.
+## Logging
 
-Jobs run in the console's time zone (see above). Their output is
-discarded (`MAILTO=""`, no syslog).
-
-## Go services drop privileges in the entrypoint
-
-Each Go container starts as root only long enough for `as-user.sh` to create
-and chown its directories, then `exec`s the app via `setpriv` as the app's own
-user, as the container's main process (signals delivered directly). The pod
-shares one process namespace (see "No systemd"), so PID 1 is the pause
-container.
-
-- **Users** (resolved inside the image, uids as of 5.1.42): `ulp-go` 999,
-  `uid` 991, `ucs-agent` 975, `unifi-directory` 979, `ucs-update` 974 for
-  identity-update. `--init-groups` applies supplementary groups from the
-  image's `/etc/group` (`ucs-update` is in `ucs-agent`); a pod-level
-  `runAsUser` would drop those. Re-check with `getent passwd` when upgrading.
-- **Why a root step at all:** the PVC subdirectories, `/run/<app>` and the
-  stock image's root-owned files need preparing. `as-user.sh` only chowns
-  recursively when a listed directory's owner is wrong, so restarts are cheap.
-  **List every directory explicitly, parents first:** `mkdir -p` creates
-  missing parents as root and only listed directories are chowned.
-- Core and the Network app still use `runuser` from their entrypoints, like
-  their systemd units. The pod therefore needs Pod Security level `baseline`.
-- `uid-agent` leaves a root-owned `devnull` file in `/data/uid`: the app runs
-  `systemctl` via sudo (fails, no systemd) with a relative `devnull` redirect.
-  Harmless.
-
-## Logging goes to stdout/stderr
-
-All Go services log to `kubectl logs`. Each needed its own mechanism; none
-has a single "log to stdout" switch:
-
-- `files/config/logger/<app>.yaml` replace the stock logger configs (mounted
-  over `/usr/lib/<app>/configs/logger/prd.yaml` for `ulp-go`, `ucs-agent`,
-  `unifi-identity-update`, and `/usr/lib/uid-agent/logger.yaml`). They set
-  `std: true` and reduce the mandatory `default` file group to level `error`:
-  the logging library always keeps a `default` group that writes one
-  `<prefix>.log` per logger prefix and re-adds it with defaults if absent;
-  levels above `error` are not accepted and silently fall back to `info`.
-  These are trimmed copies; diff them against the image's originals when
-  upgrading.
-- `log.redirect_std_output = false` stops the apps from capturing their own
-  stdout/stderr into `std.log`/`std.err.log`, so panics show up in the
-  container log. `uid-agent` uses `log.std_to_file.enable = false`.
-  `log.metrics.enable = false` stops `ulp-go`'s daily metrics file.
-- `unifi-directory` has no logger YAML (`log.std = true`); its
-  `all.log`/`info.log`/`error.log` are hard-wired.
-- `log.file = false` has **no effect** in any of them. The remaining internal
-  log directories are size-capped in-memory `emptyDir` volumes, so nothing
-  persists or fills the PVC.
-
-The Network app and core still write their own log files to the PVC
-(`/data/unifi/logs`, `/data/unifi-core/logs`).
+Upstream's forwarder (`/root/uos-logs.cjs`) follows the journal of the UniFi
+units (`unifi*`, `uos*`, `ulp*`, `ucs*`, `uid-agent`, `nginx`, `postgresql`,
+`mongodb`) and writes them to the container log as
+`<time> [<service>] <LEVEL>: <message>` (`UOS_LOG_FORMAT=json` for JSON).
+What the apps write only to their own files is not forwarded: core's
+`/data/unifi-core/logs/*.log` and the Network app's
+`/data/unifi/logs/server.log`.
 
 ## Testing
 
-`charts/unifi-os-server/test/e2e/setup.sh` creates a kind cluster with cert-manager, CloudNativePG,
-mongodb-kubernetes and the RabbitMQ Cluster Operator plus the data services
-(PostgreSQL roles and databases from CloudNativePG, or from db-operator with
-`POSTGRES_PROVISIONER=db-operator`);
-`charts/unifi-os-server/test/e2e/run.sh` installs the chart and checks that all containers become
-ready without restarts, runs `helm test`, and waits for the setup wizard in a
-headless browser. See [test/e2e/README.md](test/e2e/README.md).
+`test/e2e/setup.sh` creates a kind cluster with cert-manager, CloudNativePG,
+mongodb-kubernetes and the RabbitMQ Cluster Operator plus the data services;
+`test/e2e/run.sh` installs the chart and checks readiness without restarts,
+runs `helm test`, and waits for the setup wizard in a headless browser. See
+[test/e2e/README.md](test/e2e/README.md) for the manual checks (apps,
+settings, restarts).
 
-Static checks: `ct lint --config charts/unifi-os-server/ct.yaml` and `helm template ... | kubeconform -strict` (Kubernetes 1.26 and current).
+Static checks: `ct lint --config charts/unifi-os-server/ct.yaml` and
+`helm template ... | kubeconform -strict`.
 
 ## Services
 
@@ -559,6 +313,14 @@ recreated. `podHostname` sets a fixed one (`spec.hostname`). Whether the image's
 services use the hostname (for example as the console name) has not been
 verified.
 
+## Upgrading from 0.3 (one container per service)
+
+Not automatic. The volume layout changed (0.3 mounted one subdirectory per
+service under `/data`, now `/data` is one `subPath`), and 0.3 used
+pre-created PostgreSQL roles with passwords and configurable database names,
+whereas the apps now create their own with the stock names. Back up from the
+console and restore into a new installation.
+
 ## Known gaps
 
 - The setup wizard is verified to complete with a local account ("Proceed
@@ -569,17 +331,9 @@ verified.
   43 or DNS.
 - `console.systemIP` (`system_ip`) is passed to the Network app; its effect on
   the inform address has not been verified with a real device.
-- Image units deliberately not run: snmpd, smartmontools, epmd.
-- **Reinstalling keeps old state if any volume survives.** The MongoDB
-  database (Network app), the PostgreSQL databases (core, ulp-go, ...) and the
-  data PVC belong together. A Network database from an earlier installation
-  next to a new core and ulp-go gives a Network app whose live-update
-  WebSocket (`/proxy/network/wss/s/default/events`) closes right after
-  opening, in a loop, and `GET /proxy/network/api/self` returns 500;
-  `server.log` shows `Received invalid ObjectId[factory_default]` and
-  `websocket session error: Cannot invoke "com.ubnt.data.xTAqASU.getId()"`.
-  Wipe all of them together (local hostpath provisioners such as minikube's
-  reuse directories by PVC name, so deleting the PVCs is not enough there).
-- `GET /api/v2/identity/status` returns 404 without a session (the agent's API
-  answers 404 for unauthenticated/unknown paths); a 500 `ECONNREFUSED :11011`
-  would mean `uos-agent` is down.
+- `GET /proxy/network/v2/api/site/default/shadowmode/managed/group` answers
+  400 `api.err.SiteGatewayNotFound` on a site without a UniFi gateway (seen
+  on the e2e setup, which has no devices); behaviour with a gateway is not
+  verified.
+- Core's and the Network app's file logs are not in the container log (see
+  Logging).

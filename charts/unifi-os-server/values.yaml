@@ -20,10 +20,11 @@ podHostname: ""
 podAnnotations: {}
 podLabels: {}
 
-# the containers start as root and drop privileges per service
 podSecurityContext: {}
 
-securityContext: {}
+# systemd in the container needs a writable cgroup tree; see the README
+securityContext:
+  privileged: true
 
 console:
   # derived from the release namespace and name if empty
@@ -39,64 +40,13 @@ console:
     version: ""
 
 postgresql:
+  # PostgreSQL 14 that trusts the pod (no password) for every role; see the README.
   # every field reads `key` from Secret `name` (default: secretName), or takes a plain `value`
-  auth:
-    unifiCore:
-      secretName: ""
-      host:
-        key: host
-      port:
-        key: port
-      username:
-        key: username
-      password:
-        key: password
-      database: {}  # default: unifi-core
-    ulpGo:
-      secretName: ""
-      host:
-        key: host
-      port:
-        key: port
-      username:
-        key: username
-      password:
-        key: password
-      database: {}  # default: ulp-go
-      syslogDatabase: {}  # default: ulp-go-syslog
-    uidAgent:
-      secretName: ""
-      host:
-        key: host
-      port:
-        key: port
-      username:
-        key: username
-      password:
-        key: password
-      database: {}  # default: uid
-    ucsAgent:
-      secretName: ""
-      host:
-        key: host
-      port:
-        key: port
-      username:
-        key: username
-      password:
-        key: password
-      database: {}  # default: ucs-agent
-    unifiDirectory:
-      secretName: ""
-      host:
-        key: host
-      port:
-        key: port
-      username:
-        key: username
-      password:
-        key: password
-      database: {}  # default: unifi-directory
+  secretName: ""
+  host:
+    key: host
+  port:
+    key: port
 
 mongodb:
   secretName: ""
@@ -193,46 +143,30 @@ persistence:
   size: 10Gi
   annotations: {}
 
-logVolumeSizeLimit: 32Mi
+# Container log: the journal of the UniFi units plus these files of the apps,
+# minus lines matching any of the exclude patterns (extended regex); see README
+logs:
+  files:
+    - /data/unifi/logs/server.log
+    - /data/unifi-core/logs/system.log
+    - /data/unifi-core/logs/errors.log
+  exclude:
+    - 'pam_unix\(sudo:session\)'
+    - ' ; USER=[^;]* ; COMMAND='
+    - 'from discovery agent fetch failed'
+    - "Can't find lanIp from network interface"
+
+journalSizeLimit: 256Mi
+tmpSizeLimit: 1Gi
 
 probes:
   enabled: true
 
-containers:
-  unifiCore:
-    uvThreadpoolSize: 256
-    resources: {}
-    extraEnv: []
-  unifi:
-    javaMaxHeap: 512M
-    resources: {}
-    extraEnv: []
-  ulpGo:
-    resources: {}
-    extraEnv: []
-  uidAgent:
-    resources: {}
-    extraEnv: []
-  ucsAgent:
-    resources: {}
-    extraEnv: []
-  unifiDirectory:
-    resources: {}
-    extraEnv: []
-  unifiIdentityUpdate:
-    resources: {}
-    extraEnv: []
-  uosAgent:
-    resources: {}
-    extraEnv: []
-  uosDiscoveryClient:
-    resources: {}
-    extraEnv: []
-  cron:
-    resources: {}
-    extraEnv: []
+resources: {}
 
-terminationGracePeriodSeconds: 60
+extraEnv: []
+
+terminationGracePeriodSeconds: 120
 
 volumes: []
 volumeMounts: []

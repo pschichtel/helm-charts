@@ -1,5 +1,4 @@
 {{- include "unifi-os-server.validate" . }}
-{{- $c := .Values.containers }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,27 +36,41 @@ spec:
       hostname: {{ . }}
       {{- end }}
       # Service links would inject variables such as RABBITMQ_PORT=tcp://...
-      # for services in the namespace, clashing with the entrypoints' settings.
+      # for services in the namespace, clashing with the entrypoint's settings.
       enableServiceLinks: false
-      # One process namespace for all containers: a reboot or service restart
-      # from core signals every process, so all containers restart
-      # (files/scripts/systemctl.sh).
-      shareProcessNamespace: true
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        # --- UniFi OS core (Node.js) + nginx (web UI on 80/443)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "unifi-core" "script" "/scripts/run-unifi-core.sh" "values" $c.unifiCore) | nindent 8 }}
+        - name: unifi-os-server
+          image: {{ include "unifi-os-server.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # systemd needs a writable cgroup tree (see README)
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          command: ["/boot-script/boot.sh"]
           env:
             - name: UOS_UUID
               value: {{ include "unifi-os-server.uuid" . | quote }}
-            - name: UV_THREADPOOL_SIZE
-              value: {{ $c.unifiCore.uvThreadpoolSize | quote }}
-            {{- include "unifi-os-server.postgresEnv" (dict "svc" "unifiCore" "conn" .Values.postgresql.auth.unifiCore "role" "") | nindent 12 }}
-            {{- with $c.unifiCore.extraEnv }}
+            - name: UOS_SYSTEM_IP
+              value: {{ .Values.console.systemIP | quote }}
+            - name: UOS_PLATFORM
+              value: {{ .Values.console.identity.platform | quote }}
+            - name: UOS_PRODUCT_NAME
+              value: {{ .Values.console.identity.productName | quote }}
+            - name: UOS_APP_MODEL
+              value: {{ .Values.console.identity.appModel | quote }}
+            - name: UOS_VERSION
+              value: {{ include "unifi-os-server.firmwareVersion" . | quote }}
+            - name: UOS_LOG_FILES
+              value: {{ join "\n" .Values.logs.files | quote }}
+            - name: UOS_LOG_EXCLUDE
+              value: {{ include "unifi-os-server.logExclude" . | quote }}
+            {{- include "unifi-os-server.postgresEnv" . | nindent 12 }}
+            {{- include "unifi-os-server.networkAppDataEnv" . | nindent 12 }}
+            {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           ports:
@@ -67,42 +80,6 @@ spec:
             - name: https
               containerPort: 443
               protocol: TCP
-          {{- if .Values.probes.enabled }}
-          # core's own API listens on 127.0.0.1 only, hence exec probes
-          startupProbe:
-            exec:
-              command: ["curl", "-sf", "-o", "/dev/null", "http://127.0.0.1:11081/api/info"]
-            periodSeconds: 10
-            failureThreshold: 60
-          livenessProbe:
-            exec:
-              command: ["curl", "-sf", "-o", "/dev/null", "-m", "5", "http://127.0.0.1:11081/api/info"]
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 5
-          readinessProbe:
-            tcpSocket:
-              port: https
-            periodSeconds: 10
-          {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/unifi-core" "sub" "unifi-core") | nindent 12 }}
-
-        # --- UniFi Network application (Java)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "unifi" "script" "/scripts/run-unifi.sh" "values" $c.unifi) | nindent 8 }}
-          env:
-            - name: UOS_UUID
-              value: {{ include "unifi-os-server.uuid" . | quote }}
-            - name: UOS_SYSTEM_IP
-              value: {{ .Values.console.systemIP | quote }}
-            - name: JAVA_MAX_HEAP
-              value: {{ $c.unifi.javaMaxHeap | quote }}
-            {{- include "unifi-os-server.networkAppDataEnv" . | nindent 12 }}
-            {{- with $c.unifi.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          ports:
             - name: inform
               containerPort: 8080
               protocol: TCP
@@ -119,154 +96,64 @@ spec:
               containerPort: 8843
               protocol: TCP
           {{- if .Values.probes.enabled }}
+          # core's API listens on 127.0.0.1 only, hence exec probes. The first
+          # start of a restored app can take minutes (ubnt-dpkg-restore).
           startupProbe:
-            tcpSocket:
-              port: inform
+            exec:
+              command: ["curl", "-sf", "-o", "/dev/null", "http://127.0.0.1:11081/api/info"]
             periodSeconds: 10
-            failureThreshold: 60
+            failureThreshold: 120
           livenessProbe:
-            tcpSocket:
-              port: inform
+            exec:
+              command: ["curl", "-sf", "-o", "/dev/null", "-m", "5", "http://127.0.0.1:11081/api/info"]
             periodSeconds: 30
+            timeoutSeconds: 10
             failureThreshold: 5
           readinessProbe:
-            tcpSocket:
-              port: inform
+            exec:
+              command: ["sh", "-c", "nc -z 127.0.0.1 443 && nc -z 127.0.0.1 8080"]
             periodSeconds: 10
           {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/unifi" "sub" "unifi") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/var/lib/unifi" "sub" "unifi-var-lib") | nindent 12 }}
+            - name: boot-script
+              mountPath: /boot-script
+              readOnly: true
+            # persistent state: one volume, mounted in parts
+            {{- range $path, $sub := dict "/data" "data" "/var/lib/unifi" "unifi-var-lib" "/srv" "srv" "/persistent" "persistent" }}
+            - name: data
+              mountPath: {{ $path }}
+              subPath: {{ $sub }}
+            {{- end }}
+            # tmpfs as in the upstream compose file
+            - name: run
+              mountPath: /run
+            - name: run-lock
+              mountPath: /run/lock
+            - name: tmp
+              mountPath: /tmp
+            - name: journal
+              mountPath: /var/log/journal
+            - name: unifi-tmp
+              mountPath: /var/opt/unifi/tmp
+            - name: core-http
+              mountPath: /data/unifi-core/config/http
             {{- if .Values.rabbitmq.tls.enabled }}
             - name: rabbitmq-ca
               mountPath: /etc/rabbitmq-ca
               readOnly: true
             {{- end }}
-
-        # --- ulp-go: users and permissions (Go)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "ulp-go" "script" "/scripts/run-ulp-go.sh" "values" $c.ulpGo) | nindent 8 }}
-          env:
-            {{- include "unifi-os-server.postgresEnv" (dict "svc" "ulpGo" "conn" .Values.postgresql.auth.ulpGo "role" "ulp-go") | nindent 12 }}
-            {{- include "unifi-os-server.fieldEnv" (dict "env" "DB_SYSLOG_NAME" "path" "postgresql.auth.ulpGo" "conn" .Values.postgresql.auth.ulpGo "field" "syslogDatabase") | nindent 12 }}
-            {{- with $c.ulpGo.extraEnv }}
+            {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          ports:
-            - name: ulp-https
-              containerPort: 9443
-              protocol: TCP
-          {{- if .Values.probes.enabled }}
-          readinessProbe:
-            exec:
-              command: ["nc", "-z", "127.0.0.1", "9080"]
-            periodSeconds: 10
-          {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.goConfigMounts" (dict "app" "ulp-go" "logger" "/usr/lib/ulp-go/configs/logger/prd.yaml") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/ulp-go" "sub" "ulp-go") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/srv/ulp-go" "sub" "ulp-go-srv") | nindent 12 }}
-            - name: log-ulp-go
-              mountPath: /data/ulp-go/log
-
-        # --- uid-agent (Go)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "uid-agent" "script" "/scripts/run-uid-agent.sh" "values" $c.uidAgent) | nindent 8 }}
-          env:
-            {{- include "unifi-os-server.postgresEnv" (dict "svc" "uidAgent" "conn" .Values.postgresql.auth.uidAgent "role" "uid") | nindent 12 }}
-            {{- with $c.uidAgent.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.goConfigMounts" (dict "app" "uid-agent" "logger" "/usr/lib/uid-agent/logger.yaml") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/uid" "sub" "uid-agent") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/srv/uid" "sub" "uid-agent-srv") | nindent 12 }}
-
-        # --- ucs-agent (Go)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "ucs-agent" "script" "/scripts/run-ucs-agent.sh" "values" $c.ucsAgent) | nindent 8 }}
-          env:
-            {{- include "unifi-os-server.postgresEnv" (dict "svc" "ucsAgent" "conn" .Values.postgresql.auth.ucsAgent "role" "ucs-agent") | nindent 12 }}
-            {{- with $c.ucsAgent.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.goConfigMounts" (dict "app" "ucs-agent" "logger" "/usr/lib/ucs-agent/configs/logger/prd.yaml") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/ucs-agent" "sub" "ucs-agent") | nindent 12 }}
-            - name: log-ucs-agent
-              mountPath: /data/ucs-agent/log
-
-        # --- unifi-directory (Go)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "unifi-directory" "script" "/scripts/run-unifi-directory.sh" "values" $c.unifiDirectory) | nindent 8 }}
-          env:
-            {{- include "unifi-os-server.postgresEnv" (dict "svc" "unifiDirectory" "conn" .Values.postgresql.auth.unifiDirectory "role" "unifi-directory") | nindent 12 }}
-            {{- with $c.unifiDirectory.extraEnv }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.goConfigMounts" (dict "app" "unifi-directory" "logger" "") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/unifi-directory" "sub" "unifi-directory") | nindent 12 }}
-            - name: log-unifi-directory
-              mountPath: /data/unifi-directory/log
-
-        # --- unifi-identity-update (Go, no database)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "unifi-identity-update" "script" "/scripts/run-unifi-identity-update.sh" "values" $c.unifiIdentityUpdate) | nindent 8 }}
-          {{- with $c.unifiIdentityUpdate.extraEnv }}
-          env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.goConfigMounts" (dict "app" "unifi-identity-update" "logger" "/usr/lib/unifi-identity-update/configs/logger/prd.yaml") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/unifi-identity-update" "sub" "unifi-identity-update") | nindent 12 }}
-            - name: log-unifi-identity-update
-              mountPath: /var/log/unifi_package-identity-update
-
-        # --- uos-agent (Rust, root like the stock systemd unit)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "uos-agent" "script" "/usr/bin/uos-agent" "values" $c.uosAgent) | nindent 8 }}
-          {{- with $c.uosAgent.extraEnv }}
-          env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/uos" "sub" "uos-agent") | nindent 12 }}
-
-        # --- uos-discovery-client (Rust, root like the stock systemd unit)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "uos-discovery-client" "script" "/usr/bin/uos-discovery-client" "values" $c.uosDiscoveryClient) | nindent 8 }}
-          {{- with $c.uosDiscoveryClient.extraEnv }}
-          env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-
-        # --- cron: the image's scheduled jobs (log rotation, cleanups)
-        {{- include "unifi-os-server.containerBase" (dict "root" . "name" "cron" "script" "/scripts/run-cron.sh" "values" $c.cron) | nindent 8 }}
-          {{- with $c.cron.extraEnv }}
-          env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          volumeMounts:
-            {{- include "unifi-os-server.commonMounts" . | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/unifi-core" "sub" "unifi-core") | nindent 12 }}
-            {{- include "unifi-os-server.dataMount" (dict "path" "/data/uos" "sub" "uos-agent") | nindent 12 }}
       volumes:
-        - name: scripts
+        - name: boot-script
           configMap:
-            name: {{ include "unifi-os-server.fullname" . }}-scripts
+            name: {{ include "unifi-os-server.fullname" . }}-boot
             defaultMode: 0755
-        - name: config
-          configMap:
-            name: {{ include "unifi-os-server.fullname" . }}-config
-        - name: identity
-          configMap:
-            name: {{ include "unifi-os-server.fullname" . }}-identity
-        # shared /run: unix sockets (ulp-go jsonrpc, D-Bus) between the services
-        - name: run
-          emptyDir: {}
         - name: data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
@@ -274,13 +161,28 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-        {{- range list "ulp-go" "ucs-agent" "unifi-directory" "unifi-identity-update" }}
-        # internal per-component log files; real logging goes to stdout
-        - name: log-{{ . }}
+        - name: run
           emptyDir:
             medium: Memory
-            sizeLimit: {{ $.Values.logVolumeSizeLimit }}
-        {{- end }}
+        - name: run-lock
+          emptyDir:
+            medium: Memory
+        # tmpfs: a disk-backed mount would make systemd wait for its block device
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: {{ .Values.tmpSizeLimit }}
+        - name: journal
+          emptyDir:
+            medium: Memory
+            sizeLimit: {{ .Values.journalSizeLimit }}
+        - name: unifi-tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+        - name: core-http
+          emptyDir:
+            medium: Memory
         {{- if .Values.rabbitmq.tls.enabled }}
         - name: rabbitmq-ca
           secret:

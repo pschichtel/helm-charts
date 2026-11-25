@@ -102,11 +102,7 @@ Fail early on missing external service settings.
 {{- define "unifi-os-server.validate" -}}
 {{- $missing := list }}
 {{- $checks := list }}
-{{- range $svc := list "unifiCore" "ulpGo" "uidAgent" "ucsAgent" "unifiDirectory" }}
-{{- $fields := list "host" "port" "username" "password" "database" }}
-{{- if eq $svc "ulpGo" }}{{ $fields = append $fields "syslogDatabase" }}{{ end }}
-{{- $checks = append $checks (dict "path" (printf "postgresql.auth.%s" $svc) "conn" (index $.Values.postgresql.auth $svc | default dict) "fields" $fields) }}
-{{- end }}
+{{- $checks = append $checks (dict "path" "postgresql" "conn" .Values.postgresql "fields" (list "host" "port")) }}
 {{- $checks = append $checks (dict "path" "mongodb" "conn" .Values.mongodb "fields" (list "hosts" "replicaSet" "authSource" "username" "password" "database" "statDatabase")) }}
 {{- $checks = append $checks (dict "path" "rabbitmq" "conn" .Values.rabbitmq "fields" (list "host" "port" "username" "password")) }}
 {{- range $c := $checks }}
@@ -123,7 +119,7 @@ Fail early on missing external service settings.
 
 {{/*
 Connection settings of the external services: every field of
-postgresql.auth.<service>, mongodb and rabbitmq that names a connection
+postgresql, mongodb and rabbitmq that names a connection
 setting is either
   {value: <value>}              a plain value (not for password; a list is
                                 joined with ","), or
@@ -135,12 +131,7 @@ user-set value must override a default key). Fields without either fall back
 to the defaults below; fields listed with "" are optional.
 */}}
 {{- define "unifi-os-server.fieldDefaults" -}}
-postgresql.auth.unifiCore.database: unifi-core
-postgresql.auth.ulpGo.database: ulp-go
-postgresql.auth.ulpGo.syslogDatabase: ulp-go-syslog
-postgresql.auth.uidAgent.database: uid
-postgresql.auth.ucsAgent.database: ucs-agent
-postgresql.auth.unifiDirectory.database: unifi-directory
+postgresql.port: "5432"
 mongodb.replicaSet: ""
 mongodb.authSource: admin
 mongodb.database: ace
@@ -178,20 +169,11 @@ Call with (dict "env" "<VAR>" "path" "<values path>" "conn" <section values> "fi
 {{- end }}
 
 {{/*
-Postgres connection env for one container.
-Call with (dict "svc" "<service>" "conn" <postgresql.auth.x> "role" "<required role or empty>").
+External PostgreSQL server (see files/boot.sh).
 */}}
 {{- define "unifi-os-server.postgresEnv" -}}
-{{- $p := printf "postgresql.auth.%s" .svc }}
-{{- include "unifi-os-server.fieldEnv" (dict "env" "PGHOST" "path" $p "conn" .conn "field" "host") }}
-{{ include "unifi-os-server.fieldEnv" (dict "env" "PGPORT" "path" $p "conn" .conn "field" "port") }}
-{{ include "unifi-os-server.fieldEnv" (dict "env" "PGUSER" "path" $p "conn" .conn "field" "username") }}
-{{ include "unifi-os-server.fieldEnv" (dict "env" "PGPASSWORD" "path" $p "conn" .conn "field" "password") }}
-{{ include "unifi-os-server.fieldEnv" (dict "env" "DB_NAME" "path" $p "conn" .conn "field" "database") }}
-{{- with .role }}
-- name: PG_REQUIRED_USER
-  value: {{ . | quote }}
-{{- end }}
+{{- include "unifi-os-server.fieldEnv" (dict "env" "PG_HOST" "path" "postgresql" "conn" .Values.postgresql "field" "host") }}
+{{ include "unifi-os-server.fieldEnv" (dict "env" "PG_PORT" "path" "postgresql" "conn" .Values.postgresql "field" "port") }}
 {{- end }}
 
 {{/*
@@ -218,82 +200,6 @@ MongoDB and RabbitMQ connection env for the Network application.
 - name: RABBITMQ_TLS_VERIFY_HOSTNAME
   value: {{ $r.tls.verifyHostname | quote }}
 {{- end }}
-{{- end }}
-
-{{/*
-Mounts shared by every container: entrypoint scripts, the shared /run,
-the console identity files and user-supplied volumeMounts.
-*/}}
-{{- define "unifi-os-server.commonMounts" -}}
-- name: scripts
-  mountPath: /scripts
-  readOnly: true
-- name: run
-  mountPath: /run
-- name: identity
-  mountPath: /usr/lib/platform
-  subPath: platform
-  readOnly: true
-- name: identity
-  mountPath: /usr/lib/product_name
-  subPath: product_name
-  readOnly: true
-- name: identity
-  mountPath: /usr/lib/app_model
-  subPath: app_model
-  readOnly: true
-- name: identity
-  mountPath: /usr/lib/version
-  subPath: version
-  readOnly: true
-{{- with .Values.volumeMounts }}
-{{ toYaml . }}
-{{- end }}
-{{- end }}
-
-{{/*
-Data volume mount. Call with (dict "root" $ "path" "/data/x" "sub" "x").
-*/}}
-{{- define "unifi-os-server.dataMount" -}}
-- name: data
-  mountPath: {{ .path }}
-  subPath: {{ .sub }}
-{{- end }}
-
-{{/*
-Static config mount for a Go service: its props file and, if any, logger config.
-Call with (dict "app" "<app>" "logger" "<path in image or empty>").
-*/}}
-{{- define "unifi-os-server.goConfigMounts" -}}
-- name: config
-  mountPath: /config/{{ .app }}.props
-  subPath: {{ .app }}.props
-  readOnly: true
-{{- if .logger }}
-- name: config
-  mountPath: {{ .logger }}
-  subPath: logger-{{ .app }}.yaml
-  readOnly: true
-{{- end }}
-{{- end }}
-
-{{/*
-Container basics shared by every container.
-Call with (dict "root" $ "name" "<container>" "script" "<entrypoint>" "values" <containers.x>).
-*/}}
-{{- define "unifi-os-server.containerBase" -}}
-- name: {{ .name }}
-  image: {{ include "unifi-os-server.image" .root | quote }}
-  imagePullPolicy: {{ .root.Values.image.pullPolicy }}
-  {{- with .root.Values.securityContext }}
-  securityContext:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  command: [{{ .script | quote }}]
-  {{- with .values.resources }}
-  resources:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 {{- end }}
 
 {{/*
@@ -334,4 +240,13 @@ spec:
     {{- end }}
   selector:
     {{- include "unifi-os-server.selectorLabels" .root | nindent 4 }}
+{{- end }}
+
+{{/*
+The log exclude patterns as one extended regular expression.
+*/}}
+{{- define "unifi-os-server.logExclude" -}}
+{{- $parts := list -}}
+{{- range .Values.logs.exclude }}{{ $parts = append $parts (printf "(%s)" .) }}{{ end -}}
+{{- join "|" $parts -}}
 {{- end }}
