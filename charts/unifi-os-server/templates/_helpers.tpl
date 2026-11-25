@@ -86,7 +86,7 @@ between upgrades or `helm template` runs.
 Console firmware version string (/usr/lib/version).
 */}}
 {{- define "unifi-os-server.firmwareVersion" -}}
-{{- .Values.console.identity.version | default (printf "UOSSERVER.0000000.%s.000000.0000.0000" (.Values.image.tag | default .Chart.AppVersion)) }}
+{{- .Values.console.identity.version | default (printf "UOSSERVER.0000000.%s.0000000.000000.0000" (.Values.image.tag | default .Chart.AppVersion)) }}
 {{- end }}
 
 {{/*

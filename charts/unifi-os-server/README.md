@@ -348,7 +348,10 @@ low `podPidsLimit` need it lower, or a higher limit.
   those steps as root.
 - Console identity (`/usr/lib/{platform,product_name,app_model,version}`) is
   not in the image; the chart mounts it from a ConfigMap. The version string
-  defaults to `UOSSERVER.0000000.<image tag>.000000.0000.0000`.
+  defaults to `UOSSERVER.0000000.<image tag>.0000000.000000.0000`, the format
+  of the upstream entrypoint. The `uos` CLI parses it: with another layout
+  `uos runnable latest-versions` fails with `Unsupported firmware version
+  string`, and core cannot look up or install apps (InnerSpace).
 - The device UUID (`/data/uos_uuid`) is derived from the release namespace and
   name unless set, so it is stable across upgrades and `helm template`
   renders.
