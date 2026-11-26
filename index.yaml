@@ -4667,6 +4667,16 @@ entries:
     version: 0.1.0
   mediawiki:
   - apiVersion: v2
+    appVersion: 1.46.3
+    created: "2026-11-26T12:04:04.970038304Z"
+    description: A Helm chart for MediaWiki
+    digest: 9248de176df9f954153c31a572a23be23b4fcd04f606957888cbab8a31906fef
+    name: mediawiki
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/mediawiki-0.4.3/mediawiki-0.4.3.tgz
+    version: 0.4.3
+  - apiVersion: v2
     appVersion: 1.46.2
     created: "2026-11-23T21:17:41.966875302Z"
     description: A Helm chart for MediaWiki
@@ -5338,6 +5348,17 @@ entries:
     - https://github.com/pschichtel/helm-charts/releases/download/photon-0.1.0/photon-0.1.0.tgz
     version: 0.1.0
   powerdns:
+  - apiVersion: v2
+    appVersion: 5.0.10
+    created: "2026-11-26T12:04:05.139847416Z"
+    description: A Helm chart to deploy PowerDNS to Kubernetes
+    digest: bbd3896c1a7b99835b58668e4090301fe18d31d80214b13c92c7b5928625a6cc
+    home: https://www.powerdns.com/
+    name: powerdns
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/powerdns-0.10.2/powerdns-0.10.2.tgz
+    version: 0.10.2
   - apiVersion: v2
     appVersion: 5.0.8
     created: "2026-11-17T00:02:47.584777434Z"
@@ -8212,4 +8233,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-25T18:22:42.711993577Z"
+generated: "2026-11-26T12:04:05.140498266Z"
