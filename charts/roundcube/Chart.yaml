@@ -1,9 +1,9 @@
 apiVersion: v2
 name: roundcube
 description: Helm Chart for Roundcube
-version: 0.2.3
+version: 0.2.4
 # renovate: image=docker.io/roundcube/roundcubemail
-appVersion: "1.7.6"
+appVersion: "1.7.7"
 type: application
 
 sources:
