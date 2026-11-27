@@ -5,6 +5,13 @@
       matchManagers: ['!github-actions'],
       pinDigests: false,
     },
+    {
+      // roundcube only publishes suffixed tags (e.g. 1.7.7-fpm-alpine-nonroot);
+      // the chart appends the suffix itself, so strip it for version comparison.
+      matchDatasources: ['docker'],
+      matchPackageNames: ['docker.io/roundcube/roundcubemail'],
+      extractVersion: '^(?<version>\\d+\\.\\d+\\.\\d+)-fpm-alpine-nonroot$',
+    },
   ],
   postUpgradeTasks: {
     commands: ['bash scripts/bump-chart-versions.sh'],
