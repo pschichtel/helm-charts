@@ -6108,6 +6108,23 @@ entries:
     version: 0.1.0
   roundcube:
   - apiVersion: v2
+    appVersion: 1.7.7
+    created: "2026-11-27T01:08:27.088420783Z"
+    description: Helm Chart for Roundcube
+    digest: 32bf5987f7213f773e865293cd63ec2a8bbd3ca3fc706c5c01b3cad52b23980a
+    keywords:
+    - roundcube
+    - roundcubemail
+    - webmail
+    name: roundcube
+    sources:
+    - https://github.com/roundcube/roundcubemail-docker
+    - https://github.com/pschichtel/helm-charts
+    type: application
+    urls:
+    - https://github.com/pschichtel/helm-charts/releases/download/roundcube-0.2.4/roundcube-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
     appVersion: 1.7.6
     created: "2026-11-23T21:17:42.102798918Z"
     description: Helm Chart for Roundcube
@@ -8262,4 +8279,4 @@ entries:
     urls:
     - https://github.com/pschichtel/helm-charts/releases/download/znc-0.1.0/znc-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-27T01:02:14.735216531Z"
+generated: "2026-11-27T01:08:27.089273311Z"
